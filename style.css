@@ -1,0 +1,19 @@
+body {
+  margin: 0;
+  height: 100svh;
+  width: 100svw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+h1{
+    font-family: sans-serif;
+}
+
+.height100 {
+  display: none;
+}
+canvas {
+  background-color: black;
+}
