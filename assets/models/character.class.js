@@ -6,7 +6,7 @@ class Character extends MovableObject {
   height = 200;
   width = 100;
   speed = 4;
-  camera_speed = 6
+  camera_speed = 6;
   speedY = 5;
   floor;
   world;
@@ -65,6 +65,13 @@ class Character extends MovableObject {
     this.playAnimation(this.idle_images);
     this.initWalkingAnimation(this.walking_images);
     this.initJumpingAnimation(this.jumping_images);
+
+    this.offset = {
+      top: 80, // Schneidet oben (über dem Hut) 100 Pixel ab
+      bottom: 10, // Schneidet unten bei den Füßen 10 Pixel ab
+      left: 20, // Schneidet links 30 Pixel ab
+      right: 30, // Schneidet rechts 30 Pixel ab
+    };
   }
   //states
   initCharacterPhysics() {
@@ -110,7 +117,7 @@ class Character extends MovableObject {
       } else if (this.world.keyboard.LEFT && this.x >= 20) {
         this.characterMovingLeft();
       }
-    }, 1000/60);
+    }, 1000 / 60);
   }
   checkKeyboardJumpingState() {
     setInterval(() => {

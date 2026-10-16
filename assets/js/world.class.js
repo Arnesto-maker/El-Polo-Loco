@@ -217,7 +217,7 @@ class World {
       this.character.y,
       this.character.width,
       this.character.height,
-    );
+    ); 
 
     if (this.character.other_direction) {
       this.character.x = this.character.x * -1;
@@ -276,9 +276,26 @@ class World {
             "assets/img/3_enemies_chicken/chicken_normal/2_dead/dead.png",
           );
           this.character.jump();
+          setTimeout(() => {
+            this.enemies.splice(this.enemies.indexOf(enemy), 1);
+          }, 1000);
         } else {
           console.log("damaged");
         }
+      }
+    });
+
+    this.coins.forEach((coin) => {
+      if (this.character.isColliding(coin)) {
+        console.log("coin colected");
+        this.coins.splice(this.coins.indexOf(coin), 1);
+      }
+    });
+ 
+    this.bottles.forEach((bottle) => {
+      if (this.character.isColliding(bottle)) {
+        console.log("bottle colected");
+        this.bottles.splice(this.bottles.indexOf(bottle), 1);
       }
     });
   }

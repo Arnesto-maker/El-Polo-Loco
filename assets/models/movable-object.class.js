@@ -1,6 +1,12 @@
 class MovableObject {
   x = 120;
   y = 400;
+  offset = {
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  };
   img;
   availableImages = {};
   currentImageIndex = 0;
@@ -64,15 +70,29 @@ class MovableObject {
       this.gravity(speed);
     }, 1000 / 60);
   }
-  isColliding(object) {
+  isColliding(obj) {
     return (
-      this.x + this.width >= object.x &&
-      this.x <= object.x + object.width &&
-      this.y + this.height >= object.y &&
-      this.y <= object.y + object.height
+      this.x + this.width - this.offset.right >= obj.x + obj.offset.left &&
+      this.x + this.offset.left <= obj.x + obj.width - obj.offset.right &&
+      this.y + this.height - this.offset.bottom >= obj.y + obj.offset.top &&
+      this.y + this.offset.top <= obj.y + obj.height - obj.offset.bottom
     );
   }
   isJumpingOn(object) {
     return this.y + this.height < object.y + object.height / 2;
+  }
+
+  drawFrame(ctx) {
+    ctx.beginPath();
+    ctx.lineWidth = "2"; // Liniendicke
+    ctx.strokeStyle = "blue"; // Linienfarbe (wie auf deinem Foto)
+    ctx.rect(
+      this.x + this.offset.left,
+      this.y + this.offset.top,
+      this.width - this.offset.left - this.offset.right,
+      this.height - this.offset.top - this.offset.bottom,
+    );
+    ctx.stroke();
+    ctx.stroke();
   }
 }
