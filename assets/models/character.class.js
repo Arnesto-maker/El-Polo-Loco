@@ -5,6 +5,8 @@ class Character extends MovableObject {
   y = 220;
   height = 200;
   width = 100;
+  health = 100;
+  isDead = false;
   speed = 4;
   camera_speed = 6;
   speedY = 5;
@@ -67,13 +69,26 @@ class Character extends MovableObject {
     this.initJumpingAnimation(this.jumping_images);
 
     this.offset = {
-      top: 80, 
-      bottom: 10, 
-      left: 20, 
-      right: 30, 
+      top: 80,
+      bottom: 10,
+      left: 20,
+      right: 30,
     };
   }
   //states
+  hit() {
+    this.health -= 5;
+    if (this.health < 0) {
+      this.health = 0;
+    }
+  }
+  isdead() {
+    setInterval(() => {
+      if (this.health == 0) {
+        this.isDead = true;
+      }
+    }, 100);
+  }
   initCharacterPhysics() {
     this.checkKeyboardWalkingState();
     this.checkKeyboardJumpingState();
@@ -172,27 +187,3 @@ class Character extends MovableObject {
 }
 
 // note :
-
-// if (this.world.keyboard.RIGHT && this.levelEndPosition()) {
-//   this.moveRight(this.speed, this.walking_images);
-//   this.followCharacterRight();
-//   this.other_direction = false;
-// } else if (this.world.keyboard.LEFT && this.x >= 20) {
-//   this.moveLeft(this.speed);
-//   this.followCharacterleft();
-//   this.other_direction = true;
-// } else if (this.world.keyboard.SPACE && this.y >= this.floor) {
-//   this.jump();
-// }
-// right
-// this.moveRight(this.speed, this.walking_images);
-// this.followCharacterRight();
-// this.other_direction = false;
-// left
-// this.moveLeft(this.speed);
-// this.followCharacterleft();
-// this.other_direction = true;
-// character Physics
-// this.checkKeyboardWalkingState();
-// this.checkKeyboardJumpingState();
-// this.applyGravity(this.speedY);

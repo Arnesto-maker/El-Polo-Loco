@@ -9,10 +9,24 @@ class DrawableObject {
     right: 0,
     bottom: 0,
   };
+  availableImages = {};
+  img
   loadimage(path) {
     this.img = new Image();
     this.img.src = path;
   }
+  createImage(path) {
+    let img = new Image();
+    img.src = path;
+    return img;
+  }
+
+  setAvailableImages(array) {
+    array.forEach((path) => {
+      this.availableImages[path] = this.createImage(path);
+    });
+  }
+
   drawFrame(ctx) {
     ctx.beginPath();
     ctx.lineWidth = "2";

@@ -101,15 +101,15 @@ class World {
       new Bottle(1150),
     ];
 
-    this.health = new HealthStatusBar(this);
     this.character = new Character(this);
+    this.health = new HealthStatusBar(this);
     this.enemies = [
-      // new Chicken(),
-      // new Chicken(),
-      // new Chicken(),
-      // new Chicken(),
-      // new Chicken(),
-      // new Chicken(),
+       new Chicken(),
+       new Chicken(),
+       new Chicken(),
+       new Chicken(),
+       new Chicken(),
+       new Chicken(),
     ];
     this.runColissionCheck();
     this.draw();
@@ -221,7 +221,6 @@ class World {
       this.character.height,
     );
 
-
     if (this.character.other_direction) {
       this.character.x = this.character.x * -1;
       this.ctx.restore();
@@ -264,7 +263,6 @@ class World {
       this.health.height,
     );
 
-
     // render maschine einrichten :
     requestAnimationFrame(() => {
       this.draw();
@@ -292,7 +290,8 @@ class World {
             this.enemies.splice(this.enemies.indexOf(enemy), 1);
           }, 1000);
         } else {
-          console.log("damaged");
+          this.character.hit();
+          this.health.setHealthPrecentage(this.character.health);
         }
       }
     });

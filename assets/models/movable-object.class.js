@@ -79,13 +79,18 @@ class MovableObject {
     );
   }
   isJumpingOn(object) {
-    return this.y + this.height < object.y + object.height / 2;
+    return (
+      this.y + this.height - this.offset.bottom <
+      object.y +
+        object.offset.top +
+        (object.height - object.offset.top - object.offset.bottom) / 2
+    );
   }
 
   drawFrame(ctx) {
     ctx.beginPath();
-    ctx.lineWidth = "2"; 
-    ctx.strokeStyle = "blue"; 
+    ctx.lineWidth = "2";
+    ctx.strokeStyle = "blue";
     ctx.rect(
       this.x + this.offset.left,
       this.y + this.offset.top,
