@@ -67,10 +67,10 @@ class Character extends MovableObject {
     this.initJumpingAnimation(this.jumping_images);
 
     this.offset = {
-      top: 80, // Schneidet oben (über dem Hut) 100 Pixel ab
-      bottom: 10, // Schneidet unten bei den Füßen 10 Pixel ab
-      left: 20, // Schneidet links 30 Pixel ab
-      right: 30, // Schneidet rechts 30 Pixel ab
+      top: 80, 
+      bottom: 10, 
+      left: 20, 
+      right: 30, 
     };
   }
   //states

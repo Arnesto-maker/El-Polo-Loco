@@ -4,6 +4,7 @@ class World {
   backgroundThirdLayer;
   backgroundSecondLayer;
   backgroundFirstLayer;
+  health;
   character;
   enemies;
   coins;
@@ -100,14 +101,15 @@ class World {
       new Bottle(1150),
     ];
 
+    this.health = new HealthStatusBar(this);
     this.character = new Character(this);
     this.enemies = [
-       new Chicken(),
-       new Chicken(),
-       new Chicken(),
-       new Chicken(),
-       new Chicken(),
-       new Chicken(),
+      // new Chicken(),
+      // new Chicken(),
+      // new Chicken(),
+      // new Chicken(),
+      // new Chicken(),
+      // new Chicken(),
     ];
     this.runColissionCheck();
     this.draw();
@@ -217,9 +219,8 @@ class World {
       this.character.y,
       this.character.width,
       this.character.height,
-    ); 
+    );
 
-    this.character.drawFrame(this.character.world.ctx)
 
     if (this.character.other_direction) {
       this.character.x = this.character.x * -1;
@@ -254,6 +255,15 @@ class World {
     // enamies
 
     this.ctx.translate(-this.camera_x, 0);
+
+    this.ctx.drawImage(
+      this.health.img,
+      this.health.x,
+      this.health.y,
+      this.health.width,
+      this.health.height,
+    );
+
 
     // render maschine einrichten :
     requestAnimationFrame(() => {
@@ -293,7 +303,7 @@ class World {
         this.coins.splice(this.coins.indexOf(coin), 1);
       }
     });
- 
+
     this.bottles.forEach((bottle) => {
       if (this.character.isColliding(bottle)) {
         console.log("bottle colected");

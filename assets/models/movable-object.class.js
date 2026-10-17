@@ -84,8 +84,8 @@ class MovableObject {
 
   drawFrame(ctx) {
     ctx.beginPath();
-    ctx.lineWidth = "2"; // Liniendicke
-    ctx.strokeStyle = "blue"; // Linienfarbe (wie auf deinem Foto)
+    ctx.lineWidth = "2"; 
+    ctx.strokeStyle = "blue"; 
     ctx.rect(
       this.x + this.offset.left,
       this.y + this.offset.top,
