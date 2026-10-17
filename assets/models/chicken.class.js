@@ -13,13 +13,21 @@ class Chicken extends MovableObject {
   isDead = false;
   constructor() {
     super();
-    this.x = Math.random() * 500 + 180;
+    this.x = Math.random() * 500 + this.setFaktor()*180;
     this.loadimage(
       "assets/img/3_enemies_chicken/chicken_normal/1_walk/1_w.png",
     );
 
     this.chickenMoving(this.speed);
     this.playEnemyAnimation(this.walking_images,this)
+  }
+  setFaktor(){
+    let randomNumber = Math.random()
+    if (randomNumber < 0.5) {
+      return 1
+    } else{
+      return 5
+    }
   }
   chickenMoving(speed) {
     setInterval(() => {

@@ -102,12 +102,12 @@ class World {
 
     this.character = new Character(this);
     this.enemies = [
-      new Chicken(),
-      new Chicken(),
-      new Chicken(),
-      new Chicken(),
-      new Chicken(),
-      new Chicken(),
+       new Chicken(),
+       new Chicken(),
+       new Chicken(),
+       new Chicken(),
+       new Chicken(),
+       new Chicken(),
     ];
     this.runColissionCheck();
     this.draw();
@@ -218,6 +218,8 @@ class World {
       this.character.width,
       this.character.height,
     ); 
+
+    this.character.drawFrame(this.character.world.ctx)
 
     if (this.character.other_direction) {
       this.character.x = this.character.x * -1;
