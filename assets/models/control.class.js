@@ -2,6 +2,7 @@ class Keyboard {
   LEFT = false;
   RIGHT = false;
   SPACE = false;
+  D = false;
   constructor() {
     this.initKeyboardControl();
   }
@@ -20,6 +21,8 @@ class Keyboard {
       if (event.code == "Space") {
         world.keyboard.SPACE = false;
       }
+      console.log(event);
+      
     });
   }
   keyboardControlKeyDown() {
@@ -33,6 +36,8 @@ class Keyboard {
       if (event.code == "Space") {
         world.keyboard.SPACE = true;
       }
+      console.log(event);
+      
     });
   }
 }

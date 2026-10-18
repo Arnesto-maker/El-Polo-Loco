@@ -10,6 +10,7 @@ class MovableObject {
   img;
   availableImages = {};
   currentImageIndex = 0;
+  floor = 220
   loadimage(path) {
     this.img = new Image();
     this.img.src = path;

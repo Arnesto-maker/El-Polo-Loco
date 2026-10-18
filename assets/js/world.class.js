@@ -9,6 +9,7 @@ class World {
   bottleCounter;
   character;
   enemies;
+  throwable;
   coins;
   bottles;
   ctx;
@@ -107,6 +108,7 @@ class World {
     this.health = new HealthStatusBar(this);
     this.coinCounter = new CoinStatusBar(this);
     this.bottleCounter = new BottleStatusBar(this);
+    this.throwable = new ThrowableObject();
     this.enemies = [
       //  new Chicken(),
       //   new Chicken(),
@@ -261,7 +263,6 @@ class World {
     this.health.draw(this.ctx);
     this.coinCounter.drawGroupWithText(this.ctx, "sancreek", "#FFD700");
     this.bottleCounter.drawGroupWithText(this.ctx, "sancreek", "black");
-
     // render maschine einrichten :
     requestAnimationFrame(() => {
       this.draw();
@@ -297,7 +298,6 @@ class World {
 
     this.coins.forEach((coin) => {
       if (this.character.isColliding(coin)) {
-        console.log("coin colected");
         this.coins.splice(this.coins.indexOf(coin), 1);
         this.character.collectedCoins++;
         this.coinCounter.setCounter(this.character.collectedCoins);
@@ -306,9 +306,8 @@ class World {
 
     this.bottles.forEach((bottle) => {
       if (this.character.isColliding(bottle)) {
-        console.log("bottle colected");
         this.bottles.splice(this.bottles.indexOf(bottle), 1);
-        this.character.collectedBottles ++;
+        this.character.collectedBottles++;
         this.bottleCounter.setCounter(this.character.collectedBottles);
       }
     });

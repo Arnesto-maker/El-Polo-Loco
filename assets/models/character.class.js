@@ -12,7 +12,6 @@ class Character extends MovableObject {
   speed = 4;
   camera_speed = 6;
   speedY = 5;
-  floor;
   world;
   idle_images = [
     "assets/img/2_character_pepe/1_idle/idle/I-1.png",
@@ -62,7 +61,6 @@ class Character extends MovableObject {
   constructor(worldInstance) {
     super();
     this.world = worldInstance;
-    this.floor = 220;
     this.loadimage(this.idle_images[0]);
     this.initCharacterPhysics();
     // animation functions
