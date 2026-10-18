@@ -6,6 +6,8 @@ class Character extends MovableObject {
   height = 200;
   width = 100;
   health = 100;
+  collectedCoins = 0;
+  collectedBottles = 0;
   isDead = false;
   speed = 4;
   camera_speed = 6;

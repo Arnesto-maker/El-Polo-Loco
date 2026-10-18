@@ -1,5 +1,4 @@
 class HealthStatusBar extends DrawableObject {
-  world;
   IMAGES = [
     "assets/img/7_statusbars/1_statusbar/2_statusbar_health/green/0.png",
     "assets/img/7_statusbars/1_statusbar/2_statusbar_health/green/20.png",

@@ -5,6 +5,8 @@ class World {
   backgroundSecondLayer;
   backgroundFirstLayer;
   health;
+  coinCounter;
+  bottleCounter;
   character;
   enemies;
   coins;
@@ -103,13 +105,15 @@ class World {
 
     this.character = new Character(this);
     this.health = new HealthStatusBar(this);
+    this.coinCounter = new CoinStatusBar(this);
+    this.bottleCounter = new BottleStatusBar(this);
     this.enemies = [
-       new Chicken(),
-       new Chicken(),
-       new Chicken(),
-       new Chicken(),
-       new Chicken(),
-       new Chicken(),
+      //  new Chicken(),
+      //   new Chicken(),
+      //   new Chicken(),
+      //   new Chicken(),
+      //   new Chicken(),
+      //   new Chicken(),
     ];
     this.runColissionCheck();
     this.draw();
@@ -254,14 +258,9 @@ class World {
     // enamies
 
     this.ctx.translate(-this.camera_x, 0);
-
-    this.ctx.drawImage(
-      this.health.img,
-      this.health.x,
-      this.health.y,
-      this.health.width,
-      this.health.height,
-    );
+    this.health.draw(this.ctx);
+    this.coinCounter.drawGroupWithText(this.ctx, "sancreek", "#FFD700");
+    this.bottleCounter.drawGroupWithText(this.ctx, "sancreek", "black");
 
     // render maschine einrichten :
     requestAnimationFrame(() => {
@@ -300,6 +299,8 @@ class World {
       if (this.character.isColliding(coin)) {
         console.log("coin colected");
         this.coins.splice(this.coins.indexOf(coin), 1);
+        this.character.collectedCoins++;
+        this.coinCounter.setCounter(this.character.collectedCoins);
       }
     });
 
@@ -307,6 +308,8 @@ class World {
       if (this.character.isColliding(bottle)) {
         console.log("bottle colected");
         this.bottles.splice(this.bottles.indexOf(bottle), 1);
+        this.character.collectedBottles ++;
+        this.bottleCounter.setCounter(this.character.collectedBottles);
       }
     });
   }

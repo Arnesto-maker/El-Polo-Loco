@@ -1,4 +1,5 @@
 class DrawableObject {
+  world;
   x = 0;
   y = 0;
   width = 0;
@@ -10,7 +11,7 @@ class DrawableObject {
     bottom: 0,
   };
   availableImages = {};
-  img
+  img;
   loadimage(path) {
     this.img = new Image();
     this.img.src = path;
@@ -25,6 +26,17 @@ class DrawableObject {
     array.forEach((path) => {
       this.availableImages[path] = this.createImage(path);
     });
+  }
+
+  draw(ctx) {
+    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  }
+
+  drawGroupWithText(ctx, fontFamily, color) {
+    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+    ctx.font = `30px ${fontFamily}`;
+    ctx.fillStyle = `${color}`;
+    ctx.fillText(this.counter, this.x + this.width + 1, this.y + 42);
   }
 
   drawFrame(ctx) {
