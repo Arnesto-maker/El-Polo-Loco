@@ -1,46 +1,46 @@
 # 🐔 El Polo Loco
 
-Ein objektorientiertes 2D-Jump-and-Run-Spiel, entwickelt mit modernem JavaScript (ES6+), HTML5 Canvas und einer eigens konzipierten Loop-Engine.
+An object-oriented 2D Jump-and-Run game built with modern JavaScript (ES6+), HTML5 Canvas, and a custom loop engine.
 
 ---
 
 ## 🚀 Features & Highlights
 
-* **Objektorientierte Architektur:** Saubere Vererbungshierarchie basierend auf einer abstrakten `MovableObject`-Basisklasse für Charaktere, Wolken und Hintergründe.
-* **Performance-optimierte Loop-Engine:** Ein zentraler 60-FPS-Render-Loop (`requestAnimationFrame`), der Logik-Updates (`update()`) und Zeichenprozesse (`draw()`) synchronisiert.
-* **Dynamisches Multi-Frame-Kamerasystem:** Eine flüssige Kamera-Steuerung, die den Charakter über mehrere Level-Frames (Frame 1 & Frame 2) hinweg begleitet und an den Rändern intelligent abriegelt.
-* **Realistische Physik & Sprungsequenzen:** Gravitations- und Sprungberechnung in Abhängigkeit von vertikaler Geschwindigkeit ($\vec{v}_g$), maximaler Sprunghöhe ($y_{max}$) und einer klaren Sequenz-Trennung (Verhinderung des „Jetpack-Effekts“).
-* **Parallax- & Patrouillen-Mechaniken:** Hintergrund- und Wolkenelemente mit automatischen Richtungswechseln ($\vec{v}$ / $-\vec{v}$) über definierte Grenzen.
-* **Responsives 16:9-Layout:** Skaliert sauber auf Basis einer internen Auflösung von 1920x1080 Pixeln.
+* **Object-Oriented Architecture:** Clean inheritance hierarchy based on an abstract `MovableObject` base class for characters, clouds, and backgrounds.
+* **Performance-Optimized Loop Engine:** A centralized 60 FPS render loop (`requestAnimationFrame`) that synchronizes logic updates (`update()`) and drawing processes (`draw()`).
+* **Dynamic Multi-Frame Camera System:** Fluid camera control that tracks the character across multiple level frames (Frame 1 & Frame 2) and intelligently locks at the boundaries.
+* **Realistic Physics & Jump Sequences:** Gravity and jump calculations dependent on vertical velocity ($\vec{v}_g$), maximum jump height ($y_{max}$), and clear sequence separation (preventing the "jetpack effect").
+* **Parallax & Patrol Mechanics:** Background and cloud elements with automatic directional changes ($\vec{v}$ / $-\vec{v}$) across defined boundaries.
+* **Responsive 16:9 Layout:** Scales cleanly based on an internal resolution of 1920x1080 pixels.
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **JavaScript (ES6 Modules):** Klassenbasierte Logik, Event-Listener und Zustandsverwaltung.
-* **HTML5 Canvas API:** Direktes Zeichnen von Sprites und Hintergründen.
-* **CSS3:** Responsives Layout mit modernen Einheiten (`clamp()`, `aspect-ratio`).
+* **JavaScript (ES6 Modules):** Class-based logic, event listeners, and state management.
+* **HTML5 Canvas API:** Direct rendering of sprites and backgrounds.
+* **CSS3:** Responsive layout using modern units (`clamp()`, `aspect-ratio`).
 
 ---
 
-## 🗂️ Projektstruktur
+## 🗂️ Project Structure
 
 ```text
 el-polo-loco/
 │
 ├── js/
 │   ├── models/
-│   │   ├── movable-object.class.js   # Abstrakte Basisklasse für Physik & Bilder
-│   │   ├── character.class.js        # Spieler-Logik, Animationen & Kamera-Control
-│   │   ├── cloud.class.js            # Wolken-Objekte mit Patrouillen-Logik
-│   │   └── background.class.js       # Hintergrund-Layer für Frame 1 & 2
+│   │   ├── movable-object.class.js   # Abstract base class for physics & images
+│   │   ├── character.class.js        # Player logic, animations & camera control
+│   │   ├── cloud.class.js            # Cloud objects with patrol logic
+│   │   └── background.class.js       # Background layers for Frame 1 & 2
 │   ├── levels/
-│   │   └── background-package.js     # Initialisierung der Level-Komponenten
-│   ├── models/controller.class.js    # Tastatur-Steuerung (WASD & Space)
-│   └── models/loop-engine.class.js   # Zentrale Spielschleife (Render & Update)
+│   │   └── background-package.js     # Initialization of level components
+│   ├── models/controller.class.js    # Keyboard controls (WASD & Space)
+│   └── models/loop-engine.class.js   # Central game loop (render & update)
 │
 ├── assets/
-│   └── img/                          # Grafiken, Hintergründe & Sprites
+│   └── img/                          # Graphics, backgrounds & sprites
 │
-├── index.html                        # Haupt-HTML mit Canvas-Container
-└── style.css                         # Layout & Skalierungs-Styles
+├── index.html                        # Main HTML with canvas container
+└── style.css                         # Layout & scaling styles
