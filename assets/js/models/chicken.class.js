@@ -14,6 +14,7 @@ class Chicken extends MovableObject {
     this.setMainparameter(minX, maxX);
     this.setPatrolRange();
   }
+
   setMainparameter(minX, maxX) {
     this.img = this.imageCache[this.IMAGE_0];
     this.width = this.canvasWidth * 0.06;
@@ -27,16 +28,19 @@ class Chicken extends MovableObject {
       this.direction = 1;
     }
   }
+
   setPatrolRange() {
     this.xMax = 0.25 * this.canvasWidth;
     this.minPatrolX = this.x - this.xMax;
     this.maxPatrolX = this.x + this.xMax;
   }
+
   loadAllImages() {
     this.loadImages([this.IMAGE_0]);
      this.loadImages(this.IMAGES_WALK);
     this.loadImages(this.IMAGES_DEAD);
   }
+
   updateMovement() {
     this.x += this.v * this.direction;
     if (this.x >= this.maxPatrolX) {
@@ -52,6 +56,7 @@ class Chicken extends MovableObject {
       this.otherDirection = false;
     }
   }
+  
   update() {
     this.updateMovement();
     this.playAnimation(this.IMAGES_WALK);
