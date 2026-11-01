@@ -1,18 +1,18 @@
 class World {
   constructor(canvas) {
     this.bgPackage = new BackgroundPackage(canvas).getBgPackage();
-    //this.enemies = [new Enemy(), new Enemy(), new Enemy()];
+    this.enemies = [new Chicken(canvas), new Chicken(canvas), new Chicken(canvas)];
     this.character = new Character(canvas);
   }
 
   getFramePackages() {
     let componentsFrames = [];
     this.bgPackage.forEach((item) => {
-      componentsFrames .push(item);
+      componentsFrames.push(item);
     });
-    //this.enemies.forEach(enemy => {
-    //package.push(enemy);
-    //});
+    this.enemies.forEach((enemy) => {
+      componentsFrames.push(enemy);
+    });
     componentsFrames.push(this.character);
     return componentsFrames;
   }
