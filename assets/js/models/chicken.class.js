@@ -37,7 +37,7 @@ class Chicken extends MovableObject {
 
   loadAllImages() {
     this.loadImages([this.IMAGE_0]);
-     this.loadImages(this.IMAGES_WALK);
+    this.loadImages(this.IMAGES_WALK);
     this.loadImages(this.IMAGES_DEAD);
   }
 
@@ -50,6 +50,10 @@ class Chicken extends MovableObject {
       this.x = this.minPatrolX;
       this.direction = 1;
     }
+    this.registerDirectionChange()
+  }
+
+  registerDirectionChange() {
     if (this.direction === 1) {
       this.otherDirection = true;
     } else {
