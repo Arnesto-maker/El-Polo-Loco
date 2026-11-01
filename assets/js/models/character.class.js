@@ -52,6 +52,10 @@ class Character extends MovableObject {
   constructor(canvas) {
     super(canvas);
     this.loadAllImages();
+    this.setMainParameter();
+  }
+
+  setMainParameter() {
     this.img = this.imageCache[this.IMAGE_0];
     this.width = this.canvasWidth * 0.14;
     this.height = this.canvasHeight * 0.37;
