@@ -8,7 +8,6 @@ class MovableObject {
   gravity = 0.8;
   yMax = 0;
   floor = 0;
-  groundY = 0;
   img = new Image();
   otherDirection = false;
   imageCache = {};
