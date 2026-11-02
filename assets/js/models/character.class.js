@@ -48,7 +48,7 @@ class Character extends MovableObject {
     "assets/img/2_character_pepe/2_walk/W-25.png",
     "assets/img/2_character_pepe/2_walk/W-26.png",
   ];
-
+  
   constructor(canvas) {
     super(canvas);
     this.loadAllImages();
@@ -146,7 +146,7 @@ class Character extends MovableObject {
   jump(controller) {
     if (controller.space && !this.isJumping) {
       this.isJumping = true;
-      this.vg = -20;
+      this.vg = -25;
       this.imageCounter = 0;
     }
     if (this.isJumping) {
