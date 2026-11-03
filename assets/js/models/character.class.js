@@ -48,7 +48,7 @@ class Character extends MovableObject {
     "assets/img/2_character_pepe/2_walk/W-25.png",
     "assets/img/2_character_pepe/2_walk/W-26.png",
   ];
-  
+
   constructor(canvas) {
     super(canvas);
     this.loadAllImages();
@@ -111,16 +111,24 @@ class Character extends MovableObject {
       this.img = this.imageCache[this.IMAGE_0];
       this.resetAnimationFrame();
     } else if (this.idleTimer < 360) {
-      if (this.idleTimer === 120) {
-        this.resetAnimationFrame();
-      }
-      this.playAnimation(this.IMAGES_IDLE);
+      this.startIdleAnimation();
     } else {
-      if (this.idleTimer === 360) {
-        this.resetAnimationFrame();
-      }
-      this.playAnimation(this.IMAGES_LONG_IDLE);
+      this.startLongidleAnimation();
     }
+  }
+
+  startIdleAnimation() {
+    if (this.idleTimer === 120) {
+      this.resetAnimationFrame();
+    }
+    this.playAnimation(this.IMAGES_IDLE);
+  }
+
+  startLongidleAnimation() {
+    if (this.idleTimer === 360) {
+      this.resetAnimationFrame();
+    }
+    this.playAnimation(this.IMAGES_LONG_IDLE);
   }
 
   resetAnimationFrame() {
