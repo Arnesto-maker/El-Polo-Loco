@@ -7,7 +7,6 @@ class World {
     this.character = new Character(canvas);
     this.spawnBottlesForFrame(0, canvas);
     this.spawnBottlesForFrame(1, canvas);
-
     this.spawnEnemies(8, canvas);
     this.spawnCoinsForFrame(0, canvas);
     this.spawnCoinsForFrame(1, canvas);
