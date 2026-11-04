@@ -3,6 +3,7 @@ class GameEngine {
     this.ctx = canvasElement.getContext("2d");
     this.controller = inputController;
     this.frameObjects = gameFrames;
+    this.statusBar = new StatusBar(canvasElement)
     this.renderLoop();
   }
   renderLoop() {
@@ -13,6 +14,7 @@ class GameEngine {
     this.ctx.translate(char.cameraX, 0);
     this.drawFrame();
     this.ctx.translate(-char.cameraX, 0);
+    this.statusBar.draw(this.ctx);
     requestAnimationFrame(() => this.renderLoop());
   }
   updateLogic() {
