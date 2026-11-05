@@ -5,7 +5,8 @@ class Chicken extends MovableObject {
     "assets/img/3_enemies_chicken/chicken_normal/1_walk/2_w.png",
     "assets/img/3_enemies_chicken/chicken_normal/1_walk/3_w.png",
   ];
-  IMAGES_DEAD = ["assets/img/3_enemies_chicken/chicken_normal/2_dead/dead.png"];
+  IMAGE_DEAD = ["assets/img/3_enemies_chicken/chicken_normal/2_dead/dead.png"];
+  isDead = false;
   V = 0;
   diection = 1;
   constructor(canvas, minX, maxX) {
@@ -38,7 +39,7 @@ class Chicken extends MovableObject {
   loadAllImages() {
     this.loadImages([this.IMAGE_0]);
     this.loadImages(this.IMAGES_WALK);
-    this.loadImages(this.IMAGES_DEAD);
+    this.loadImages(this.IMAGE_DEAD);
   }
 
   updateMovement() {
@@ -50,7 +51,7 @@ class Chicken extends MovableObject {
       this.x = this.minPatrolX;
       this.direction = 1;
     }
-    this.registerDirectionChange()
+    this.registerDirectionChange();
   }
 
   registerDirectionChange() {
@@ -60,9 +61,17 @@ class Chicken extends MovableObject {
       this.otherDirection = false;
     }
   }
-  
+
+  die() {
+    this.isDead = true;
+    this.v = 0;
+    this.img = this.imageCache[this.IMAGE_DEAD];
+  }
+
   update() {
-    this.updateMovement();
-    this.playAnimation(this.IMAGES_WALK);
+    if (!this.isDead) {
+      this.updateMovement();
+      this.playAnimation(this.IMAGES_WALK);
+    }
   }
 }

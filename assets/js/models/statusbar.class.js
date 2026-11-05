@@ -76,7 +76,6 @@ class StatusBar extends DrawableObject {
     ctx.font = ` ${fontSize}px PolloFont`;
     ctx.fillStyle = "#000000";
     ctx.strokeStyle = "#000000";
-    ctx.lineWidth = 3;
     ctx.textBaseline = "middle";
   }
 

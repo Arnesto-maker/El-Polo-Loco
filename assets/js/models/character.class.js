@@ -48,6 +48,7 @@ class Character extends MovableObject {
     "assets/img/2_character_pepe/2_walk/W-25.png",
     "assets/img/2_character_pepe/2_walk/W-26.png",
   ];
+  health = 100;
 
   constructor(canvas) {
     super(canvas);
@@ -131,6 +132,11 @@ class Character extends MovableObject {
     this.playAnimation(this.IMAGES_LONG_IDLE);
   }
 
+  startJumpingAnimation(){
+    this.resetAnimationFrame()
+    this.playAnimation(this.IMAGES_JUMP)
+  }
+
   resetAnimationFrame() {
     this.imageCounter = 0;
     this.frameTick = 0;
@@ -169,4 +175,28 @@ class Character extends MovableObject {
       this.isJumping = false;
     }
   }
+
+  isStomping(enemy) {
+    if (!this.isColliding(enemy || enemy.isDead) ) {
+        return false;
+    }
+    const isFallingDown = this.isAboveGround() && this.vg > 0;
+    const charBottom = this.y + this.height - this.offset.bottom;
+    const enemyCenterY = enemy.y + enemy.height * 0.6;
+    if (isFallingDown && charBottom <= enemyCenterY) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  hit() {
+    this.health -= 0.5;
+    if (this.health < 0) {
+      this.health = 0;
+    }
+  }
+  bounce() {
+    this.vg = 15; 
+}
 }

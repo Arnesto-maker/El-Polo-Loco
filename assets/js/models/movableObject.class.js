@@ -13,6 +13,12 @@ class MovableObject {
   imageCache = {};
   imageCounter = 0;
   frameTick = 0;
+  offset = {
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  };
   constructor(canvas) {
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
@@ -42,6 +48,35 @@ class MovableObject {
     }
   }
 
+  checkRightEdgeHitsLeft(obj) {
+    return this.x + this.width - this.offset.right >= obj.x + obj.offset.left;
+  }
+
+  checkLeftEdgeHitsRight(obj) {
+    return this.x + this.offset.left <= obj.x + obj.width - obj.offset.right;
+  }
+
+  checkBottomEdgeHitsTop(obj) {
+    return this.y + this.height - this.offset.bottom >= obj.y + obj.offset.top;
+  }
+
+  checkTopEdgeHitsBottom(obj) {
+    return this.y + this.offset.top <= obj.y + obj.height - obj.offset.bottom;
+  }
+
+  isColliding(obj) {
+    if (
+      this.checkRightEdgeHitsLeft(obj) &&
+      this.checkLeftEdgeHitsRight(obj) &&
+      this.checkBottomEdgeHitsTop(obj) &&
+      this.checkTopEdgeHitsBottom(obj)
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   loadImage(path) {
     this.img.src = path;
   }
@@ -65,7 +100,7 @@ class MovableObject {
   }
 
   draw(ctx) {
-    if (this.img.complete && this.otherDirection) {
+    if (this.img && this.otherDirection) {
       this.setMirrorEffect(ctx);
     } else {
       ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
