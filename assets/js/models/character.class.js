@@ -54,12 +54,14 @@ class Character extends MovableObject {
     super(canvas);
     this.loadAllImages();
     this.setMainParameter();
+    console.log(this.y);
+    
   }
 
   setMainParameter() {
     this.img = this.imageCache[this.IMAGE_0];
     this.width = this.canvasWidth * 0.14;
-    this.height = this.canvasHeight * 0.37;
+    this.height = this.canvasHeight * 0.36;
     this.x = this.canvasWidth * 0.08;
     this.y = this.canvasHeight - this.height - this.floor;
     this.yMax = this.y - this.canvasHeight * 0.5;
@@ -176,6 +178,16 @@ class Character extends MovableObject {
     if (this.isJumping) {
       this.setJumpingSequenz();
     }
+    
+  }
+
+  initGeneralJumpAction() {
+    this.isJumping = true;
+    this.vg = -20;
+    this.imageCounter = 0;
+    if (this.isJumping) {
+      this.setJumpingSequenz(); 
+    }
   }
 
   setJumpingSequenz() {
@@ -183,6 +195,7 @@ class Character extends MovableObject {
     const groundLine = this.canvasHeight - this.height - this.floor;
     if (this.y >= groundLine) {
       this.isJumping = false;
+      this.y = groundLine
     }
   }
 

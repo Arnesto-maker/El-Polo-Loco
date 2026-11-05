@@ -44,7 +44,7 @@ class GameEngine {
   }
 
   startCharStompingSequence(char, obj) {
-    char.vg = -20;
+    char.initGeneralJumpAction(char.y)
     this.statusBar.score += 500;
     char.startJumpingAnimation();
     obj.die();
