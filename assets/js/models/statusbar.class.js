@@ -67,6 +67,10 @@ class StatusBar extends DrawableObject {
     return String(value);
   }
 
+  drawHealthBar(ctx) {
+    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  }
+
   setFontStyling(ctx) {
     const fontSize = Math.floor(this.canvasHeight * 0.031);
     ctx.font = ` ${fontSize}px PolloFont`;
@@ -112,7 +116,7 @@ class StatusBar extends DrawableObject {
 
   draw(ctx) {
     ctx.save();
-    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+    this.drawHealthBar(ctx)
     this.setFontStyling(ctx);
     this.drawBottleGroup(ctx);
     this.drawCoinGroup(ctx);
