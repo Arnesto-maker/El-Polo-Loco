@@ -54,8 +54,6 @@ class Character extends MovableObject {
     super(canvas);
     this.loadAllImages();
     this.setMainParameter();
-    console.log(this.y);
-    
   }
 
   setMainParameter() {
