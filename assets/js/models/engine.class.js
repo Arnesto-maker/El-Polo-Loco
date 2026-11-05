@@ -20,6 +20,7 @@ class GameEngine {
     this.statusBar.draw(this.ctx);
     requestAnimationFrame(() => this.renderLoop());
   }
+
   updateLogic() {
     this.frameObjects.forEach((object) => {
       if (object.update) {
@@ -106,6 +107,7 @@ class GameEngine {
       this.statusBar.bottleCount += 1;
     }
   }
+  
   checkBottleCollisions(char) {
     for (let i = this.frameObjects.length - 1; i >= 0; i--) {
       this.setCollectingBottleSequence(char,i)
