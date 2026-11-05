@@ -114,4 +114,23 @@ class MovableObject {
     ctx.drawImage(this.img, -this.x, this.y, this.width, this.height);
     ctx.restore();
   }
+
+  setHitBoxParameter(ctx) {
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "blue";
+  }
+
+  drawHitbox(ctx) {
+    ctx.save();
+    ctx.beginPath();
+    this.setHitBoxParameter(ctx);
+    ctx.rect(
+      this.x + this.offset.left,
+      this.y + this.offset.top,
+      this.width - this.offset.left - this.offset.right,
+      this.height - this.offset.top - this.offset.bottom,
+    );
+    ctx.stroke();
+    ctx.restore();
+  }
 }

@@ -13,10 +13,9 @@ class GameEngine {
     );
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.updateLogic();
-
+    this.checkAllCollisions();
     this.ctx.translate(char.cameraX, 0);
     this.drawFrame();
-    this.checkAllCollisions();
     this.ctx.translate(-char.cameraX, 0);
     this.statusBar.draw(this.ctx);
     requestAnimationFrame(() => this.renderLoop());
@@ -32,8 +31,8 @@ class GameEngine {
   checkAllCollisions() {
     const char = this.frameObjects.find((obj) => obj.cameraX !== undefined);
     this.checkChickenCollision(char);
-    //this.checkCoinCollision(char);
-    //this.checkBottleCollision(char);
+    this.checkCoinCollisions(char);
+    this.checkBottleCollisions(char);
   }
 
   drawFrame() {
@@ -44,34 +43,72 @@ class GameEngine {
     });
   }
 
-  startCharStompingSequenz(char, obj) {
-    char.vg = -12;
+  startCharStompingSequence(char, obj) {
+    char.vg = -20;
     this.statusBar.score += 500;
     char.startJumpingAnimation();
     obj.die();
   }
-  startCharHitSequenz(char) {
+  startCharHitSequence(char) {
     char.hit();
     this.statusBar.health = char.health;
     this.statusBar.updateHealthImage();
+    this.removeDeadChicken();
   }
 
-  updateChickenCollision(char, obj, index) {
+  removeDeadChicken() {
+    this.frameObjects = this.frameObjects.filter((obj) => {
+      if (obj instanceof Chicken && obj.isDead) {
+        const timeDead = performance.now() - obj.deadTime;
+        return timeDead < 500;
+      }
+      return true;
+    });
+  }
+
+  updateChickenCollision(char, obj) {
     if (char.isStomping(obj)) {
-      this.startCharStompingSequenz(char,obj);
-      setTimeout(() => {
-        this.frameObjects.splice(index, 1);
-      }, 200);
+      this.startCharStompingSequence(char, obj);
     } else if (char.isColliding(obj)) {
-      this.startCharHitSequenz(char);
+      if (!char.isHurt()) {
+        this.startCharHitSequence(char);
+      }
     }
   }
 
   checkChickenCollision(char) {
-    this.frameObjects.forEach((obj, index) => {
+    this.frameObjects.forEach((obj) => {
       if (obj instanceof Chicken) {
-        this.updateChickenCollision(char, obj, index);
+        this.updateChickenCollision(char, obj);
       }
     });
+  }
+
+  setCollectingCoinSequence(char, index) {
+    const obj = this.frameObjects[index];
+    if (obj instanceof Coin && char.isColliding(obj)) {
+      this.frameObjects.splice(index, 1);
+      this.statusBar.coinCount += 1;
+      this.statusBar.score += 100;
+    }
+  }
+
+  checkCoinCollisions(char) {
+    for (let i = this.frameObjects.length - 1; i >= 0; i--) {
+      this.setCollectingCoinSequence(char, i);
+    }
+  }
+
+  setCollectingBottleSequence(char, index) {
+    const obj = this.frameObjects[index];
+    if (obj instanceof Bottle && char.isColliding(obj)) {
+      this.frameObjects.splice(index, 1);
+      this.statusBar.bottleCount += 1;
+    }
+  }
+  checkBottleCollisions(char) {
+    for (let i = this.frameObjects.length - 1; i >= 0; i--) {
+      this.setCollectingBottleSequence(char,i)
+    }
   }
 }

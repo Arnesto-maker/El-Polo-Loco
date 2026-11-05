@@ -63,6 +63,16 @@ class Character extends MovableObject {
     this.x = this.canvasWidth * 0.08;
     this.y = this.canvasHeight - this.height - this.floor;
     this.yMax = this.y - this.canvasHeight * 0.5;
+    this.offset = this.setOffsetParameter();
+  }
+
+  setOffsetParameter() {
+    return {
+      top: this.height * 0.38,
+      bottom: this.height * 0.05,
+      left: this.width * 0.22,
+      right: this.width * 0.22,
+    };
   }
 
   loadAllImages() {
@@ -132,9 +142,9 @@ class Character extends MovableObject {
     this.playAnimation(this.IMAGES_LONG_IDLE);
   }
 
-  startJumpingAnimation(){
-    this.resetAnimationFrame()
-    this.playAnimation(this.IMAGES_JUMP)
+  startJumpingAnimation() {
+    this.resetAnimationFrame();
+    this.playAnimation(this.IMAGES_JUMP);
   }
 
   resetAnimationFrame() {
@@ -177,13 +187,13 @@ class Character extends MovableObject {
   }
 
   isStomping(enemy) {
-    if (!this.isColliding(enemy || enemy.isDead) ) {
-        return false;
+    if (!this.isColliding(enemy || enemy.isDead)) {
+      return false;
     }
     const isFallingDown = this.isAboveGround() && this.vg > 0;
     const charBottom = this.y + this.height - this.offset.bottom;
-    const enemyCenterY = enemy.y + enemy.height * 0.6;
-    if (isFallingDown && charBottom <= enemyCenterY) {
+    const enemyCenterY = enemy.y + enemy.height * 0.8;
+    if (isFallingDown && charBottom <= enemyCenterY && !enemy.isDead) {
       return true;
     } else {
       return false;
@@ -191,12 +201,16 @@ class Character extends MovableObject {
   }
 
   hit() {
-    this.health -= 0.5;
+    this.health -= 5;
     if (this.health < 0) {
       this.health = 0;
+    } else {
+      this.lastHit = performance.now();
     }
   }
-  bounce() {
-    this.vg = 15; 
-}
+
+  isHurt() {
+    const timePassed = performance.now() - this.lastHit;
+    return timePassed < 750;
+  }
 }

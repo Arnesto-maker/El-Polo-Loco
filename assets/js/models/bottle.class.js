@@ -6,7 +6,8 @@ class Bottle extends DrawableObject {
   constructor(canvas, sectorMinX, sectorMaxX) {
     super(canvas);
     this.initBottleImage();
-    this.setBottleParameter(sectorMaxX,sectorMinX);
+    this.setBottleParameter(sectorMaxX, sectorMinX);
+    this.offset = this.setOffsetParameter()
   }
 
   initBottleImage() {
@@ -25,5 +26,14 @@ class Bottle extends DrawableObject {
     this.y = this.canvasHeight - this.height - this.floor;
     const availableWidth = sectorMaxX - sectorMinX - this.width;
     this.x = sectorMinX + Math.random() * availableWidth;
+  }
+
+  setOffsetParameter() {
+    return {
+      top: this.height * 0.15,
+      bottom: this.height * 0.05,
+      left: this.width * 0.2,
+      right: this.width * 0.2,
+    };
   }
 }

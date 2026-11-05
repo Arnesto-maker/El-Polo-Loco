@@ -14,6 +14,7 @@ class Chicken extends MovableObject {
     this.loadAllImages();
     this.setMainparameter(minX, maxX);
     this.setPatrolRange();
+    this.offset = this.setOffsetParameter();
   }
 
   setMainparameter(minX, maxX) {
@@ -30,10 +31,21 @@ class Chicken extends MovableObject {
     }
   }
 
+  setOffsetParameter() {
+    return {
+      top: this.height * 0.1,
+      bottom: this.height * 0.1,
+      left: this.width * 0.1,
+      right: this.width * 0.1,
+    };
+  }
+
   setPatrolRange() {
     this.xMax = 0.25 * this.canvasWidth;
-    this.minPatrolX = this.x - this.xMax;
-    this.maxPatrolX = this.x + this.xMax;
+    const levelMinX = 300;
+    const levelMaxX = 2 * this.canvasWidth - 300;
+    this.minPatrolX = Math.max(levelMinX, this.x - this.xMax);
+    this.maxPatrolX = Math.min(levelMaxX, this.x + this.xMax);
   }
 
   loadAllImages() {
@@ -66,6 +78,7 @@ class Chicken extends MovableObject {
     this.isDead = true;
     this.v = 0;
     this.img = this.imageCache[this.IMAGE_DEAD];
+    this.deadTime = performance.now();
   }
 
   update() {

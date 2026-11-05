@@ -11,7 +11,18 @@ class Coin extends DrawableObject {
     this.height = this.canvasHeight * 0.12;
     this.x = x;
     this.y = y;
+    this.offset = this.setOffsetParameter()
   }
+
+  setOffsetParameter() {
+    return {
+      top: this.height * 0.3,
+      bottom: this.height * 0.3,
+      left: this.width * 0.3,
+      right: this.width * 0.3,
+    };
+  }
+
   update() {
     this.playAnimation(this.IMAGES_COIN);
   }

@@ -12,8 +12,8 @@ class World {
     this.spawnCoinsForFrame(1, canvas);
   }
   spawnEnemies(count, canvas) {
-    const startOffset = canvas.width * 0.25;
-    const totalEnd = canvas.width * 2 - canvas.width * 0.1;
+    const startOffset = 350;
+    const totalEnd = canvas.width * 2 - 300;
     const sectorWidth = (totalEnd - startOffset) / count;
     for (let i = 0; i < count; i++) {
       const sectorMinX = startOffset + i * sectorWidth;
@@ -59,7 +59,7 @@ class World {
     let startX = frameIndex * canvas.width + 300;
     let endX = (frameIndex + 1) * canvas.width - canvas.width * 0.05 - 300;
     const sectorWidth = (endX - startX) / bottleCount;
-    this.initBottleSpawning(bottleCount, startX, sectorWidth)
+    this.initBottleSpawning(bottleCount, startX, sectorWidth);
   }
 
   initBottleSpawning(bottleCount, startX, sectorWidth) {

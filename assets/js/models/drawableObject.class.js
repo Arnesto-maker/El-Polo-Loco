@@ -8,6 +8,12 @@ class DrawableObject {
   imageCache = {};
   imageCounter = 0;
   frameTick = 0;
+  offset = {
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  };
   constructor(canvas) {
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
@@ -38,5 +44,24 @@ class DrawableObject {
 
   draw(ctx) {
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  }
+
+  setHitBoxParameter(ctx) {
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "red";
+  }
+
+  drawHitbox(ctx) {
+    ctx.save();
+    ctx.beginPath();
+    this.setHitBoxParameter(ctx);
+    ctx.rect(
+      this.x + this.offset.left,
+      this.y + this.offset.top,
+      this.width - this.offset.left - this.offset.right,
+      this.height - this.offset.top - this.offset.bottom,
+    );
+    ctx.stroke();
+    ctx.restore();
   }
 }
