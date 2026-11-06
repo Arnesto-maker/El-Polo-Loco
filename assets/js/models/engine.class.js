@@ -1,5 +1,6 @@
 class GameEngine {
-  constructor(canvasElement, inputController, gameFrames) {
+  constructor(canvasElement, inputController, gameFrames,world) {
+    this.world =world
     this.ctx = canvasElement.getContext("2d");
     this.controller = inputController;
     this.frameObjects = gameFrames;
@@ -7,7 +8,6 @@ class GameEngine {
     this.renderLoop();
   }
   renderLoop() {
-    console.log("engine started");
     const char = this.frameObjects.find(
       (object) => object.cameraX !== undefined,
     );
@@ -45,7 +45,7 @@ class GameEngine {
   }
 
   startCharStompingSequence(char, obj) {
-    char.initGeneralJumpAction(char.y)
+    char.initGeneralJumpAction(char.y);
     this.statusBar.score += 500;
     char.startJumpingAnimation();
     obj.die();
@@ -107,10 +107,10 @@ class GameEngine {
       this.statusBar.bottleCount += 1;
     }
   }
-  
+
   checkBottleCollisions(char) {
     for (let i = this.frameObjects.length - 1; i >= 0; i--) {
-      this.setCollectingBottleSequence(char,i)
+      this.setCollectingBottleSequence(char, i);
     }
   }
 }

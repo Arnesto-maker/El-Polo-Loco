@@ -75,15 +75,15 @@ class World {
     this.bgPackage.forEach((item) => {
       componentsFrames.push(item);
     });
-    // this.coins.forEach((item) => {
-    //   componentsFrames.push(item);
-    // });
-    // this.bottles.forEach((item) => {
-    //   componentsFrames.push(item);
-    // });
-    // this.enemies.forEach((enemy) => {
-    //   componentsFrames.push(enemy);
-    // });
+      this.coins.forEach((item) => {
+       componentsFrames.push(item);
+     });
+     this.bottles.forEach((item) => {
+       componentsFrames.push(item);
+     });
+     this.enemies.forEach((enemy) => {
+       componentsFrames.push(enemy);
+     });
     componentsFrames.push(this.character);
     return componentsFrames;
   }
