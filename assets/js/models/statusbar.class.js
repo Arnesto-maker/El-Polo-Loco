@@ -26,7 +26,7 @@ class StatusBar extends DrawableObject {
 
   loadInitialValue() {
     this.health = 100;
-    this.bottleCount = 0;
+    this.bottleCount = 100;
     this.coinCount = 0;
     this.score = 0;
   }
