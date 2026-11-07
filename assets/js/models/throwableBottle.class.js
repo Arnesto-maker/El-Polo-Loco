@@ -23,7 +23,6 @@ class ThrowableBottle extends MovableObject {
     this.loadAllImages();
     this.setMainParameter(startX, startY, otherDirection, yMax);
     this.setDirectionParameter(otherDirection);
-    console.log("started");
     
   }
 
