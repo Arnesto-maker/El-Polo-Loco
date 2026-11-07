@@ -3,14 +3,15 @@ class Character extends MovableObject {
   isJumping = false;
   isMoving = false;
   isThrowing = false;
-  readyToSpawnBottle = false;
-  isJumpThrow = false;
+  readyToSpawnBottle = false; 
+  
   idleTimer = 0;
   cameraX = 0;
   health = 100;
   lastHit = 0;
   lastThrowTime = 0;
   throwCooldown = 500;
+  throwDuration = 400;
   IMAGE_0 = "assets/img/2_character_pepe/1_idle/idle/I-1.png";
   IMAGES_LONG_IDLE = [
     "assets/img/2_character_pepe/1_idle/long_idle/I-11.png",
@@ -55,7 +56,12 @@ class Character extends MovableObject {
     "assets/img/2_character_pepe/2_walk/W-25.png",
     "assets/img/2_character_pepe/2_walk/W-26.png",
   ];
-
+  IMAGES_THROWING = [
+    "assets/img/2_character_pepe/6_throw/T-1.png",
+    "assets/img/2_character_pepe/6_throw/T-2.png",
+    "assets/img/2_character_pepe/6_throw/T-3.png",
+    "assets/img/2_character_pepe/6_throw/T-4.png",
+  ];
 
   constructor(canvas) {
     super(canvas);
@@ -76,7 +82,7 @@ class Character extends MovableObject {
   setOffsetParameter() {
     return {
       top: this.height * 0.38,
-      bottom: this.height * 0.05,
+      bottom: this.height * 0.06,
       left: this.width * 0.22,
       right: this.width * 0.22,
     };
@@ -88,6 +94,7 @@ class Character extends MovableObject {
     this.loadImages(this.IMAGES_LONG_IDLE);
     this.loadImages(this.IMAGES_JUMP);
     this.loadImages(this.IMAGES_MOVING);
+    this.loadImages(this.IMAGES_THROWING);
   }
 
   updateCameraControl() {
@@ -100,6 +107,15 @@ class Character extends MovableObject {
     } else {
       this.cameraX = -this.canvasWidth;
     }
+  }
+
+  draw(ctx) {
+    const savedY = this.y;
+    if (this.isThrowing) {
+      this.y += this.height * 0.04;
+    }
+    super.draw(ctx);
+    this.y = savedY;
   }
 
   update(controller) {
@@ -115,7 +131,8 @@ class Character extends MovableObject {
   updateAnimation(controller) {
     const isMoving = controller.right || controller.left;
     if (this.isThrowing) {
-      this.idleTimer = 0; 
+      this.idleTimer = 0;
+      this.handleThrowAnimation()
     } else if (this.isJumping) {
       this.idleTimer = 0;
       this.playAnimation(this.IMAGES_JUMP);
@@ -242,12 +259,19 @@ startThrowSequence() {
     }
     this.isThrowing = true;
     this.lastThrowTime = currentTime;
-    this.resetThrowParameter()
+    this.resetAnimationFrame(); 
+  }
+
+  handleThrowAnimation() {
+    const timeThrowing = performance.now() - this.lastThrowTime;
+    this.playAnimation(this.IMAGES_THROWING);
+    if (timeThrowing >= this.throwDuration) {
+      this.resetThrowParameter();
+    }
   }
 
   resetThrowParameter() {
     this.isThrowing = false;
-    this.isJumpThrow = false;
     this.readyToSpawnBottle = true;
   }
 }
