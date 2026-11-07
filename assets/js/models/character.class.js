@@ -7,6 +7,10 @@ class Character extends MovableObject {
   isJumpThrow = false;
   idleTimer = 0;
   cameraX = 0;
+  health = 100;
+  lastHit = 0;
+  lastThrowTime = 0;
+  throwCooldown = 500;
   IMAGE_0 = "assets/img/2_character_pepe/1_idle/idle/I-1.png";
   IMAGES_LONG_IDLE = [
     "assets/img/2_character_pepe/1_idle/long_idle/I-11.png",
@@ -51,24 +55,7 @@ class Character extends MovableObject {
     "assets/img/2_character_pepe/2_walk/W-25.png",
     "assets/img/2_character_pepe/2_walk/W-26.png",
   ];
-  IMAGES_THROWING = [
-    "assets/img/2_character_pepe/6_throw/T-58.png",
-    "assets/img/2_character_pepe/6_throw/T-59.png",
-    "assets/img/2_character_pepe/6_throw/T-60.png",
-    "assets/img/2_character_pepe/6_throw/T-61.png",
-  ];
-  IMAGES_THROWING_JUMP = [
-    "assets/img/2_character_pepe/6_throw/T-58.png",
-    "assets/img/2_character_pepe/6_throw/T-59.png",
-    "assets/img/2_character_pepe/6_throw/T-60.png",
-    "assets/img/2_character_pepe/6_throw/T-61.png",
-    "assets/img/2_character_pepe/3_jump/J-35.png",
-    "assets/img/2_character_pepe/3_jump/J-36.png",
-    "assets/img/2_character_pepe/3_jump/J-37.png",
-    "assets/img/2_character_pepe/3_jump/J-38.png",
-    "assets/img/2_character_pepe/3_jump/J-39.png",
-  ];
-  health = 100;
+
 
   constructor(canvas) {
     super(canvas);
@@ -101,8 +88,6 @@ class Character extends MovableObject {
     this.loadImages(this.IMAGES_LONG_IDLE);
     this.loadImages(this.IMAGES_JUMP);
     this.loadImages(this.IMAGES_MOVING);
-    this.loadImages(this.IMAGES_THROWING);
-    this.loadImages(this.IMAGES_THROWING_JUMP);
   }
 
   updateCameraControl() {
@@ -129,7 +114,9 @@ class Character extends MovableObject {
 
   updateAnimation(controller) {
     const isMoving = controller.right || controller.left;
-    if (this.isJumping) {
+    if (this.isThrowing) {
+      this.idleTimer = 0; 
+    } else if (this.isJumping) {
       this.idleTimer = 0;
       this.playAnimation(this.IMAGES_JUMP);
     } else if (isMoving) {
@@ -138,9 +125,6 @@ class Character extends MovableObject {
     } else {
       this.idleTimer++;
       this.startIdleSequenz();
-    }
-    if (this.isThrowing) {
-      this.handleThrowAnimation();
     }
   }
 
@@ -216,7 +200,7 @@ class Character extends MovableObject {
 
   setJumpingSequenz() {
     this.setGravitation();
-    const groundLine = this.canvasHeight - this.height - this.floor;
+    const groundLine = this.getGroundLine();
     if (this.y >= groundLine) {
       this.isJumping = false;
       this.y = groundLine;
@@ -224,7 +208,7 @@ class Character extends MovableObject {
   }
 
   isStomping(enemy) {
-    if (!this.isColliding(enemy || enemy.isDead)) {
+    if (!this.isColliding(enemy) || enemy.isDead) {
       return false;
     }
     const isFallingDown = this.isAboveGround() && this.vg > 0;
@@ -251,30 +235,14 @@ class Character extends MovableObject {
     return timePassed < 750;
   }
 
-  startThrowSequence() {
-    if (this.isThrowing) {
+startThrowSequence() {
+    const currentTime = performance.now();
+    if (this.isThrowing || currentTime - this.lastThrowTime < this.throwCooldown) {
       return;
     }
     this.isThrowing = true;
-    this.resetAnimationFrame();
-    if (this.isAboveGround()) {
-      this.isJumpThrow = true;
-    } else {
-      this.isJumpThrow = false;
-    }
-  }
-
-  handleThrowAnimation() {
-    let activeThrowArray;
-    if (this.isJumpThrow) {
-      activeThrowArray = this.IMAGES_THROWING_JUMP;
-    } else {
-      activeThrowArray = this.IMAGES_THROWING;
-    }
-    this.playAnimation(activeThrowArray);
-    if (this.imageCounter >= activeThrowArray.length) {
-      this.resetThrowParameter()
-    }
+    this.lastThrowTime = currentTime;
+    this.resetThrowParameter()
   }
 
   resetThrowParameter() {

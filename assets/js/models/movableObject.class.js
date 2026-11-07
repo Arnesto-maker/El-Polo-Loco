@@ -19,6 +19,7 @@ class MovableObject {
     left: 0,
     right: 0,
   };
+
   constructor(canvas) {
     this.canvasWidth = canvas.width;
     this.canvasHeight = canvas.height;
@@ -34,17 +35,21 @@ class MovableObject {
   }
 
   setGravitation() {
-    const groundLine = this.canvasHeight - this.height - this.floor;
+    const groundLine = this.getGroundLine();
     if (this.isAboveGround() || this.vg < 0) {
-      this.y += this.vg;
-      this.vg += this.gravity;
-      if (this.y <= this.yMax) {
-        this.y = this.yMax;
-        this.vg = this.gravity;
-      }
+      this.applyVerticalMovement();
     } else {
       this.y = groundLine;
       this.vg = 0;
+    }
+  }
+
+  applyVerticalMovement() {
+    this.y += this.vg;
+    this.vg += this.gravity;
+    if (this.y <= this.yMax) {
+      this.y = this.yMax;
+      this.vg = this.gravity;
     }
   }
 
@@ -99,8 +104,19 @@ class MovableObject {
     this.frameTick++;
   }
 
+isImageLoaded() {
+    if (this.img && this.img.complete && this.img.naturalWidth > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   draw(ctx) {
-    if (this.img && this.otherDirection) {
+    if (!this.isImageLoaded()) {
+      return;
+    }
+    if (this.otherDirection) {
       this.setMirrorEffect(ctx);
     } else {
       ctx.drawImage(this.img, this.x, this.y, this.width, this.height);

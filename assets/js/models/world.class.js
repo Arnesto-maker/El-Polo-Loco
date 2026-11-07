@@ -4,13 +4,19 @@ class World {
     this.enemies = [];
     this.coins = [];
     this.bottles = [];
+    this.throwableBottles = [];
     this.character = new Character(canvas);
+    this.initWorldSpawning(canvas);
+  }
+
+  initWorldSpawning(canvas) {
     this.spawnBottlesForFrame(0, canvas);
     this.spawnBottlesForFrame(1, canvas);
     this.spawnEnemies(8, canvas);
     this.spawnCoinsForFrame(0, canvas);
     this.spawnCoinsForFrame(1, canvas);
   }
+
   spawnEnemies(count, canvas) {
     const startOffset = 350;
     const totalEnd = canvas.width * 2 - 300;
@@ -27,7 +33,7 @@ class World {
     return Math.floor(minCoins + Math.random() * (maxCoins - minCoins + 1));
   }
 
-  initCoinSpawning(coinCount, stepX, yHigh, yLow, startX) {
+  initCoinSpawning(coinCount, stepX, yHigh, yLow, startX, canvas) {
     for (let i = 0; i < coinCount; i++) {
       const progress = i / (coinCount - 1);
       const x = startX + i * stepX;
@@ -45,7 +51,7 @@ class World {
     const stepX = (endX - startX) / (coinCount - 1);
     const yHigh = canvas.height * 0.35;
     const yLow = canvas.height * 0.52;
-    this.initCoinSpawning(coinCount, stepX, yHigh, yLow, startX);
+    this.initCoinSpawning(coinCount, stepX, yHigh, yLow, startX, canvas);
   }
 
   setBottleCount(minBottles, maxBottles) {
@@ -59,10 +65,10 @@ class World {
     let startX = frameIndex * canvas.width + 300;
     let endX = (frameIndex + 1) * canvas.width - canvas.width * 0.05 - 300;
     const sectorWidth = (endX - startX) / bottleCount;
-    this.initBottleSpawning(bottleCount, startX, sectorWidth);
+    this.initBottleSpawning(bottleCount, startX, sectorWidth, canvas);
   }
 
-  initBottleSpawning(bottleCount, startX, sectorWidth) {
+  initBottleSpawning(bottleCount, startX, sectorWidth, canvas) {
     for (let i = 0; i < bottleCount; i++) {
       const sectorMinX = startX + i * sectorWidth;
       const sectorMaxX = sectorMinX + sectorWidth;
@@ -70,20 +76,19 @@ class World {
     }
   }
 
+  addArrayToFrame(sourceArray, targetArray) {
+    for (let i = 0; i < sourceArray.length; i++) {
+      targetArray.push(sourceArray[i]);
+    }
+  }
+
   getFramePackages() {
     let componentsFrames = [];
-    this.bgPackage.forEach((item) => {
-      componentsFrames.push(item);
-    });
-      this.coins.forEach((item) => {
-       componentsFrames.push(item);
-     });
-     this.bottles.forEach((item) => {
-       componentsFrames.push(item);
-     });
-     this.enemies.forEach((enemy) => {
-       componentsFrames.push(enemy);
-     });
+    this.addArrayToFrame(this.bgPackage, componentsFrames);
+    this.addArrayToFrame(this.coins, componentsFrames);
+    this.addArrayToFrame(this.bottles, componentsFrames);
+    this.addArrayToFrame(this.enemies, componentsFrames);
+    this.addArrayToFrame(this.throwableBottles, componentsFrames);
     componentsFrames.push(this.character);
     return componentsFrames;
   }

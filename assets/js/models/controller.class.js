@@ -6,35 +6,25 @@ class Controller {
     this.enter = false;
     this.bindKeyEvents();
   }
+
   bindKeyEvents() {
     window.addEventListener("keydown", (event) => {
-      if (event.code === "ArrowRight" || event.code === "KeyD") {
-        this.right = true;
-      }
-      if (event.code === "ArrowLeft" || event.code === "KeyA") {
-        this.left = true;
-      }
-      if (event.code === "Space") {
-        this.space = true;
-      }
-      if (event.code === "Enter") {
-        this.enter = true;
-      }
+      this.setKeyState(event.code, true);
     });
-
     window.addEventListener("keyup", (event) => {
-      if (event.code === "ArrowRight" || event.code === "KeyD") {
-        this.right = false;
-      }
-      if (event.code === "ArrowLeft" || event.code === "KeyA") {
-        this.left = false;
-      }
-      if (event.code === "Space") {
-        this.space = false;
-      }
-      if (event.code === "Enter") {
-        this.enter = false;
-      }
+      this.setKeyState(event.code, false);
     });
+  }
+
+  setKeyState(code, state) {
+    if (code === "ArrowRight" || code === "KeyD") {
+      this.right = state;
+    } else if (code === "ArrowLeft" || code === "KeyA") {
+      this.left = state;
+    } else if (code === "Space") {
+      this.space = state;
+    } else if (code === "Enter" || code === "NumpadEnter") {
+      this.enter = state;
+    }
   }
 }
