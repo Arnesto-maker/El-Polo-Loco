@@ -239,7 +239,7 @@ checkSpecialEnd(now) {
     if (relY <= 0.2) {
       return 20;
     } else if (relY <= 0.5) {
-      return 15;
+      return 10 ;
     } else if (relY <= 0.8) {
       return 5;
     }
