@@ -6,16 +6,35 @@ class GameEngine {
     this.frameObjects = gameFrames;
     this.statusBar = new StatusBar(canvasElement);
     this.lastBossTick = 0;
+    this.isPaused = false;
+    this.coinConverter = new CoinConverter(this.statusBar, this);
+    this.bindConverterEvents();
     this.renderLoop();
+  }
+
+  bindConverterEvents() {
+    window.addEventListener("keydown", (e) => {
+      this.coinConverter.handleKeyDown(e.key);
+    });
+  }
+
+  handleCanvasClick(e, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    this.coinConverter.handleClick(x, y);
   }
 
   renderLoop() {
     const char = this.world.character;
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.updateLogic(char);
-    this.checkAllCollisions(char);
+    if (!this.isPaused) {
+      this.updateLogic(char);
+      this.checkAllCollisions(char);
+    }
     this.drawWorldWithCamera(char);
     this.statusBar.draw(this.ctx);
+    this.coinConverter.draw(this.ctx);
     requestAnimationFrame(() => this.renderLoop());
   }
 
@@ -91,12 +110,18 @@ class GameEngine {
     }
   }
 
-spawnBossSpecialBottles(boss) {
+  spawnBossSpecialBottles(boss) {
     const velocitiesX = [-14, -9.5, -5, 5, 9.5, 14];
     const startX = boss.x + boss.width * 0.4;
     const startY = boss.y + boss.height * 0.1;
     for (let i = 0; i < velocitiesX.length; i++) {
-      const b = new BossBottle(this.ctx.canvas, startX, startY, velocitiesX[i], -21);
+      const b = new BossBottle(
+        this.ctx.canvas,
+        startX,
+        startY,
+        velocitiesX[i],
+        -21,
+      );
       this.world.bossBottles.push(b);
     }
     this.frameObjects = this.world.getFramePackages();

@@ -73,7 +73,7 @@ class Character extends MovableObject {
     this.img = this.imageCache[this.IMAGE_0];
     this.width = this.canvasWidth * 0.14;
     this.height = this.canvasHeight * 0.36;
-    this.x = this.canvasWidth * 0.08;
+    this.x = this.canvasWidth * 0.05; 
     this.y = this.canvasHeight - this.height - this.floor;
     this.yMax = this.y - this.canvasHeight * 0.5;
     this.offset = this.setOffsetParameter();
