@@ -91,18 +91,12 @@ class GameEngine {
     }
   }
 
-  spawnBossSpecialBottles(boss) {
-    const velocitiesX = [-9, -6, -3, 3, 6, 9];
+spawnBossSpecialBottles(boss) {
+    const velocitiesX = [-14, -9.5, -5, 5, 9.5, 14];
     const startX = boss.x + boss.width * 0.4;
-    const startY = boss.y + boss.height * 0.2;
+    const startY = boss.y + boss.height * 0.1;
     for (let i = 0; i < velocitiesX.length; i++) {
-      const b = new BossBottle(
-        this.ctx.canvas,
-        startX,
-        startY,
-        velocitiesX[i],
-        -15,
-      );
+      const b = new BossBottle(this.ctx.canvas, startX, startY, velocitiesX[i], -21);
       this.world.bossBottles.push(b);
     }
     this.frameObjects = this.world.getFramePackages();

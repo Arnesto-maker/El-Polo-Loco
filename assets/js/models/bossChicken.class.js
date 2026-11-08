@@ -10,6 +10,8 @@ class Boss extends MovableObject {
   lastSpecialTime = 0;
   nextAttackTime = 0;
   attackStartTime = 0;
+  salvoCount = 0;
+  lastSalvoTime = 0;
 
   IMAGES_WALK = [
     "assets/img/4_enemie_boss_chicken/1_walk/G1.png",
@@ -84,7 +86,7 @@ class Boss extends MovableObject {
   }
 
   setPositionLimits() {
-    this.pos1X =  this.canvasWidth * 0.15;
+    this.pos1X = this.canvasWidth * 0.15;
     this.pos2X = this.canvasWidth * 2 - this.canvasWidth * 0.15 - this.width;
     this.entryTargetX = this.canvasWidth * 2 - this.width;
   }
@@ -132,29 +134,44 @@ class Boss extends MovableObject {
   }
 
   triggerSpecialAttack() {
+    const now = performance.now();
     this.isDoingSpecial = true;
     this.readyToSpawnSpecial = true;
-    this.lastSpecialTime = performance.now();
-    this.specialStartTime = performance.now();
+    this.salvoCount = 1;
+    this.lastSalvoTime = now;
+    this.lastSpecialTime = now;
+    this.specialStartTime = now;
     this.imageCounter = 0;
     this.frameTick = 0;
   }
 
-  updateCombatCycle() {
+  updateSpecialSalvos(now) {
+    if (!this.isDoingSpecial || this.salvoCount >= 3) {
+      return;
+    }
+    if (now - this.lastSalvoTime >= 450) {
+      this.readyToSpawnSpecial = true;
+      this.salvoCount += 1;
+      this.lastSalvoTime = now;
+    }
+  }
+
+updateCombatCycle() {
     const now = performance.now();
     if (now - this.lastSpecialTime >= 15000) {
       this.triggerSpecialAttack();
     }
-    if (
-      !this.isAttacking &&
-      !this.isDoingSpecial &&
-      now >= this.nextAttackTime
-    ) {
+    this.updateSpecialSalvos(now);
+    this.checkAttackStart(now);
+    this.checkAttackEnd(now);
+    this.checkSpecialEnd(now);
+  }
+
+  checkAttackStart(now) {
+    if (!this.isAttacking && !this.isDoingSpecial && now >= this.nextAttackTime) {
       this.isAttacking = true;
       this.attackStartTime = now;
     }
-    this.checkAttackEnd(now);
-    this.checkSpecialEnd(now);
   }
 
   checkAttackEnd(now) {
@@ -164,8 +181,8 @@ class Boss extends MovableObject {
     }
   }
 
-  checkSpecialEnd(now) {
-    if (this.isDoingSpecial && now - this.specialStartTime >= 1000) {
+checkSpecialEnd(now) {
+    if (this.isDoingSpecial && now - this.specialStartTime >= 1500) {
       this.isDoingSpecial = false;
     }
   }
