@@ -84,7 +84,7 @@ class Boss extends MovableObject {
   }
 
   setPositionLimits() {
-    this.pos1X = this.canvasWidth + this.canvasWidth * 0.15;
+    this.pos1X =  this.canvasWidth * 0.15;
     this.pos2X = this.canvasWidth * 2 - this.canvasWidth * 0.15 - this.width;
     this.entryTargetX = this.canvasWidth * 2 - this.width;
   }

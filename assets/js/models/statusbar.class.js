@@ -100,7 +100,7 @@ class StatusBar extends DrawableObject {
   drawBossTimerGroup(ctx) {
     const sec = this.formatCount(Math.floor(this.bossTimeMs / 1000));
     const ms = this.formatCount(Math.floor((this.bossTimeMs % 1000) / 10));
-    const timeText = "Zeit: " + sec + ":" + ms;
+    const timeText = "Time: " + sec + ":" + ms;
     const timeX = this.canvasWidth * 0.45;
     const timeY = this.y + this.height * 0.55;
     ctx.strokeText(timeText, timeX, timeY);

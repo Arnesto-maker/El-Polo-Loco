@@ -83,7 +83,7 @@ class GameEngine {
 
   reduceBossScoreBonus(dt) {
     if (this.statusBar.bossBonus > 0) {
-      const penalty = Math.floor(dt * 0.05);
+      const penalty = Math.floor(dt * 0.1);
       this.statusBar.bossBonus = Math.max(
         0,
         this.statusBar.bossBonus - penalty,
