@@ -5,6 +5,8 @@ class World {
     this.coins = [];
     this.bottles = [];
     this.throwableBottles = [];
+    this.bossBottles = [];
+    this.boss = new Boss(canvas);
     this.character = new Character(canvas);
     this.initWorldSpawning(canvas);
   }
@@ -89,6 +91,10 @@ class World {
     this.addArrayToFrame(this.bottles, componentsFrames);
     this.addArrayToFrame(this.enemies, componentsFrames);
     this.addArrayToFrame(this.throwableBottles, componentsFrames);
+    this.addArrayToFrame(this.bossBottles, componentsFrames);
+    if (this.boss) {
+      componentsFrames.push(this.boss);
+    }
     componentsFrames.push(this.character);
     return componentsFrames;
   }

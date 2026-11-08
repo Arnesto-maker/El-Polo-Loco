@@ -8,6 +8,15 @@ class StatusBar extends DrawableObject {
     "assets/img/7_statusbars/1_statusbar/2_statusbar_health/green/100.png",
   ];
 
+  IMAGES_BOSS_HEALTH = [
+    "assets/img/7_statusbars/2_statusbar_endboss/green/green0.png",
+    "assets/img/7_statusbars/2_statusbar_endboss/green/green20.png",
+    "assets/img/7_statusbars/2_statusbar_endboss/green/green40.png",
+    "assets/img/7_statusbars/2_statusbar_endboss/green/green60.png",
+    "assets/img/7_statusbars/2_statusbar_endboss/green/green80.png",
+    "assets/img/7_statusbars/2_statusbar_endboss/green/green100.png",
+  ];
+
   ICON_BOTTLE = "assets/img/7_statusbars/3_icons/icon_salsa_bottle.png";
   ICON_COIN = "assets/img/7_statusbars/3_icons/icon_coin.png";
 
@@ -17,18 +26,24 @@ class StatusBar extends DrawableObject {
     this.setMainParameter();
     this.loadInitialValue();
     this.updateHealthImage();
+    this.updateBossHealthImage();
   }
 
   initLoadImages() {
     this.loadImages(this.IMAGES_HEALTH);
+    this.loadImages(this.IMAGES_BOSS_HEALTH);
     this.loadImages([this.ICON_BOTTLE, this.ICON_COIN]);
   }
 
   loadInitialValue() {
     this.health = 100;
+    this.bossHealth = 100;
     this.bottleCount = 0;
     this.coinCount = 0;
     this.score = 0;
+    this.bossBonus = 0;
+    this.bossTimeMs = 0;
+    this.showBossHud = false;
   }
 
   setMainParameter() {
@@ -42,6 +57,12 @@ class StatusBar extends DrawableObject {
     let index = this.setHealthIndex(this.health);
     const path = this.IMAGES_HEALTH[index];
     this.img = this.imageCache[path];
+  }
+
+  updateBossHealthImage() {
+    let index = this.setHealthIndex(this.bossHealth);
+    const path = this.IMAGES_BOSS_HEALTH[index];
+    this.bossImg = this.imageCache[path];
   }
 
   setHealthIndex(health) {
@@ -69,6 +90,29 @@ class StatusBar extends DrawableObject {
 
   drawHealthBar(ctx) {
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+  }
+
+  drawBossHealthBar(ctx) {
+    const bossBarX = this.canvasWidth * 0.78;
+    ctx.drawImage(this.bossImg, bossBarX, this.y, this.width, this.height);
+  }
+
+  drawBossTimerGroup(ctx) {
+    const sec = this.formatCount(Math.floor(this.bossTimeMs / 1000));
+    const ms = this.formatCount(Math.floor((this.bossTimeMs % 1000) / 10));
+    const timeText = "Zeit: " + sec + ":" + ms;
+    const timeX = this.canvasWidth * 0.45;
+    const timeY = this.y + this.height * 0.55;
+    ctx.strokeText(timeText, timeX, timeY);
+    ctx.fillText(timeText, timeX, timeY);
+  }
+
+  drawBossHud(ctx) {
+    if (!this.showBossHud) {
+      return;
+    }
+    this.drawBossHealthBar(ctx);
+    this.drawBossTimerGroup(ctx);
   }
 
   setFontStyling(ctx) {
@@ -111,15 +155,27 @@ class StatusBar extends DrawableObject {
     const scoreText = "Score: " + this.score;
     ctx.strokeText(scoreText, this.x + 50, row3Y);
     ctx.fillText(scoreText, this.x + 50, row3Y);
+    this.drawBossBonusText(ctx, row3Y);
+  }
+
+  drawBossBonusText(ctx, row3Y) {
+    if (!this.showBossHud) {
+      return;
+    }
+    const bonusText = "+ " + this.bossBonus;
+    const bonusX = this.x + this.width * 0.85;
+    ctx.strokeText(bonusText, bonusX, row3Y);
+    ctx.fillText(bonusText, bonusX, row3Y);
   }
 
   draw(ctx) {
     ctx.save();
-    this.drawHealthBar(ctx)
+    this.drawHealthBar(ctx);
     this.setFontStyling(ctx);
     this.drawBottleGroup(ctx);
     this.drawCoinGroup(ctx);
     this.drawScoringGroup(ctx);
+    this.drawBossHud(ctx);
     ctx.restore();
   }
 }

@@ -5,6 +5,7 @@ class GameEngine {
     this.controller = inputController;
     this.frameObjects = gameFrames;
     this.statusBar = new StatusBar(canvasElement);
+    this.lastBossTick = 0;
     this.renderLoop();
   }
 
@@ -26,25 +27,94 @@ class GameEngine {
 
   updateLogic(char) {
     this.updateThrowWorkflow(char);
+    this.updateBossFightState();
     for (let i = 0; i < this.frameObjects.length; i++) {
       if (this.frameObjects[i].update) {
         this.frameObjects[i].update(this.controller);
       }
     }
+    this.cleanupObjects();
+  }
+
+  cleanupObjects() {
     this.removeDeadChicken();
     this.removeSplashedBottles();
+    this.removeSplashedBossBottles();
+    this.removeDeadBoss();
+  }
+
+  updateBossFightState() {
+    const boss = this.world.boss;
+    if (!boss || boss.isDead) {
+      return;
+    }
+    if (!boss.isActivated && this.world.enemies.length === 0) {
+      this.activateBossFight(boss);
+    }
+    if (boss.isActivated) {
+      this.updateBossHudAndSpecial(boss);
+    }
+  }
+
+  activateBossFight(boss) {
+    boss.isActivated = true;
+    this.statusBar.showBossHud = true;
+    this.statusBar.bossBonus = 10000;
+    this.lastBossTick = performance.now();
+  }
+
+  updateBossHudAndSpecial(boss) {
+    this.updateBossTimerAndScore();
+    this.statusBar.bossHealth = boss.health;
+    this.statusBar.updateBossHealthImage();
+    if (boss.readyToSpawnSpecial) {
+      boss.readyToSpawnSpecial = false;
+      this.spawnBossSpecialBottles(boss);
+    }
+  }
+
+  updateBossTimerAndScore() {
+    const now = performance.now();
+    const dt = now - this.lastBossTick;
+    this.lastBossTick = now;
+    this.statusBar.bossTimeMs += dt;
+    this.reduceBossScoreBonus(dt);
+  }
+
+  reduceBossScoreBonus(dt) {
+    if (this.statusBar.bossBonus > 0) {
+      const penalty = Math.floor(dt * 0.05);
+      this.statusBar.bossBonus = Math.max(
+        0,
+        this.statusBar.bossBonus - penalty,
+      );
+    }
+  }
+
+  spawnBossSpecialBottles(boss) {
+    const velocitiesX = [-9, -6, -3, 3, 6, 9];
+    const startX = boss.x + boss.width * 0.4;
+    const startY = boss.y + boss.height * 0.2;
+    for (let i = 0; i < velocitiesX.length; i++) {
+      const b = new BossBottle(
+        this.ctx.canvas,
+        startX,
+        startY,
+        velocitiesX[i],
+        -15,
+      );
+      this.world.bossBottles.push(b);
+    }
+    this.frameObjects = this.world.getFramePackages();
   }
 
   updateThrowWorkflow(char) {
-    if (this.controller.enter && this.statusBar.bottleCount > 0 
-    ) {
+    if (this.controller.enter && this.statusBar.bottleCount > 0) {
       char.startThrowSequence();
     }
     if (char.readyToSpawnBottle) {
       this.initBottleThrow(char);
     }
-    
-    
   }
 
   initBottleThrow(char) {
@@ -81,6 +151,8 @@ class GameEngine {
     this.checkCoinCollisions(char);
     this.checkBottleCollisions(char);
     this.checkThrownBottleCollisions();
+    this.checkBossCollisions(char);
+    this.checkBossBottleCollisions(char);
   }
 
   checkThrownBottleCollisions() {
@@ -101,6 +173,50 @@ class GameEngine {
         this.statusBar.score += 500;
       }
     }
+    this.checkBottleHitsBoss(bottle);
+  }
+
+  checkBottleHitsBoss(bottle) {
+    const boss = this.world.boss;
+    if (boss && !boss.isDead && bottle.isColliding(boss)) {
+      bottle.startSplashSequenz();
+      boss.applyZoneHit(bottle);
+      this.statusBar.bossHealth = boss.health;
+      this.statusBar.updateBossHealthImage();
+    }
+  }
+
+  checkBossCollisions(char) {
+    const boss = this.world.boss;
+    if (!boss || !boss.isActivated || boss.isDead) {
+      return;
+    }
+    if (char.isColliding(boss) && !char.isHurt()) {
+      this.applyBossContactDamage(char, boss);
+    }
+  }
+
+  applyBossContactDamage(char, boss) {
+    if (boss.isAttacking) {
+      char.health = Math.max(0, char.health - 10);
+    } else {
+      char.health = Math.max(0, char.health - 2);
+    }
+    char.lastHit = performance.now();
+    this.statusBar.health = char.health;
+    this.statusBar.updateHealthImage();
+  }
+
+  checkBossBottleCollisions(char) {
+    const bottles = this.world.bossBottles;
+    for (let i = 0; i < bottles.length; i++) {
+      if (!bottles[i].isSplashing && char.isColliding(bottles[i])) {
+        bottles[i].startSplashSequenz();
+        if (!char.isHurt()) {
+          this.startCharHitSequence(char);
+        }
+      }
+    }
   }
 
   removeSplashedBottles() {
@@ -111,6 +227,16 @@ class GameEngine {
       },
     );
     if (this.world.throwableBottles.length !== prevLength) {
+      this.frameObjects = this.world.getFramePackages();
+    }
+  }
+
+  removeSplashedBossBottles() {
+    const prevLength = this.world.bossBottles.length;
+    this.world.bossBottles = this.world.bossBottles.filter((bottle) => {
+      return this.isBottleStillActive(bottle);
+    });
+    if (this.world.bossBottles.length !== prevLength) {
       this.frameObjects = this.world.getFramePackages();
     }
   }
@@ -139,6 +265,17 @@ class GameEngine {
       return timeDead < 500;
     }
     return true;
+  }
+
+  removeDeadBoss() {
+    const boss = this.world.boss;
+    if (boss && boss.isDead && performance.now() - boss.deadTime >= 1000) {
+      this.statusBar.score += this.statusBar.bossBonus;
+      this.statusBar.bossBonus = 0;
+      this.statusBar.showBossHud = false;
+      this.world.boss = null;
+      this.frameObjects = this.world.getFramePackages();
+    }
   }
 
   drawFrame() {
