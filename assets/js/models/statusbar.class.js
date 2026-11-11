@@ -11,7 +11,7 @@ class StatusBar extends DrawableObject {
   IMAGES_BOSS_HEALTH = [
     "assets/img/7_statusbars/2_statusbar_endboss/green/green0.png",
     "assets/img/7_statusbars/2_statusbar_endboss/green/green20.png",
-    "assets/img/7_statusbars/2_statusbar_endboss/green/green40.png",
+    "assets/img/7_statusbars/2_statusbar_endboss/green/green80.png",
     "assets/img/7_statusbars/2_statusbar_endboss/green/green60.png",
     "assets/img/7_statusbars/2_statusbar_endboss/green/green80.png",
     "assets/img/7_statusbars/2_statusbar_endboss/green/green100.png",
@@ -38,6 +38,7 @@ class StatusBar extends DrawableObject {
   loadInitialValue() {
     this.health = 100;
     this.bossHealth = 100;
+    this.bossArmour = 100;
     this.bottleCount = 0;
     this.coinCount = 0;
     this.score = 0;
@@ -97,6 +98,17 @@ class StatusBar extends DrawableObject {
     ctx.drawImage(this.bossImg, bossBarX, this.y, this.width, this.height);
   }
 
+  drawBossArmourText(ctx) {
+    if (this.bossArmour <= 0) {
+      return;
+    }
+    const armourText = "+" + this.bossArmour + " Armour";
+    const armourX = this.canvasWidth * 0.78;
+    const armourY = this.y + this.height + this.canvasHeight * 0.035;
+    ctx.strokeText(armourText, armourX, armourY);
+    ctx.fillText(armourText, armourX, armourY);
+  }
+
   drawBossTimerGroup(ctx) {
     const sec = this.formatCount(Math.floor(this.bossTimeMs / 1000));
     const ms = this.formatCount(Math.floor((this.bossTimeMs % 1000) / 10));
@@ -112,6 +124,7 @@ class StatusBar extends DrawableObject {
       return;
     }
     this.drawBossHealthBar(ctx);
+    this.drawBossArmourText(ctx);
     this.drawBossTimerGroup(ctx);
   }
 
@@ -175,7 +188,7 @@ class StatusBar extends DrawableObject {
     }
     const row4Y = row3Y + this.canvasHeight * 0.045;
     const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.08;
-    const fontSize = Math.floor(this.canvasHeight * 0.024  * pulse);
+    const fontSize = Math.floor(this.canvasHeight * 0.024 * pulse);
     ctx.save();
     ctx.font = `${fontSize}px PolloFont`;
     this.renderBuyHintElements(ctx, row4Y, pulse);
@@ -187,7 +200,7 @@ class StatusBar extends DrawableObject {
     const textX = this.x + 50;
     ctx.strokeText(hintText, textX, row4Y);
     ctx.fillText(hintText, textX, row4Y);
-    const iconSize = this.height * 0.50 * pulse;
+    const iconSize = this.height * 0.5 * pulse;
     const iconX = textX + ctx.measureText(hintText).width + 4;
     const bottleIcon = this.imageCache[this.ICON_BOTTLE];
     ctx.drawImage(bottleIcon, iconX, row4Y - iconSize / 2, iconSize, iconSize);

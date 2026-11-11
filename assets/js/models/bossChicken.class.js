@@ -1,5 +1,6 @@
 class Boss extends MovableObject {
   health = 100;
+  armour = 100;
   isActivated = false;
   hasEnteredArena = false;
   isDead = false;
@@ -12,6 +13,7 @@ class Boss extends MovableObject {
   attackStartTime = 0;
   salvoCount = 0;
   lastSalvoTime = 0;
+  backHitCount = 0;
 
   IMAGES_WALK = [
     "assets/img/4_enemie_boss_chicken/1_walk/G1.png",
@@ -39,7 +41,6 @@ class Boss extends MovableObject {
     "assets/img/4_enemie_boss_chicken/3_attack/G19.png",
     "assets/img/4_enemie_boss_chicken/3_attack/G20.png",
   ];
-
   IMAGES_SPECIAL_ATTACK = [
     "assets/img/4_enemie_boss_chicken/3_attack/G18.png",
     "assets/img/4_enemie_boss_chicken/3_attack/G19.png",
@@ -47,7 +48,6 @@ class Boss extends MovableObject {
     "assets/img/4_enemie_boss_chicken/3_attack/G19.png",
     "assets/img/4_enemie_boss_chicken/3_attack/G20.png",
   ];
-
   IMAGES_HURT = [
     "assets/img/4_enemie_boss_chicken/4_hurt/G21.png",
     "assets/img/4_enemie_boss_chicken/4_hurt/G22.png",
@@ -156,15 +156,23 @@ class Boss extends MovableObject {
     }
   }
 
-updateCombatCycle() {
+  updateCombatCycle() {
     const now = performance.now();
-    if (now - this.lastSpecialTime >= 15000) {
+    const cooldown = this.getSalvoCooldown();
+    if (now - this.lastSpecialTime >= cooldown) {
       this.triggerSpecialAttack();
     }
     this.updateSpecialSalvos(now);
     this.checkAttackStart(now);
     this.checkAttackEnd(now);
     this.checkSpecialEnd(now);
+  }
+
+  getSalvoCooldown() {
+    if (this.armour <= 0) {
+      return 8000;
+    }
+    return 15000;
   }
 
   checkAttackStart(now) {
@@ -181,7 +189,7 @@ updateCombatCycle() {
     }
   }
 
-checkSpecialEnd(now) {
+  checkSpecialEnd(now) {
     if (this.isDoingSpecial && now - this.specialStartTime >= 1500) {
       this.isDoingSpecial = false;
     }
@@ -231,6 +239,34 @@ checkSpecialEnd(now) {
     }
     const damage = this.calculateZoneDamage(bottle);
     this.takeDamage(damage);
+    this.checkBackHitReaction(bottle);
+  }
+
+  checkBackHitReaction(bottle) {
+    if (this.isHitFromBehind(bottle)) {
+      this.backHitCount += 1;
+      if (this.backHitCount >= 3) {
+        this.executeTurnAroundCombo();
+      }
+    }
+  }
+
+  isHitFromBehind(bottle) {
+    const bottleCenter = bottle.x + bottle.width * 0.5;
+    const bossCenter = this.x + this.width * 0.5;
+    if (this.otherDirection) {
+      return bottleCenter < bossCenter;
+    } else {
+      return bottleCenter > bossCenter;
+    }
+  }
+
+  executeTurnAroundCombo() {
+    this.backHitCount = 0;
+    this.otherDirection = !this.otherDirection;
+    this.isAttacking = true;
+    this.attackStartTime = performance.now();
+    this.triggerSpecialAttack();
   }
 
   calculateZoneDamage(bottle) {
@@ -239,7 +275,7 @@ checkSpecialEnd(now) {
     if (relY <= 0.2) {
       return 20;
     } else if (relY <= 0.5) {
-      return 10 ;
+      return 10;
     } else if (relY <= 0.8) {
       return 5;
     }
@@ -247,12 +283,26 @@ checkSpecialEnd(now) {
   }
 
   takeDamage(damage) {
-    this.health -= damage;
+    const leftover = this.absorbArmourDamage(damage);
+    this.health -= leftover;
     this.lastHit = performance.now();
     if (this.health <= 0) {
       this.health = 0;
       this.isDead = true;
       this.deadTime = performance.now();
     }
+  }
+
+  absorbArmourDamage(damage) {
+    if (this.armour <= 0) {
+      return damage;
+    }
+    if (this.armour >= damage) {
+      this.armour -= damage;
+      return 0;
+    }
+    const rest = damage - this.armour;
+    this.armour = 0;
+    return rest;
   }
 }

@@ -84,6 +84,7 @@ constructor(canvasElement, inputController, gameFrames, world) {
   updateBossHudAndSpecial(boss) {
     this.updateBossTimerAndScore();
     this.statusBar.bossHealth = boss.health;
+    this.statusBar.bossArmour = boss.armour;
     this.statusBar.updateBossHealthImage();
     if (boss.readyToSpawnSpecial) {
       boss.readyToSpawnSpecial = false;
@@ -200,6 +201,7 @@ constructor(canvasElement, inputController, gameFrames, world) {
       bottle.startSplashSequenz();
       boss.applyZoneHit(bottle);
       this.statusBar.bossHealth = boss.health;
+      this.statusBar.bossArmour = boss.armour;
       this.statusBar.updateBossHealthImage();
     }
   }

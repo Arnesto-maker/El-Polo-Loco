@@ -12,7 +12,7 @@ class StartHelpPopup {
     this.lines = [
       "Wellcome to El Polo loco",
       "Hints :",
-      "A/D or Arrow Left/ Arrow Right to move pepe",
+      "A/D or Arrow Left / Arrow Right to move pepe",
       "space to jump",
       "enter to Throw bottle",
       "Combo :",
