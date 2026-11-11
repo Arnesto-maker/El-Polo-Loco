@@ -156,6 +156,7 @@ class StatusBar extends DrawableObject {
     ctx.strokeText(scoreText, this.x + 50, row3Y);
     ctx.fillText(scoreText, this.x + 50, row3Y);
     this.drawBossBonusText(ctx, row3Y);
+    this.drawBuyHintGroup(ctx, row3Y);
   }
 
   drawBossBonusText(ctx, row3Y) {
@@ -166,6 +167,30 @@ class StatusBar extends DrawableObject {
     const bonusX = this.x + this.width * 0.85;
     ctx.strokeText(bonusText, bonusX, row3Y);
     ctx.fillText(bonusText, bonusX, row3Y);
+  }
+
+  drawBuyHintGroup(ctx, row3Y) {
+    if (this.coinCount < 2) {
+      return;
+    }
+    const row4Y = row3Y + this.canvasHeight * 0.045;
+    const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.08;
+    const fontSize = Math.floor(this.canvasHeight * 0.024  * pulse);
+    ctx.save();
+    ctx.font = `${fontSize}px PolloFont`;
+    this.renderBuyHintElements(ctx, row4Y, pulse);
+    ctx.restore();
+  }
+
+  renderBuyHintElements(ctx, row4Y, pulse) {
+    const hintText = "Press B to buy";
+    const textX = this.x + 50;
+    ctx.strokeText(hintText, textX, row4Y);
+    ctx.fillText(hintText, textX, row4Y);
+    const iconSize = this.height * 0.50 * pulse;
+    const iconX = textX + ctx.measureText(hintText).width + 4;
+    const bottleIcon = this.imageCache[this.ICON_BOTTLE];
+    ctx.drawImage(bottleIcon, iconX, row4Y - iconSize / 2, iconSize, iconSize);
   }
 
   draw(ctx) {
