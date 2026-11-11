@@ -1,5 +1,5 @@
 class GameEngine {
-  constructor(canvasElement, inputController, gameFrames, world) {
+constructor(canvasElement, inputController, gameFrames, world) {
     this.world = world;
     this.ctx = canvasElement.getContext("2d");
     this.controller = inputController;
@@ -7,22 +7,20 @@ class GameEngine {
     this.statusBar = new StatusBar(canvasElement);
     this.lastBossTick = 0;
     this.isPaused = false;
+    this.startHelp = new StartHelpPopup(this);
     this.coinConverter = new CoinConverter(this.statusBar, this);
-    this.bindConverterEvents();
+    this.bindPopupEvents();
     this.renderLoop();
   }
 
-  bindConverterEvents() {
+  bindPopupEvents() {
     window.addEventListener("keydown", (e) => {
-      this.coinConverter.handleKeyDown(e.key);
+      if (this.startHelp.isOpen) {
+        this.startHelp.handleKeyDown(e.key);
+      } else {
+        this.coinConverter.handleKeyDown(e.key);
+      }
     });
-  }
-
-  handleCanvasClick(e, canvas) {
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-    this.coinConverter.handleClick(x, y);
   }
 
   renderLoop() {
@@ -35,6 +33,7 @@ class GameEngine {
     this.drawWorldWithCamera(char);
     this.statusBar.draw(this.ctx);
     this.coinConverter.draw(this.ctx);
+    this.startHelp.draw(this.ctx);
     requestAnimationFrame(() => this.renderLoop());
   }
 

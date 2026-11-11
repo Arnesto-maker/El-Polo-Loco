@@ -1,12 +1,26 @@
 class CoinConverter {
-  constructor(statusBar, engine) {
+constructor(statusBar, engine) {
     this.statusBar = statusBar;
     this.engine = engine;
     this.isOpen = false;
     this.initialCoins = 0;
     this.rate = 2;
+    this.borderRadius = [20, 20, 20, 20];
     this.initImages();
     this.initPopupLayout();
+  }
+
+  openPopup() {
+    if (this.engine.startHelp && this.engine.startHelp.isOpen) {
+      return;
+    }
+    if (!this.isOpen) {
+      this.initPopupLayout();
+      this.isOpen = true;
+      this.engine.isPaused = true;
+      this.initialCoins = this.statusBar.coinCount;
+      this.rate = 2;
+    }
   }
 
   initImages() {
@@ -94,8 +108,16 @@ class CoinConverter {
     ctx.fillStyle = "rgba(238, 138, 69, 0.96)";
     ctx.strokeStyle = "#000000";
     ctx.lineWidth = 5;
-    ctx.fillRect(this.box.x, this.box.y, this.box.w, this.box.h);
-    ctx.strokeRect(this.box.x, this.box.y, this.box.w, this.box.h);
+    ctx.beginPath();
+    ctx.roundRect(
+      this.box.x,
+      this.box.y,
+      this.box.w,
+      this.box.h,
+      this.borderRadius,
+    );
+    ctx.fill();
+    ctx.stroke();
     ctx.restore();
   }
 
