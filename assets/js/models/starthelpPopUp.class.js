@@ -109,7 +109,7 @@ class StartHelpPopup {
     ctx.font = "bold " + this.fontSize + "px Arial";
     const textX = this.box.x + this.box.w * 0.32;
     const textY = this.box.y + this.box.h * 0.92;
-    ctx.fillText("enter = ok and exit", textX, textY);
+    ctx.fillText("Enter = ok and exit", textX, textY);
     ctx.restore();
   }
 }

@@ -1,5 +1,5 @@
 class GameEngine {
-constructor(canvasElement, inputController, gameFrames, world) {
+  constructor(canvasElement, inputController, gameFrames, world) {
     this.world = world;
     this.ctx = canvasElement.getContext("2d");
     this.controller = inputController;
@@ -9,14 +9,23 @@ constructor(canvasElement, inputController, gameFrames, world) {
     this.isPaused = false;
     this.startHelp = new StartHelpPopup(this);
     this.coinConverter = new CoinConverter(this.statusBar, this);
+    this.initPopups();
     this.bindPopupEvents();
     this.renderLoop();
+  }
+
+  initPopups() {
+    this.startHelp = new StartHelpPopup(this);
+    this.bossDossier = new BossDossierPopup(this);
+    this.coinConverter = new CoinConverter(this.statusBar, this);
   }
 
   bindPopupEvents() {
     window.addEventListener("keydown", (e) => {
       if (this.startHelp.isOpen) {
         this.startHelp.handleKeyDown(e.key);
+      } else if (this.bossDossier.isOpen) {
+        this.bossDossier.handleKeyDown(e.key);
       } else {
         this.coinConverter.handleKeyDown(e.key);
       }
@@ -32,9 +41,14 @@ constructor(canvasElement, inputController, gameFrames, world) {
     }
     this.drawWorldWithCamera(char);
     this.statusBar.draw(this.ctx);
-    this.coinConverter.draw(this.ctx);
-    this.startHelp.draw(this.ctx);
+    this.drawActivePopups();
     requestAnimationFrame(() => this.renderLoop());
+  }
+
+  drawActivePopups() {
+    this.coinConverter.draw(this.ctx);
+    this.bossDossier.draw(this.ctx);
+    this.startHelp.draw(this.ctx);
   }
 
   drawWorldWithCamera(char) {
@@ -79,6 +93,7 @@ constructor(canvasElement, inputController, gameFrames, world) {
     this.statusBar.showBossHud = true;
     this.statusBar.bossBonus = 10000;
     this.lastBossTick = performance.now();
+    this.bossDossier.openPopup();
   }
 
   updateBossHudAndSpecial(boss) {
