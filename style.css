@@ -19,4 +19,5 @@ body {
   aspect-ratio: 16 / 9;
   object-fit: cover;
   position: fixed;
+  width: 100dvw;
 }

@@ -95,7 +95,7 @@ class StatusBar extends DrawableObject {
 
   drawBossHealthBar(ctx) {
     const bossBarX = this.canvasWidth * 0.78;
-    ctx.drawImage(this.bossImg, bossBarX, this.y, this.width, this.height);
+    ctx.drawImage(this.bossImg, bossBarX, this.y + 20, this.width, this.height);
   }
 
   drawBossArmourText(ctx) {

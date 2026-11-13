@@ -78,9 +78,9 @@ class Boss extends MovableObject {
   setMainParameter() {
     this.img = this.imageCache[this.IMAGES_ALERT[0]];
     this.width = this.canvasWidth * 0.25;
-    this.height = this.canvasHeight * 0.48;
+    this.height = this.canvasHeight * 0.55;
     this.x = this.canvasWidth * 2;
-    this.y = this.getGroundLine();
+    this.y = this.getGroundLine() + 10;
     this.speed = 3.5;
     this.offset = this.setOffsetParameter();
   }
