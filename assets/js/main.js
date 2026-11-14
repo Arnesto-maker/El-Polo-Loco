@@ -57,7 +57,9 @@ function openHighScore() {
   currentMenuFrame = 4;
 }
 
-
+function initDebug() {
+  startNewGame()
+}
 
 
 function exitGame() {

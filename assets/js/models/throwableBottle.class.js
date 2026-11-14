@@ -23,7 +23,6 @@ class ThrowableBottle extends MovableObject {
     this.loadAllImages();
     this.setMainParameter(startX, startY, otherDirection, yMax);
     this.setDirectionParameter(otherDirection);
-    
   }
 
   loadAllImages() {
@@ -106,5 +105,4 @@ class ThrowableBottle extends MovableObject {
     this.frameTick = 0;
     this.splashTime = performance.now();
   }
-
 }

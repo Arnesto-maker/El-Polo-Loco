@@ -1,5 +1,5 @@
 class CoinConverter {
-constructor(statusBar, engine) {
+  constructor(statusBar, engine) {
     this.statusBar = statusBar;
     this.engine = engine;
     this.isOpen = false;
@@ -27,8 +27,7 @@ constructor(statusBar, engine) {
     this.coinImg = new Image();
     this.coinImg.src = "assets/img/7_statusbars/3_icons/icon_coin.png";
     this.bottleImg = new Image();
-    this.bottleImg.src =
-      "assets/img/7_statusbars/3_icons/icon_salsa_bottle.png";
+    this.bottleImg.src = "assets/img/7_statusbars/3_icons/icon_salsa_bottle.png";
   }
 
   initPopupLayout() {
@@ -109,13 +108,7 @@ constructor(statusBar, engine) {
     ctx.strokeStyle = "#000000";
     ctx.lineWidth = 5;
     ctx.beginPath();
-    ctx.roundRect(
-      this.box.x,
-      this.box.y,
-      this.box.w,
-      this.box.h,
-      this.borderRadius,
-    );
+    ctx.roundRect(this.box.x, this.box.y, this.box.w, this.box.h, this.borderRadius);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
@@ -136,11 +129,7 @@ constructor(statusBar, engine) {
     ctx.fillStyle = "#000000";
     ctx.font = "bold 36px Arial";
     ctx.fillText(this.statusBar.coinCount, this.box.x + 145, this.box.y + 195);
-    ctx.fillText(
-      this.statusBar.bottleCount,
-      this.box.x + 365,
-      this.box.y + 195,
-    );
+    ctx.fillText(this.statusBar.bottleCount, this.box.x + 365, this.box.y + 195);
     ctx.restore();
   }
 

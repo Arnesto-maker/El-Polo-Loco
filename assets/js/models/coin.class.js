@@ -1,8 +1,5 @@
 class Coin extends DrawableObject {
-  IMAGES_COIN = [
-    "assets/img/8_coin/coin_1.png",
-    "assets/img/8_coin/coin_2.png",
-  ];
+  IMAGES_COIN = ["assets/img/8_coin/coin_1.png", "assets/img/8_coin/coin_2.png"];
   constructor(canvas, x, y) {
     super(canvas);
     this.loadImages(this.IMAGES_COIN);
@@ -11,7 +8,7 @@ class Coin extends DrawableObject {
     this.height = this.canvasHeight * 0.12;
     this.x = x;
     this.y = y;
-    this.offset = this.setOffsetParameter()
+    this.offset = this.setOffsetParameter();
   }
 
   setOffsetParameter() {

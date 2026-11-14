@@ -1,13 +1,10 @@
 class Bottle extends DrawableObject {
-  IMAGES_GROUND = [
-    "assets/img/6_salsa_bottle/1_salsa_bottle_on_ground.png",
-    "assets/img/6_salsa_bottle/2_salsa_bottle_on_ground.png",
-  ];
+  IMAGES_GROUND = ["assets/img/6_salsa_bottle/1_salsa_bottle_on_ground.png", "assets/img/6_salsa_bottle/2_salsa_bottle_on_ground.png"];
   constructor(canvas, sectorMinX, sectorMaxX) {
     super(canvas);
     this.initBottleImage();
     this.setBottleParameter(sectorMaxX, sectorMinX);
-    this.offset = this.setOffsetParameter()
+    this.offset = this.setOffsetParameter();
   }
 
   initBottleImage() {

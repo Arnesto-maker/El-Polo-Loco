@@ -57,9 +57,7 @@ class World {
   }
 
   setBottleCount(minBottles, maxBottles) {
-    return Math.floor(
-      minBottles + Math.random() * (maxBottles - minBottles + 1),
-    );
+    return Math.floor(minBottles + Math.random() * (maxBottles - minBottles + 1));
   }
 
   spawnBottlesForFrame(frameIndex, canvas) {

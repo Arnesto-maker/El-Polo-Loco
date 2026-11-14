@@ -24,7 +24,7 @@ class StartHelpPopup {
   initLayout() {
     const cw = this.engine.ctx.canvas.width;
     const ch = this.engine.ctx.canvas.height;
-    const w = cw * 0.80;
+    const w = cw * 0.8;
     const h = ch * 0.64;
     this.box = { x: (cw - w) / 2, y: (ch - h) / 2, w: w, h: h };
     this.initInnerBox(ch);
@@ -38,7 +38,7 @@ class StartHelpPopup {
       w: b.w * 0.8,
       h: b.h * 0.74,
     };
-    this.fontSize = Math.floor(ch * 0.030);
+    this.fontSize = Math.floor(ch * 0.03);
     this.lineStep = this.fontSize * 2;
   }
 
@@ -82,12 +82,7 @@ class StartHelpPopup {
     ctx.save();
     ctx.strokeStyle = "#000000";
     ctx.lineWidth = 2;
-    ctx.strokeRect(
-      this.innerBox.x,
-      this.innerBox.y,
-      this.innerBox.w,
-      this.innerBox.h,
-    );
+    ctx.strokeRect(this.innerBox.x, this.innerBox.y, this.innerBox.w, this.innerBox.h);
     ctx.restore();
   }
 

@@ -70,12 +70,7 @@ class MovableObject {
   }
 
   isColliding(obj) {
-    if (
-      this.checkRightEdgeHitsLeft(obj) &&
-      this.checkLeftEdgeHitsRight(obj) &&
-      this.checkBottomEdgeHitsTop(obj) &&
-      this.checkTopEdgeHitsBottom(obj)
-    ) {
+    if (this.checkRightEdgeHitsLeft(obj) && this.checkLeftEdgeHitsRight(obj) && this.checkBottomEdgeHitsTop(obj) && this.checkTopEdgeHitsBottom(obj)) {
       return true;
     } else {
       return false;
@@ -104,7 +99,7 @@ class MovableObject {
     this.frameTick++;
   }
 
-isImageLoaded() {
+  isImageLoaded() {
     if (this.img && this.img.complete && this.img.naturalWidth > 0) {
       return true;
     } else {
@@ -140,12 +135,7 @@ isImageLoaded() {
     ctx.save();
     ctx.beginPath();
     this.setHitBoxParameter(ctx);
-    ctx.rect(
-      this.x + this.offset.left,
-      this.y + this.offset.top,
-      this.width - this.offset.left - this.offset.right,
-      this.height - this.offset.top - this.offset.bottom,
-    );
+    ctx.rect(this.x + this.offset.left, this.y + this.offset.top, this.width - this.offset.left - this.offset.right, this.height - this.offset.top - this.offset.bottom);
     ctx.stroke();
     ctx.restore();
   }

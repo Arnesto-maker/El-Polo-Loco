@@ -16,20 +16,13 @@ class BossDossierPopup {
 
   initTextData() {
     this.topLines = ["Boss fight started !!", "Hints:"];
-    this.bottomLines = [
-      "upper body : -20",
-      "middle Body : -10",
-      "lower body : -5",
-      "tipp:",
-      "use jump throw to deal more damage and avoid",
-      "salvo attack.",
-    ];
+    this.bottomLines = ["upper body : -20", "middle Body : -10", "lower body : -5", "tipp:", "use jump throw to deal more damage and avoid", "salvo attack."];
   }
 
   initLayout() {
     const cw = this.engine.ctx.canvas.width;
     const ch = this.engine.ctx.canvas.height;
-    const w = cw * 0.80;
+    const w = cw * 0.8;
     const h = ch * 0.64;
     this.box = { x: (cw - w) / 2, y: (ch - h) / 2, w: w, h: h };
     this.initImageAndFontLayout(ch);

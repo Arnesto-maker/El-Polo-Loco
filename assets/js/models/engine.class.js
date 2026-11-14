@@ -118,10 +118,7 @@ class GameEngine {
   reduceBossScoreBonus(dt) {
     if (this.statusBar.bossBonus > 0) {
       const penalty = Math.floor(dt * 0.1);
-      this.statusBar.bossBonus = Math.max(
-        0,
-        this.statusBar.bossBonus - penalty,
-      );
+      this.statusBar.bossBonus = Math.max(0, this.statusBar.bossBonus - penalty);
     }
   }
 
@@ -130,13 +127,7 @@ class GameEngine {
     const startX = boss.x + boss.width * 0.4;
     const startY = boss.y + boss.height * 0.1;
     for (let i = 0; i < velocitiesX.length; i++) {
-      const b = new BossBottle(
-        this.ctx.canvas,
-        startX,
-        startY,
-        velocitiesX[i],
-        -21,
-      );
+      const b = new BossBottle(this.ctx.canvas, startX, startY, velocitiesX[i], -21);
       this.world.bossBottles.push(b);
     }
     this.frameObjects = this.world.getFramePackages();
@@ -169,13 +160,7 @@ class GameEngine {
   }
 
   spawnThrownBottle(startX, startY, otherDirection, yMax) {
-    const bottle = new ThrowableBottle(
-      this.ctx.canvas,
-      startX,
-      startY,
-      otherDirection,
-      yMax,
-    );
+    const bottle = new ThrowableBottle(this.ctx.canvas, startX, startY, otherDirection, yMax);
     this.world.throwableBottles.push(bottle);
     this.frameObjects = this.world.getFramePackages();
   }
@@ -256,11 +241,9 @@ class GameEngine {
 
   removeSplashedBottles() {
     const prevLength = this.world.throwableBottles.length;
-    this.world.throwableBottles = this.world.throwableBottles.filter(
-      (bottle) => {
-        return this.isBottleStillActive(bottle);
-      },
-    );
+    this.world.throwableBottles = this.world.throwableBottles.filter((bottle) => {
+      return this.isBottleStillActive(bottle);
+    });
     if (this.world.throwableBottles.length !== prevLength) {
       this.frameObjects = this.world.getFramePackages();
     }

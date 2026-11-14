@@ -3,8 +3,8 @@ class Character extends MovableObject {
   isJumping = false;
   isMoving = false;
   isThrowing = false;
-  readyToSpawnBottle = false; 
-  
+  readyToSpawnBottle = false;
+
   idleTimer = 0;
   cameraX = 0;
   health = 100;
@@ -73,7 +73,7 @@ class Character extends MovableObject {
     this.img = this.imageCache[this.IMAGE_0];
     this.width = this.canvasWidth * 0.14;
     this.height = this.canvasHeight * 0.36;
-    this.x = this.canvasWidth * 0.05; 
+    this.x = this.canvasWidth * 0.05;
     this.y = this.canvasHeight - this.height - this.floor;
     this.yMax = this.y - this.canvasHeight * 0.5;
     this.offset = this.setOffsetParameter();
@@ -132,7 +132,7 @@ class Character extends MovableObject {
     const isMoving = controller.right || controller.left;
     if (this.isThrowing) {
       this.idleTimer = 0;
-      this.handleThrowAnimation()
+      this.handleThrowAnimation();
     } else if (this.isJumping) {
       this.idleTimer = 0;
       this.playAnimation(this.IMAGES_JUMP);
@@ -252,14 +252,14 @@ class Character extends MovableObject {
     return timePassed < 750;
   }
 
-startThrowSequence() {
+  startThrowSequence() {
     const currentTime = performance.now();
     if (this.isThrowing || currentTime - this.lastThrowTime < this.throwCooldown) {
       return;
     }
     this.isThrowing = true;
     this.lastThrowTime = currentTime;
-    this.resetAnimationFrame(); 
+    this.resetAnimationFrame();
   }
 
   handleThrowAnimation() {

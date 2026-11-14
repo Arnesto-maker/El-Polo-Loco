@@ -15,12 +15,14 @@ body {
   font-family: "PolloFont", Arial, sans-serif;
 }
 
+
+
 #gameCanvas {
   max-height: 100vh;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   position: fixed;
-  width: 100dvw;
+  /* width: 100dvw; */
 }
 * {
   box-sizing: border-box;

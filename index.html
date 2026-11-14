@@ -2,11 +2,40 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>El Pollo Loco – Tactical Edition</title>
+    <meta
+      name="description"
+      content="Tactical 2D action jump-and-run game featuring multi-phase boss combat, vertical hit-zones, and a live coin-to-ammo economy. Built with Arnesto Classic Architecture."
+    />
+    <meta name="keywords" content="El Pollo Loco, Indie Game, HTML5 Canvas, JavaScript Game, Tactical Platformer" />
+    <meta name="author" content="Arnesto" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#ee8a45" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="El Pollo Loco" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="El Pollo Loco – Tactical Edition" />
+    <meta
+      property="og:description"
+      content="Face the ultimate feathered nightmare! Break the 100-point armor shield, hit critical zones, and survive bullet-hell salvos."
+    />
+    <meta property="og:image" content="assets/img/9_intro_outro_screens/start/startscreen_1.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="El Pollo Loco – Tactical Edition" />
+    <meta
+      name="twitter:description"
+      content="Tactical 2D action game engineered with Pure JS and the strict Arnesto Classic Architecture."
+    />
+    <meta name="twitter:image" content="assets/img/9_intro_outro_screens/start/startscreen_1.png" />
     <title>El Polo Loco</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" href="assets/img/7_statusbars/3_icons/icon_salsa_bottle.png" />
   </head>
-  <body onload="initMenu()" onkeydown="handleMenuKeyDown(event)">
+  <body onload="initDebug()" onkeydown="handleMenuKeyDown(event)">
     <canvas id="gameCanvas" width="2048" height="1280"></canvas>
     <section id="start-overlay" class="start-overlay">
       <div id="frame-1" class="frame-1" onclick="showFrame2()">
@@ -21,35 +50,30 @@
       <article id="frame-about" class="frame-about d-none">
         <h2 class="about-title">EL POLLO LOCO – TACTICAL EDITION</h2>
         <p class="about-text">
-          Forget everything you know about standard jump-and-run games. In the
-          scorching Mexican desert, Pepe faces the ultimate feathered nightmare!
+          Forget everything you know about standard jump-and-run games. In the scorching Mexican desert, Pepe faces the
+          ultimate feathered nightmare!
         </p>
         <div class="about-list">
           <p class="about-item">
-            <strong>Tactical Boss Combat:</strong> Break through a 100-point
-            armor shield, aim for critical vertical hit-zones, and survive
-            escalating bullet-hell salvo phases.
+            <strong>Tactical Boss Combat:</strong> Break through a 100-point armor shield, aim for critical vertical
+            hit-zones, and survive escalating bullet-hell salvo phases.
           </p>
           <p class="about-item">
-            <strong>Smart Resource Economy:</strong> Collect coins and use the
-            live in-game Coin Converter (Press B) to restock salsa bottles in
-            the heat of battle.
+            <strong>Smart Resource Economy:</strong> Collect coins and use the live in-game Coin Converter (Press B) to
+            restock salsa bottles in the heat of battle.
           </p>
           <p class="about-item">
-            <strong>Adaptive AI:</strong> Watch your step—three sneaky back-hits
-            will trigger an instant turnaround combo!
+            <strong>Adaptive AI:</strong> Watch your step—three sneaky back-hits will trigger an instant turnaround
+            combo!
           </p>
         </div>
         <p class="about-text">
-          <strong>Engineering &amp; Architecture:</strong> Built from scratch
-          using Pure Vanilla JavaScript, HTML5 Canvas,
-          <strong>and powered by Gemini 4 Argon</strong>.
+          <strong>Engineering &amp; Architecture:</strong> Built from scratch using Pure Vanilla JavaScript, HTML5
+          Canvas, <strong>and powered by Gemini 4 Argon</strong>.
           <strong>The Image Assets of this Game are Product of Developer Akademie GmbH</strong>
         </p>
         <p class="about-Author">Created by: Arnesto as a Project for developer Akademie</p>
-        <button class="menu-btn about-back-btn" onclick="showFrame2()">
-          Back
-        </button>
+        <button class="menu-btn about-back-btn" onclick="showFrame2()">Back</button>
       </article>
     </section>
   </body>
