@@ -18,18 +18,38 @@ class GameEngine {
     this.startHelp = new StartHelpPopup(this);
     this.bossDossier = new BossDossierPopup(this);
     this.coinConverter = new CoinConverter(this.statusBar, this);
+    this.pausePopup = new PausePopup(this);
   }
 
   bindPopupEvents() {
     window.addEventListener("keydown", (e) => {
-      if (this.startHelp.isOpen) {
-        this.startHelp.handleKeyDown(e.key);
-      } else if (this.bossDossier.isOpen) {
-        this.bossDossier.handleKeyDown(e.key);
-      } else {
-        this.coinConverter.handleKeyDown(e.key);
-      }
+      this.routePopupKeyDown(e.key);
     });
+  }
+
+  initPopups() {
+    this.startHelp = new StartHelpPopup(this);
+    this.bossDossier = new BossDossierPopup(this);
+    this.coinConverter = new CoinConverter(this.statusBar, this);
+    this.pausePopup = new PausePopup(this);
+  }
+
+  bindPopupEvents() {
+    window.addEventListener("keydown", (e) => {
+      this.routePopupKeyDown(e.key);
+    });
+  }
+
+routePopupKeyDown(key) {
+    if (this.startHelp.isOpen) {
+      this.startHelp.handleKeyDown(key);
+    } else if (this.bossDossier.isOpen) {
+      this.bossDossier.handleKeyDown(key);
+    } else if (key === "Escape" || this.pausePopup.isOpen) {
+      this.pausePopup.handleKeyDown(key);
+    } else {
+      this.coinConverter.handleKeyDown(key);
+    }
   }
 
   renderLoop() {
@@ -47,8 +67,6 @@ class GameEngine {
 
   drawActivePopups() {
     this.coinConverter.draw(this.ctx);
-    this.bossDossier.draw(this.ctx);
-    this.startHelp.draw(this.ctx);
   }
 
   drawWorldWithCamera(char) {

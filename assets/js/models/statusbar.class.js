@@ -20,6 +20,7 @@ class StatusBar extends DrawableObject {
   ICON_BOTTLE = "assets/img/7_statusbars/3_icons/icon_salsa_bottle.png";
   ICON_COIN = "assets/img/7_statusbars/3_icons/icon_coin.png";
 
+
   constructor(canvas) {
     super(canvas);
     this.initLoadImages();
@@ -29,11 +30,13 @@ class StatusBar extends DrawableObject {
     this.updateBossHealthImage();
   }
 
+
   initLoadImages() {
     this.loadImages(this.IMAGES_HEALTH);
     this.loadImages(this.IMAGES_BOSS_HEALTH);
     this.loadImages([this.ICON_BOTTLE, this.ICON_COIN]);
   }
+
 
   loadInitialValue() {
     this.health = 100;
@@ -47,6 +50,7 @@ class StatusBar extends DrawableObject {
     this.showBossHud = false;
   }
 
+
   setMainParameter() {
     this.x = this.canvasWidth * 0.01;
     this.y = this.canvasHeight * 0.11;
@@ -54,17 +58,20 @@ class StatusBar extends DrawableObject {
     this.height = this.canvasHeight * 0.1;
   }
 
+
   updateHealthImage() {
     let index = this.setHealthIndex(this.health);
     const path = this.IMAGES_HEALTH[index];
     this.img = this.imageCache[path];
   }
 
+
   updateBossHealthImage() {
     let index = this.setHealthIndex(this.bossHealth);
     const path = this.IMAGES_BOSS_HEALTH[index];
     this.bossImg = this.imageCache[path];
   }
+
 
   setHealthIndex(health) {
     if (health >= 100) {
@@ -77,10 +84,10 @@ class StatusBar extends DrawableObject {
       return 2;
     } else if (health >= 20) {
       return 1;
-    } else {
-      return 0;
     }
+    return 0;
   }
+
 
   formatCount(value) {
     if (value < 10) {
@@ -89,14 +96,17 @@ class StatusBar extends DrawableObject {
     return String(value);
   }
 
+
   drawHealthBar(ctx) {
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
   }
+
 
   drawBossHealthBar(ctx) {
     const bossBarX = this.canvasWidth * 0.78;
     ctx.drawImage(this.bossImg, bossBarX, this.y + 20, this.width, this.height);
   }
+
 
   drawBossArmourText(ctx) {
     if (this.bossArmour <= 0) {
@@ -109,6 +119,7 @@ class StatusBar extends DrawableObject {
     ctx.fillText(armourText, armourX, armourY);
   }
 
+
   drawBossTimerGroup(ctx) {
     const sec = this.formatCount(Math.floor(this.bossTimeMs / 1000));
     const ms = this.formatCount(Math.floor((this.bossTimeMs % 1000) / 10));
@@ -119,6 +130,7 @@ class StatusBar extends DrawableObject {
     ctx.fillText(timeText, timeX, timeY);
   }
 
+
   drawBossHud(ctx) {
     if (!this.showBossHud) {
       return;
@@ -128,6 +140,7 @@ class StatusBar extends DrawableObject {
     this.drawBossTimerGroup(ctx);
   }
 
+
   setFontStyling(ctx) {
     const fontSize = Math.floor(this.canvasHeight * 0.031);
     ctx.font = ` ${fontSize}px PolloFont`;
@@ -135,6 +148,7 @@ class StatusBar extends DrawableObject {
     ctx.strokeStyle = "#000000";
     ctx.textBaseline = "middle";
   }
+
 
   drawBottleGroup(ctx) {
     const row2Y = this.y + this.height + this.canvasHeight * 0.01;
@@ -147,6 +161,7 @@ class StatusBar extends DrawableObject {
     ctx.strokeText(bottleText, bottleTextX, textCenterY);
     ctx.fillText(bottleText, bottleTextX, textCenterY);
   }
+
 
   drawCoinGroup(ctx) {
     const row2Y = this.y + this.height + this.canvasHeight * 0.01;
@@ -161,6 +176,7 @@ class StatusBar extends DrawableObject {
     ctx.fillText(coinText, coinTextX, textCenterY);
   }
 
+
   drawScoringGroup(ctx) {
     const row2Y = this.y + this.height + this.canvasHeight * 0.01;
     const iconSize = this.height * 0.85;
@@ -169,8 +185,10 @@ class StatusBar extends DrawableObject {
     ctx.strokeText(scoreText, this.x + 50, row3Y);
     ctx.fillText(scoreText, this.x + 50, row3Y);
     this.drawBossBonusText(ctx, row3Y);
+    this.drawPauseHintText(ctx, row3Y);
     this.drawBuyHintGroup(ctx, row3Y);
   }
+
 
   drawBossBonusText(ctx, row3Y) {
     if (!this.showBossHud) {
@@ -182,29 +200,45 @@ class StatusBar extends DrawableObject {
     ctx.fillText(bonusText, bonusX, row3Y);
   }
 
+
+  drawPauseHintText(ctx, row3Y) {
+    const row4Y = row3Y + this.canvasHeight * 0.042;
+    const fontSize = Math.floor(this.canvasHeight * 0.024);
+    const hintText = "Press esc to pause";
+    const textX = this.x + 50;
+    ctx.save();
+    ctx.font = `${fontSize}px PolloFont`;
+    ctx.strokeText(hintText, textX, row4Y);
+    ctx.fillText(hintText, textX, row4Y);
+    ctx.restore();
+  }
+
+
   drawBuyHintGroup(ctx, row3Y) {
     if (this.coinCount < 2) {
       return;
     }
-    const row4Y = row3Y + this.canvasHeight * 0.045;
+    const row5Y = row3Y + this.canvasHeight * 0.085;
     const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.08;
     const fontSize = Math.floor(this.canvasHeight * 0.024 * pulse);
     ctx.save();
     ctx.font = `${fontSize}px PolloFont`;
-    this.renderBuyHintElements(ctx, row4Y, pulse);
+    this.renderBuyHintElements(ctx, row5Y, pulse);
     ctx.restore();
   }
 
-  renderBuyHintElements(ctx, row4Y, pulse) {
+
+  renderBuyHintElements(ctx, row5Y, pulse) {
     const hintText = "Press B to buy";
     const textX = this.x + 50;
-    ctx.strokeText(hintText, textX, row4Y);
-    ctx.fillText(hintText, textX, row4Y);
+    ctx.strokeText(hintText, textX, row5Y);
+    ctx.fillText(hintText, textX, row5Y);
     const iconSize = this.height * 0.5 * pulse;
     const iconX = textX + ctx.measureText(hintText).width + 4;
     const bottleIcon = this.imageCache[this.ICON_BOTTLE];
-    ctx.drawImage(bottleIcon, iconX, row4Y - iconSize / 2, iconSize, iconSize);
+    ctx.drawImage(bottleIcon, iconX, row5Y - iconSize / 2, iconSize, iconSize);
   }
+
 
   draw(ctx) {
     ctx.save();

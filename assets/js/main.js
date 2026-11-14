@@ -53,6 +53,12 @@ function initGameEngine() {
   const engine = new GameEngine(canvas,controller,world.getFramePackages(),world);
 }
 
+function returnToFrame2FromGame() {
+  currentMenuFrame = 2;
+  toggleElement("start-overlay", true);
+  setMenuVisibility(false, true, false);
+}
+
 function openHighScore() {
   currentMenuFrame = 4;
 }
