@@ -1,36 +1,48 @@
 let currentMenuFrame = 1;
 
+function setMenuVisibility(showF1, showF2, showAbout) {
+  toggleElement("frame-1", showF1);
+  toggleElement("frame-2", showF2);
+  toggleElement("frame-about", showAbout);
+}
+
+function toggleElement(id, show) {
+  const el = document.getElementById(id);
+  if (show) {
+    el.classList.remove("d-none");
+  } else {
+    el.classList.add("d-none");
+  }
+}
+
 function initMenu() {
   currentMenuFrame = 1;
-  const overlay = document.getElementById("start-overlay");
-  const frame1 = document.getElementById("frame-1");
-  const frame2 = document.getElementById("frame-2");
-  overlay.classList.remove("d-none");
-  frame1.classList.remove("d-none");
-  frame2.classList.add("d-none");
+  toggleElement("start-overlay", true);
+  setMenuVisibility(true, false, false);
 }
 
 function handleMenuKeyDown(event) {
-  if (currentMenuFrame === 1) {
-    if (event.key === "Enter") {
-      showFrame2();
-    }
+  if (currentMenuFrame === 1 && event.key === "Enter") {
+    showFrame2();
+  } else if (currentMenuFrame === 3 && event.key === "Escape") {
+    showFrame2();
   }
 }
 
 function showFrame2() {
   currentMenuFrame = 2;
-  const frame1 = document.getElementById("frame-1");
-  const frame2 = document.getElementById("frame-2");
-  frame1.classList.add("d-none");
-  frame2.classList.remove("d-none");
+  setMenuVisibility(false, true, false);
+}
+
+function openAbout() {
+  currentMenuFrame = 3;
+  setMenuVisibility(false, false, true);
 }
 
 
 function startNewGame() {
   currentMenuFrame = 0;
-  const overlay = document.getElementById("start-overlay");
-  overlay.classList.add("d-none");
+  toggleElement("start-overlay", false);
   initGameEngine();
 }
 
@@ -42,15 +54,10 @@ function initGameEngine() {
 }
 
 function openHighScore() {
-  // Wird mit der Highscore-Skizze verknüpft
+  currentMenuFrame = 4;
 }
 
-/**
- * Platzhalter-Methode für das About-Menü.
- */
-function openAbout() {
-  // Wird mit der About-Skizze verknüpft
-}
+
 
 
 function exitGame() {
