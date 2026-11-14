@@ -6,8 +6,18 @@
     <title>El Polo Loco</title>
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
-    <canvas id="gameCanvas" width="2048" height="1380"></canvas>
+  <body onload="initMenu()" onkeydown="handleMenuKeyDown(event)">
+    <canvas id="gameCanvas" width="2048" height="1280"></canvas>
+    <section id="start-overlay" class="start-overlay">
+      <div id="frame-1" class="frame-1" onclick="showFrame2()">
+        <p class="blink-text">Press Enter,Click or Touch to start</p></div>
+      <nav id="frame-2" class="frame-2 d-none">
+        <button class="menu-btn" onclick="startNewGame()">New game</button>
+        <button class="menu-btn" onclick="openHighScore()">High score</button>
+        <button class="menu-btn" onclick="openAbout()">About</button>
+        <button class="menu-btn" onclick="exitGame()">Exit.</button>
+      </nav>
+    </section>
   </body>
   <script src="assets/js/models/movableObject.class.js"></script>
   <script src="assets/js/models/drawableObject.class.js"></script>
