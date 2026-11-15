@@ -13,7 +13,6 @@ class PausePopup {
     window.pausePopup = this;
   }
 
-
   /**
    * Blendet das Pause-Overlay im DOM ein (O2).
    */
@@ -22,7 +21,6 @@ class PausePopup {
       this.overlayElement.classList.remove("d-none");
     }
   }
-
 
   /**
    * Blendet das Pause-Overlay im DOM aus.
@@ -33,7 +31,6 @@ class PausePopup {
     }
   }
 
-
   /**
    * Prüft die Escape-Taste zum Öffnen oder Schließen der Pause (i1).
    * @param {string} key - Der gedrückte Tastenname.
@@ -43,7 +40,6 @@ class PausePopup {
       this.togglePause();
     }
   }
-
 
   /**
    * Schaltet zwischen Pause und Spiel um, wenn kein anderes Popup offen ist.
@@ -59,7 +55,6 @@ class PausePopup {
     }
   }
 
-
   /**
    * Prüft, ob aktuell this.startHelp oder this.bossDossier geöffnet ist.
    * @returns {boolean} True, wenn ein anderes Overlay aktiv ist.
@@ -70,7 +65,6 @@ class PausePopup {
     return Boolean(helpOpen || bossOpen);
   }
 
-
   /**
    * Pausiert den Spiel-Algorithmus und startet das CSS-Overlay (O1 -> O2).
    */
@@ -79,7 +73,6 @@ class PausePopup {
     this.engine.isPaused = true;
     this.showOverlay();
   }
-
 
   /**
    * Zweig 2a: Schließt das Pause-Menü und setzt den Spiel-Algorithmus fort (O1).
@@ -94,7 +87,6 @@ class PausePopup {
     }
   }
 
-
   /**
    * Zweig 2b (ja): Schließt Frame 4 und zeigt this.startHelp erneut an (O2).
    */
@@ -105,7 +97,6 @@ class PausePopup {
       this.engine.startHelp.openPopup();
     }
   }
-
 
   /**
    * Zweig 2c (sonst): Beendet den Lauf und kehrt zurück zu Frame 2 (Menü Start).
@@ -118,7 +109,6 @@ class PausePopup {
   }
 }
 
-
 /**
  * Globale Inline-Funktion für den Klick/Touch auf "Resume" (Zweig 2a).
  */
@@ -128,7 +118,6 @@ function resumeGameFromDom() {
   }
 }
 
-
 /**
  * Globale Inline-Funktion für den Klick/Touch auf "Help" (Zweig 2b).
  */
@@ -137,7 +126,6 @@ function openHelpFromPauseDom() {
     window.pausePopup.openHelp();
   }
 }
-
 
 /**
  * Globale Inline-Funktion für den Klick/Touch auf "Exit" (Zweig 2c).

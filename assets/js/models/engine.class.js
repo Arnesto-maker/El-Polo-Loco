@@ -35,12 +35,16 @@ class GameEngine {
   }
 
   bindPopupEvents() {
-    window.addEventListener("keydown", (e) => {
+    if (window.activePopupKeyHandler) {
+      window.removeEventListener("keydown", window.activePopupKeyHandler);
+    }
+    window.activePopupKeyHandler = (e) => {
       this.routePopupKeyDown(e.key);
-    });
+    };
+    window.addEventListener("keydown", window.activePopupKeyHandler);
   }
 
-routePopupKeyDown(key) {
+  routePopupKeyDown(key) {
     if (this.startHelp.isOpen) {
       this.startHelp.handleKeyDown(key);
     } else if (this.bossDossier.isOpen) {
