@@ -3,6 +3,7 @@ let currentMenuFrame = 1;
 function setMenuVisibility(showF1, showF2, showAbout, showGameOver) {
   toggleElement("frame-1", showF1);
   toggleElement("frame-2", showF2);
+  toggleElement("gameCanvas", showF2);
   toggleElement("frame-about", showAbout);
   toggleElement("game-over-frame", Boolean(showGameOver));
 }
