@@ -4,14 +4,20 @@ class Character extends MovableObject {
   isMoving = false;
   isThrowing = false;
   readyToSpawnBottle = false;
-
   idleTimer = 0;
   cameraX = 0;
   health = 100;
   lastHit = 0;
+  hurtTriggerTime = 0;
+  nextHurtThreshold = 80;
   lastThrowTime = 0;
   throwCooldown = 500;
   throwDuration = 400;
+  deathAnimationStarted = false;
+  deathFinishedTime = 0;
+  deathHoldDuration = 1200;
+  isReadyForGameOver = false;
+
   IMAGE_0 = "assets/img/2_character_pepe/1_idle/idle/I-1.png";
   IMAGES_LONG_IDLE = [
     "assets/img/2_character_pepe/1_idle/long_idle/I-11.png",
@@ -62,6 +68,19 @@ class Character extends MovableObject {
     "assets/img/2_character_pepe/6_throw/T-3.png",
     "assets/img/2_character_pepe/6_throw/T-4.png",
   ];
+  IMAGES_HURT = [
+    "assets/img/2_character_pepe/4_hurt/H-41.png",
+    "assets/img/2_character_pepe/4_hurt/H-42.png",
+    "assets/img/2_character_pepe/4_hurt/H-43.png",
+  ];
+  IMAGES_DEATH = [
+    "assets/img/2_character_pepe/5_dead/D-51.png",
+    "assets/img/2_character_pepe/5_dead/D-52.png",
+    "assets/img/2_character_pepe/5_dead/D-53.png",
+    "assets/img/2_character_pepe/5_dead/D-54.png",
+    "assets/img/2_character_pepe/5_dead/D-55.png",
+    "assets/img/2_character_pepe/5_dead/D-56.png",
+  ];
 
   constructor(canvas) {
     super(canvas);
@@ -95,6 +114,8 @@ class Character extends MovableObject {
     this.loadImages(this.IMAGES_JUMP);
     this.loadImages(this.IMAGES_MOVING);
     this.loadImages(this.IMAGES_THROWING);
+    this.loadImages(this.IMAGES_HURT);
+    this.loadImages(this.IMAGES_DEATH);
   }
 
   updateCameraControl() {
@@ -119,16 +140,57 @@ class Character extends MovableObject {
   }
 
   update(controller) {
-    if (!this.isThrowing) {
+    this.checkHurtThreshold();
+    const isLocked = this.isDead() || this.isHurtAnimationActive();
+    if (!isLocked && !this.isThrowing) {
       this.moveRight(controller);
       this.moveleft(controller);
     }
-    this.jump(controller);
+    this.updateJumpOrGravity(controller, isLocked);
     this.updateCameraControl();
     this.updateAnimation(controller);
   }
 
+  updateJumpOrGravity(controller, isLocked) {
+    if (!isLocked) {
+      this.jump(controller);
+    } else if (this.isJumping || this.isAboveGround()) {
+      this.setJumpingSequenz();
+    }
+  }
+
+  checkHurtThreshold() {
+    if (this.health <= 0 || this.nextHurtThreshold <= 0) {
+      return;
+    }
+    if (this.health < this.nextHurtThreshold) {
+      this.hurtTriggerTime = performance.now();
+      this.resetAnimationFrame();
+      this.advanceHurtThreshold();
+    }
+  }
+
+  advanceHurtThreshold() {
+    if (this.health < 20) {
+      this.nextHurtThreshold = 0;
+    } else if (this.health < 40) {
+      this.nextHurtThreshold = 20;
+    } else if (this.health < 60) {
+      this.nextHurtThreshold = 40;
+    } else if (this.health < 80) {
+      this.nextHurtThreshold = 60;
+    }
+  }
+
   updateAnimation(controller) {
+    if (this.isDead() || this.isHurtAnimationActive()) {
+      this.evaluateNodeS(controller);
+      return;
+    }
+    this.updateStandardAnimation(controller);
+  }
+
+  updateStandardAnimation(controller) {
     const isMoving = controller.right || controller.left;
     if (this.isThrowing) {
       this.idleTimer = 0;
@@ -142,6 +204,97 @@ class Character extends MovableObject {
     } else {
       this.idleTimer++;
       this.startIdleSequenz();
+    }
+  }
+
+  evaluateNodeS(controller) {
+    if (this.health < 80 && this.health >= 60) {
+      this.startHurtAnimation();
+      this.executeNodeX(controller);
+    } else if (this.health < 60 && this.health >= 40) {
+      this.startHurtAnimation();
+      this.executeNodeX(controller);
+    } else {
+      this.evaluateNode2a(controller);
+    }
+  }
+
+  evaluateNode2a(controller) {
+    if (this.health < 40 && this.health >= 20) {
+      this.startHurtAnimation();
+      this.executeNodeX(controller);
+    } else if (this.health < 20 && this.health > 0) {
+      this.startHurtAnimation();
+      this.executeNodeX(controller);
+    } else {
+      this.evaluateNode2b(controller);
+    }
+  }
+
+  evaluateNode2b(controller) {
+    if (this.health > 0) {
+      this.updateStandardAnimation(controller);
+    } else {
+      this.startDeathAnimation();
+    }
+  }
+
+  executeNodeX(controller) {
+    const otherAnimRunning = this.isOtherAnimationRunning(controller);
+    if (otherAnimRunning) {
+      this.startHurtAnimationAsPriority();
+    } else {
+      this.startHurtAnimationAsPriority();
+    }
+  }
+
+  isOtherAnimationRunning(controller) {
+    const isMoving = controller.right || controller.left;
+    return this.isThrowing || this.isJumping || isMoving || this.idleTimer > 0;
+  }
+
+  startHurtAnimation() {
+    this.idleTimer = 0;
+  }
+
+  startHurtAnimationAsPriority() {
+    this.isThrowing = false;
+    this.idleTimer = 0;
+    this.playAnimation(this.IMAGES_HURT);
+  }
+
+  startDeathAnimation() {
+    this.initDeathSequence();
+    const lastFrame = this.IMAGES_DEATH[this.IMAGES_DEATH.length - 1];
+    if (this.deathFinishedTime === 0) {
+      this.playDeathFrames(lastFrame);
+    } else {
+      this.holdLastDeathFrame(lastFrame);
+    }
+  }
+
+  initDeathSequence() {
+    if (!this.deathAnimationStarted) {
+      this.deathAnimationStarted = true;
+      this.deathFinishedTime = 0;
+      this.resetAnimationFrame();
+    }
+    this.isThrowing = false;
+    this.idleTimer = 0;
+  }
+
+  playDeathFrames(lastFrame) {
+    this.playAnimation(this.IMAGES_DEATH);
+    if (this.imageCounter >= this.IMAGES_DEATH.length - 1) {
+      this.img = this.imageCache[lastFrame];
+      this.deathFinishedTime = performance.now();
+    }
+  }
+
+  holdLastDeathFrame(lastFrame) {
+    this.img = this.imageCache[lastFrame];
+    if (performance.now() - this.deathFinishedTime >= this.deathHoldDuration) {
+      this.isReadyForGameOver = true;
     }
   }
 
@@ -240,7 +393,7 @@ class Character extends MovableObject {
 
   hit() {
     this.health -= 5;
-    if (this.health < 0) {
+    if (this.health <= 0) {
       this.health = 0;
     } else {
       this.lastHit = performance.now();
@@ -249,10 +402,22 @@ class Character extends MovableObject {
 
   isHurt() {
     const timePassed = performance.now() - this.lastHit;
-    return timePassed < 750;
+    return timePassed < 750 && this.health > 0;
+  }
+
+  isHurtAnimationActive() {
+    const timePassed = performance.now() - this.hurtTriggerTime;
+    return timePassed < 750 && this.health > 0;
+  }
+
+  isDead() {
+    return this.health <= 0;
   }
 
   startThrowSequence() {
+    if (this.isHurtAnimationActive() || this.isDead()) {
+      return;
+    }
     const currentTime = performance.now();
     if (this.isThrowing || currentTime - this.lastThrowTime < this.throwCooldown) {
       return;

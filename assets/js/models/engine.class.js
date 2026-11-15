@@ -7,24 +7,11 @@ class GameEngine {
     this.statusBar = new StatusBar(canvasElement);
     this.lastBossTick = 0;
     this.isPaused = false;
-    this.startHelp = new StartHelpPopup(this);
-    this.coinConverter = new CoinConverter(this.statusBar, this);
+    this.isRunning = true;
+    this.animationFrameId = null;
     this.initPopups();
     this.bindPopupEvents();
     this.renderLoop();
-  }
-
-  initPopups() {
-    this.startHelp = new StartHelpPopup(this);
-    this.bossDossier = new BossDossierPopup(this);
-    this.coinConverter = new CoinConverter(this.statusBar, this);
-    this.pausePopup = new PausePopup(this);
-  }
-
-  bindPopupEvents() {
-    window.addEventListener("keydown", (e) => {
-      this.routePopupKeyDown(e.key);
-    });
   }
 
   initPopups() {
@@ -45,6 +32,9 @@ class GameEngine {
   }
 
   routePopupKeyDown(key) {
+    if (!this.isRunning) {
+      return;
+    }
     if (this.startHelp.isOpen) {
       this.startHelp.handleKeyDown(key);
     } else if (this.bossDossier.isOpen) {
@@ -57,16 +47,22 @@ class GameEngine {
   }
 
   renderLoop() {
+    if (!this.isRunning || !this.world) {
+      return;
+    }
     const char = this.world.character;
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     if (!this.isPaused) {
       this.updateLogic(char);
+      if (!this.isRunning) {
+        return;
+      }
       this.checkAllCollisions(char);
     }
     this.drawWorldWithCamera(char);
     this.statusBar.draw(this.ctx);
     this.drawActivePopups();
-    requestAnimationFrame(() => this.renderLoop());
+    this.animationFrameId = requestAnimationFrame(() => this.renderLoop());
   }
 
   drawActivePopups() {
@@ -80,14 +76,25 @@ class GameEngine {
   }
 
   updateLogic(char) {
-    this.updateThrowWorkflow(char);
-    this.updateBossFightState();
+    if (!char.isDead() && !char.isHurtAnimationActive()) {
+      this.updateThrowWorkflow(char);
+    }
+    if (!char.isDead()) {
+      this.updateBossFightState();
+    }
     for (let i = 0; i < this.frameObjects.length; i++) {
       if (this.frameObjects[i].update) {
         this.frameObjects[i].update(this.controller);
       }
     }
     this.cleanupObjects();
+    if (char.isReadyForGameOver) {
+      this.executeNode2c();
+    }
+  }
+
+  executeNode2c() {
+    showGameOverFrame();
   }
 
   cleanupObjects() {
@@ -188,6 +195,9 @@ class GameEngine {
   }
 
   checkAllCollisions(char) {
+    if (char.isDead()) {
+      return;
+    }
     this.checkChickenCollision(char);
     this.checkCoinCollisions(char);
     this.checkBottleCollisions(char);

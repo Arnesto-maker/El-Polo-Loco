@@ -92,10 +92,14 @@
     <section id="pause-overlay" class="help-overlay d-none">
       <nav class="pause-box">
         <h2 class="pause-title">Paused</h2>
-        <button class="menu-btn" onclick="resumeGameFromDom() ">Resume</button>
+        <button class="menu-btn" onclick="resumeGameFromDom()">Resume</button>
         <button class="menu-btn" onclick="openHelpFromPauseDom()">Help</button>
         <button class="menu-btn" onclick="exitToMenuFromPauseDom()">Exit</button>
       </nav>
+    </section>
+    <section id="game-over-frame" class="game-over-frame d-none" onclick="handleGameOverTouchOrClick(event)" ontouchstart="handleGameOverTouchOrClick(event)">
+      <img src="assets/img/You won, you lost/Game Over.png" alt="Game Over" class="game-over-bild-02" />
+      <p class="game-over-text">Press Enter, touch, click to continue</p>
     </section>
   </body>
   <script src="assets/js/models/movableObject.class.js"></script>
