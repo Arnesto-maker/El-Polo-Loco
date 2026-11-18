@@ -1,5 +1,3 @@
-
-
 const winState = {
   summary: null,
   pendingPayload: null,
