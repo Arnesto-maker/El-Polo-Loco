@@ -1,14 +1,30 @@
 let currentMenuFrame = 1;
 
-function setMenuVisibility(showF1, showF2, showAbout, showGameOver) {
+const setMenuVisibility = (showF1, showF2, showAbout, showGameOver) => {
+  hideAllWinOverlays();
   toggleElement("frame-1", showF1);
   toggleElement("frame-2", showF2);
   toggleElement("gameCanvas", showF2);
   toggleElement("frame-about", showAbout);
   toggleElement("game-over-frame", Boolean(showGameOver));
-}
+};
 
-function toggleElement(id, show) {
+const hideAllWinOverlays = () => {
+  toggleElement("you-won-frame", false);
+  toggleElement("summary-frame", false);
+  toggleElement("save-score-frame", false);
+  toggleElement("spinner-frame", false);
+  toggleElement("save-status-frame", false);
+  toggleElement("local-save-error-frame", false);
+  toggleElement("highscore-frame", false);
+};
+
+const showOnlyOverlayFrame = (activeId) => {
+  setMenuVisibility(false, false, false, false);
+  toggleElement(activeId, true);
+};
+
+const toggleElement = (id, show) => {
   const el = document.getElementById(id);
   if (!el) {
     return;
@@ -18,15 +34,16 @@ function toggleElement(id, show) {
   } else {
     el.classList.add("d-none");
   }
-}
+};
 
-function initMenu() {
+const initMenu = () => {
   currentMenuFrame = 1;
   toggleElement("start-overlay", true);
   setMenuVisibility(true, false, false, false);
-}
+  initPendingSyncOnLoad();
+};
 
-function handleMenuKeyDown(event) {
+const handleMenuKeyDown = (event) => {
   if (currentMenuFrame === 1 && event.key === "Enter") {
     showFrame2();
   } else if (currentMenuFrame === 2 && event.key === "Escape") {
@@ -35,30 +52,64 @@ function handleMenuKeyDown(event) {
     showFrame2();
   } else if (currentMenuFrame === 5 && event.key === "Enter") {
     returnToFrame2FromGame();
+  } else {
+    handleWinFlowKeyDown(event);
   }
-}
+};
 
-function handleGameOverTouchOrClick(event) {
+const handleWinFlowKeyDown = (event) => {
+  if (currentMenuFrame === 6 && event.key === "Enter") {
+    openSummaryFrame();
+  } else if (currentMenuFrame === 7) {
+    handleSummaryKeyDown(event.key);
+  } else if (currentMenuFrame === 8 && event.key === "Enter") {
+    handleSaveScoreSubmit();
+  } else {
+    handleSaveFlowKeyDown(event.key);
+  }
+};
+
+const handleSummaryKeyDown = (key) => {
+  if (key === "Escape") {
+    executeNode3a();
+  } else if (key === "Enter") {
+    openSaveScoreFrame();
+  }
+};
+
+const handleSaveFlowKeyDown = (key) => {
+  if (currentMenuFrame === 4 && key === "Escape") {
+    showFrame2();
+  } else if (currentMenuFrame === 10 && key === "Enter") {
+    executeNode3a();
+  } else if (currentMenuFrame === 11 && key === "Enter") {
+    handleLocalSaveConfirm();
+  } else if (currentMenuFrame === 11 && key === "Escape") {
+    executeNode3a();
+  }
+};
+
+const handleGameOverTouchOrClick = (event) => {
   if (event.type === "touchstart") {
     event.preventDefault();
   }
   if (currentMenuFrame === 5) {
     returnToFrame2FromGame();
   }
-}
+};
 
-function showFrame2() {
+const showFrame2 = () => {
   currentMenuFrame = 2;
   setMenuVisibility(false, true, false, false);
-}
+};
 
-function showGameOverFrame() {
+const showGameOverFrame = () => {
   resetAllGamePopups();
   currentMenuFrame = 5;
   setMenuVisibility(false, false, false, true);
-}
+};
 
-function resetAllGamePopups() {
+const resetAllGamePopups = () => {
   if (window.activePopupKeyHandler) {
     window.removeEventListener("keydown", window.activePopupKeyHandler);
     window.activePopupKeyHandler = null;
@@ -67,61 +118,69 @@ function resetAllGamePopups() {
   toggleElement("start-help-overlay", false);
   toggleElement("boss-dossier-overlay", false);
   stopRunningGameEngine();
-}
+};
 
-function stopRunningGameEngine() {
+const stopRunningGameEngine = () => {
   if (window.gameEngine) {
     window.gameEngine.isRunning = false;
     window.gameEngine.isPaused = true;
-    if (window.gameEngine.animationFrameId !== null) {
-      cancelAnimationFrame(window.gameEngine.animationFrameId);
-      window.gameEngine.animationFrameId = null;
-    }
+    cancelEngineFrame();
     window.gameEngine = null;
   }
+  clearGameCanvas();
+};
+
+const cancelEngineFrame = () => {
+  if (window.gameEngine.animationFrameId !== null) {
+    cancelAnimationFrame(window.gameEngine.animationFrameId);
+    window.gameEngine.animationFrameId = null;
+  }
+};
+
+const clearGameCanvas = () => {
   const canvas = document.getElementById("gameCanvas");
   if (canvas) {
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
-}
+};
 
-function openAbout() {
+const openAbout = () => {
   currentMenuFrame = 3;
   setMenuVisibility(false, false, true, false);
-}
+};
 
-function startNewGame() {
+const startNewGame = () => {
   resetAllGamePopups();
   currentMenuFrame = 0;
   toggleElement("start-overlay", false);
   setMenuVisibility(false, true, false, false);
   initGameEngine();
-}
+};
 
-function initGameEngine() {
+const initGameEngine = () => {
   const canvas = document.getElementById("gameCanvas");
   const world = new World(canvas);
   const controller = new Controller();
   window.gameEngine = new GameEngine(canvas, controller, world.getFramePackages(), world);
-}
+};
 
-function returnToFrame2FromGame() {
+const returnToFrame2FromGame = () => {
   resetAllGamePopups();
   currentMenuFrame = 2;
   toggleElement("start-overlay", true);
   setMenuVisibility(false, true, false, false);
-}
+};
 
-function openHighScore() {
-  currentMenuFrame = 4;
-}
+const openHighScore = () => {
+  loadAndShowHighscores();
+};
 
-function initDebug() {
+const initDebug = () => {
   startNewGame();
-}
+};
 
-function exitGame() {
+const exitGame = () => {
   resetAllGamePopups();
   initMenu();
-}
+};

@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="assets/img/7_statusbars/3_icons/icon_salsa_bottle.png" />
   </head>
-  <body onload="initMenu()" onkeydown="handleMenuKeyDown(event)">
+  <body onload="initDebug()" onkeydown="handleMenuKeyDown(event)">
     <canvas id="gameCanvas" width="2048" height="1280"></canvas>
     <section id="start-overlay" class="start-overlay">
       <div id="frame-1" class="frame-1" onclick="showFrame2()">
@@ -101,7 +101,18 @@
       <img src="assets/img/You won, you lost/Game Over.png" alt="Game Over" class="game-over-bild-02" />
       <p class="game-over-text">Press Enter, touch, click to continue</p>
     </section>
+    <section id="you-won-frame" class="you-won-frame d-none" onclick="handleYouWonContinue(event)" ontouchstart="handleYouWonContinue(event)">
+      <img src="assets/img/You won, you lost/You won A.png" alt="You Won" class="you-won-bild" />
+      <p class="win-continue-text win-continue-bottom">Press Enter, touch, click to continue</p>
+    </section>
+    <section id="summary-frame" class="win-overlay-frame d-none"></section>
+    <section id="save-score-frame" class="win-overlay-frame d-none"></section>
+    <section id="spinner-frame" class="win-overlay-frame d-none"></section>
+    <section id="save-status-frame" class="win-overlay-frame d-none" onclick="handleSaveStatusContinue(event)" ontouchstart="handleSaveStatusContinue(event)"></section>
+    <section id="local-save-error-frame" class="win-overlay-frame d-none"></section>
+    <section id="highscore-frame" class="win-overlay-frame d-none"></section>
   </body>
+  <script src="assets/js/appFunctions/firebaseConfig.js"></script>
   <script src="assets/js/models/movableObject.class.js"></script>
   <script src="assets/js/models/drawableObject.class.js"></script>
   <script src="assets/js/models/cloud.class.js"></script>
@@ -122,5 +133,9 @@
   <script src="assets/js/models/controller.class.js"></script>
   <script src="assets/js/models/world.class.js"></script>
   <script src="assets/js/models/engine.class.js"></script>
+  <script src="assets/js/appFunctions/template.js"></script>
+  <script src="assets/js/appFunctions/data.js"></script>
+  <script src="assets/js/appFunctions/render.js"></script>
+  <script src="assets/js/appFunctions/ui.js"></script>
   <script src="assets/js/main.js"></script>
 </html>

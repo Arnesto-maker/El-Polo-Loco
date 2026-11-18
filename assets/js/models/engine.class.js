@@ -320,12 +320,26 @@ class GameEngine {
   removeDeadBoss() {
     const boss = this.world.boss;
     if (boss && boss.isDead && performance.now() - boss.deadTime >= 1000) {
-      this.statusBar.score += this.statusBar.bossBonus;
-      this.statusBar.bossBonus = 0;
-      this.statusBar.showBossHud = false;
+      const winStats = this.collectWinStats();
       this.world.boss = null;
-      this.frameObjects = this.world.getFramePackages();
+      this.executeYouWonSequence(winStats);
     }
+  }
+
+  collectWinStats() {
+    this.statusBar.score += this.statusBar.bossBonus;
+    this.statusBar.bossBonus = 0;
+    this.statusBar.showBossHud = false;
+    return {
+      health: this.world.character.health,
+      coins: this.statusBar.coinCount,
+      bottles: this.statusBar.bottleCount,
+      score: this.statusBar.score,
+    };
+  }
+
+  executeYouWonSequence(winStats) {
+    startYouWonFlow(winStats);
   }
 
   drawFrame() {

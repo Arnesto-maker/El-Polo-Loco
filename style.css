@@ -272,6 +272,274 @@ body {
   }
 }
 
+.you-won-frame {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 30;
+  background-image: url("assets/img/5_background/first_half_background.png");
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+}
+
+.you-won-bild {
+  display: flex;
+  max-width: 75%;
+  max-height: 70dvh;
+  object-fit: contain;
+}
+
+.win-continue-bottom {
+  margin-top: 2dvh;
+  font-size: 3dvw;
+  color: #111111;
+}
+
+.win-overlay-frame {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 35;
+  
+  background-image: url("assets/img/5_background/first_half_background.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.win-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.8dvh;
+  padding: 4dvh 5dvw;
+  border: 3px solid #1a237e;
+    background-color: #ee9b4b;
+  border-radius: 10px;
+  color: #111111;
+}
+
+.win-title {
+  display: flex;
+  font-size: 4dvh;
+  margin: 0;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2dvw;
+  width: 100%;
+  font-size: 2.6dvh;
+}
+
+.summary-icon {
+  display: flex;
+  height: 4dvh;
+  width: auto;
+  object-fit: contain;
+}
+
+.summary-total {
+  font-weight: bold;
+  border-top: 2px solid #111111;
+  padding-top: 1dvh;
+}
+
+.summary-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4dvw;
+  width: 100%;
+  margin-top: 2dvh;
+  font-size: 2.4dvh;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.save-label {
+  display: flex;
+  align-self: flex-start;
+  font-size: 3dvh;
+}
+
+.save-input {
+  display: flex;
+  width: 30dvw;
+  padding: 1dvh 1.2dvw;
+  font-size: 2.6dvh;
+  border: 2px solid #111111;
+}
+
+.save-hint {
+  display: flex;
+  margin: 0;
+  font-size: 2dvh;
+  color: #c62828;
+}
+
+.save-submit-hint {
+  display: flex;
+  margin: 1dvh 0 0 0;
+  font-size: 2.5dvh;
+  color: #c62828;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.spinner-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.loading-spinner-bottle {
+  display: flex;
+  height: 18dvh;
+  width: auto;
+  object-fit: contain;
+  animation: winSpin 1s linear infinite;
+}
+
+.status-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4dvh;
+  padding: 0 6dvw;
+  text-align: center;
+  cursor: pointer;
+}
+
+.status-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  font-size: 4dvw;
+  font-weight: bold;
+}
+
+.prompt-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5dvh;
+}
+
+.prompt-option {
+  display: flex;
+  margin: 0;
+  font-size: 3dvw;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.win-continue-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  font-size: 3dvw;
+  font-weight: bold;
+  color: #111111;;
+  text-align: center;
+  animation: gameOverBlink 1.2s infinite ease-in-out;
+}
+
+.win-continue-bottom {
+  margin-bottom: 5dvh;
+  color: #111111;
+}
+
+.highscore-card {
+  min-width: 45dvw;
+  max-height: 82dvh;
+  background-color: #ee9b4b;
+  border-radius: 10px;
+}
+
+.highscore-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 1.2dvh;
+  max-height: 50dvh;
+  overflow-y: auto;
+}
+
+.highscore-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 3dvw;
+  width: 100%;
+  padding-bottom: 0.6dvh;
+  border-bottom: 1px solid #d7ccc8;
+  font-size: 2.5dvh;
+}
+
+.hs-rank {
+  display: flex;
+  min-width: 4dvw;
+  font-weight: bold;
+}
+
+.hs-name {
+  display: flex;
+  flex: 1;
+}
+
+.hs-score {
+  display: flex;
+  font-weight: bold;
+}
+
+.highscore-status-msg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2dvh 0;
+  font-size: 2.6dvh;
+  color: #c62828;
+}
+
+.highscore-back {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1.5dvh 0 0 0;
+  font-size: 2.4dvh;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@keyframes winSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .d-none {
   display: none;
 }
