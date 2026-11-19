@@ -1,5 +1,70 @@
 let currentMenuFrame = 1;
 
+/**
+ * Removes keyboard focus from the currently active DOM element.
+ * @returns {void}
+ */
+const blurActiveElement = () => {
+  if (document.activeElement && document.activeElement.blur) {
+    document.activeElement.blur();
+  }
+};
+
+/**
+ * Toggles fullscreen mode for the main game container.
+ * @returns {void}
+ */
+const toggleFullscreen = () => {
+  blurActiveElement();
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    exitFullscreen();
+    return;
+  }
+  enterFullscreen();
+};
+
+/**
+ * Requests fullscreen on the game container and locks landscape orientation.
+ * @returns {void}
+ */
+const enterFullscreen = () => {
+  const container = document.getElementById("game-container");
+  if (!container || document.fullscreenElement) {
+    return;
+  }
+  if (container.requestFullscreen) {
+    container.requestFullscreen({ navigationUI: "hide" }).then(lockLandscape).catch(() => {});
+    return;
+  }
+  if (container.webkitRequestFullscreen) {
+    container.webkitRequestFullscreen();
+  }
+};
+
+/**
+ * Exits the currently active fullscreen mode.
+ * @returns {void}
+ */
+const exitFullscreen = () => {
+  if (document.exitFullscreen) {
+    document.exitFullscreen().catch(() => {});
+    return;
+  }
+  if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+};
+
+/**
+ * Locks screen orientation to landscape on supported mobile browsers.
+ * @returns {void}
+ */
+const lockLandscape = () => {
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock("landscape").catch(() => {});
+  }
+};
+
 const setMenuVisibility = (showF1, showF2, showAbout, showGameOver) => {
   hideAllWinOverlays();
   toggleElement("frame-1", showF1);
@@ -99,6 +164,7 @@ const handleGameOverTouchOrClick = (event) => {
 };
 
 const showFrame2 = () => {
+  enterFullscreen();
   currentMenuFrame = 2;
   setMenuVisibility(false, true, false, false);
 };
@@ -151,6 +217,8 @@ const openAbout = () => {
 };
 
 const startNewGame = () => {
+  blurActiveElement();
+  enterFullscreen();
   resetAllGamePopups();
   currentMenuFrame = 0;
   toggleElement("start-overlay", false);
