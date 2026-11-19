@@ -28,17 +28,32 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="assets/img/7_statusbars/3_icons/icon_salsa_bottle.png" />
   </head>
-  <body onload="initDebug()" onkeydown="handleMenuKeyDown(event)">
+  <body onload="initMenu()">
     <main id="game-container">
-      <button id="fullscreen-btn" class="fullscreen-btn" type="button" aria-label="Toggle Fullscreen" onclick="toggleFullscreen()">⛶</button>
       <canvas id="gameCanvas" width="2048" height="1280"></canvas>
+
+      <section id="touch-controls" class="touch-controls d-none" aria-label="Touch Controls">
+        <div id="touch-slider" class="touch-slider-wrap">
+          <span id="slider-arrow-left" class="slider-arrow">◀</span>
+          <div class="slider-track">
+            <div id="slider-knob" class="slider-knob"></div>
+          </div>
+          <span id="slider-arrow-right" class="slider-arrow">▶</span>
+        </div>
+        <button id="touch-btn-tab" class="touch-btn touch-btn-tab" type="button">Tab</button>
+        <button id="touch-btn-b" class="touch-btn touch-btn-b" type="button">B</button>
+        <button id="touch-btn-space" class="touch-btn touch-btn-space" type="button">Space</button>
+        <button id="touch-btn-enter" class="touch-btn touch-btn-enter" type="button">Enter</button>
+      </section>
+
       <section id="start-overlay" class="start-overlay">
         <div id="frame-1" class="frame-1" onclick="showFrame2()">
-          <p class="blink-text">Press Enter,Click or Touch to start</p>
+          <p class="blink-text">Press Enter, Click or Touch to start</p>
         </div>
         <nav id="frame-2" class="frame-2 d-none">
           <button class="menu-btn" onclick="startNewGame()">New game</button>
           <button class="menu-btn" onclick="openHighScore()">High score</button>
+          <button class="menu-btn" onclick="openSettingsOverlay('menu')">Settings</button>
           <button class="menu-btn" onclick="openAbout()">About</button>
           <button class="menu-btn" onclick="exitGame()">Exit.</button>
         </nav>
@@ -62,21 +77,35 @@
           <button class="menu-btn about-back-btn" onclick="showFrame2()">Back</button>
         </article>
       </section>
+
+      <section id="settings-overlay" class="help-overlay d-none">
+        <div class="settings-box">
+          <h2 class="settings-title">Settings</h2>
+          <div class="settings-row">
+            <span class="settings-label">Sound</span>
+            <button id="setting-sound-btn" class="settings-toggle-btn" type="button" onclick="toggleSoundSetting()">on</button>
+          </div>
+          <div class="settings-row">
+            <span class="settings-label">Fullscreen</span>
+            <button id="setting-fullscreen-btn" class="settings-toggle-btn is-off" type="button" onclick="toggleFullscreenSetting()">off</button>
+          </div>
+          <button class="menu-btn settings-back-btn" type="button" onclick="closeSettingsOverlay()">Back (Tab)</button>
+        </div>
+      </section>
+
       <section id="start-help-overlay" class="help-overlay d-none">
         <div class="help-box">
           <div class="help-inner">
-            <p class="help-line">Wellcome to El Polo loco</p>
-            <p class="help-line">Hints :</p>
-            <p class="help-line">A/D or Arrow Left / Arrow Right to move pepe</p>
-            <p class="help-line">space to jump</p>
-            <p class="help-line">enter to Throw bottle</p>
-            <p class="help-line">Combo :</p>
-            <p class="help-line">Space + Enter : jump throw</p>
-            <p class="help-line">B : Buy Bottle.</p>
+            <p class="help-line">Welcome to El Pollo Loco</p>
+            <p class="help-line">Keyboard: A/D or Arrow Left / Right to move Pepe</p>
+            <p class="help-line">Touch: Slide the center circle left or right like a slider to move</p>
+            <p class="help-line">Space: Jump | Enter: Throw bottle | Space + Enter: Jump-Throw</p>
+            <p class="help-line">B: Buy bottle (Coin Converter) | Tab: Pause / Back</p>
           </div>
           <p class="help-footer" onclick="closeStartHelpFromDom()">Enter = ok and exit</p>
         </div>
       </section>
+
       <section id="boss-dossier-overlay" class="help-overlay d-none">
         <div class="help-box">
           <div class="help-inner">
@@ -90,14 +119,17 @@
           <p class="help-footer" onclick="closeBossDossierFromDom()">Enter = ok and exit</p>
         </div>
       </section>
+
       <section id="pause-overlay" class="help-overlay d-none">
         <nav class="pause-box">
           <h2 class="pause-title">Paused</h2>
           <button class="menu-btn" onclick="resumeGameFromDom()">Resume</button>
+          <button class="menu-btn" onclick="openSettingsFromPauseDom()">Settings</button>
           <button class="menu-btn" onclick="openHelpFromPauseDom()">Help</button>
           <button class="menu-btn" onclick="exitToMenuFromPauseDom()">Exit</button>
         </nav>
       </section>
+
       <section id="game-over-frame" class="game-over-frame d-none" onclick="handleGameOverTouchOrClick(event)" ontouchstart="handleGameOverTouchOrClick(event)">
         <img src="assets/img/You won, you lost/Game Over.png" alt="Game Over" class="game-over-bild-02" />
         <p class="game-over-text">Press Enter, touch, click to continue</p>
@@ -113,31 +145,40 @@
       <section id="local-save-error-frame" class="win-overlay-frame d-none"></section>
       <section id="highscore-frame" class="win-overlay-frame d-none"></section>
     </main>
+
     <script src="assets/js/appFunctions/firebaseConfig.js"></script>
     <script src="assets/js/models/movableObject.class.js"></script>
     <script src="assets/js/models/drawableObject.class.js"></script>
     <script src="assets/js/models/cloud.class.js"></script>
     <script src="assets/js/models/background.class.js"></script>
     <script src="assets/js/models/backgroundPackage.class.js"></script>
+    <script src="assets/js/models/bossHud.class.js"></script>
     <script src="assets/js/models/statusbar.class.js"></script>
     <script src="assets/js/models/starthelpPopUp.class.js"></script>
     <script src="assets/js/models/pausePopUp.class.js"></script>
     <script src="assets/js/models/coinConverter.class.js"></script>
     <script src="assets/js/models/coin.class.js"></script>
     <script src="assets/js/models/bottle.class.js"></script>
+    <script src="assets/js/models/characterHealth.class.js"></script>
     <script src="assets/js/models/character.class.js"></script>
     <script src="assets/js/models/throwableBottle.class.js"></script>
     <script src="assets/js/models/chicken.class.js"></script>
     <script src="assets/js/models/bossDossierPopUp.class.js"></script>
+    <script src="assets/js/models/bossCombat.class.js"></script>
     <script src="assets/js/models/bossChicken.class.js"></script>
     <script src="assets/js/models/bossBottle.class.js"></script>
     <script src="assets/js/models/controller.class.js"></script>
+    <script src="assets/js/models/worldSpawner.class.js"></script>
     <script src="assets/js/models/world.class.js"></script>
+    <script src="assets/js/models/collisionManager.class.js"></script>
+    <script src="assets/js/models/combatManager.class.js"></script>
     <script src="assets/js/models/engine.class.js"></script>
     <script src="assets/js/appFunctions/template.js"></script>
     <script src="assets/js/appFunctions/data.js"></script>
     <script src="assets/js/appFunctions/render.js"></script>
     <script src="assets/js/appFunctions/ui.js"></script>
+    <script src="assets/js/appFunctions/settings.js"></script>
+    <script src="assets/js/appFunctions/menuNavigation.js"></script>
     <script src="assets/js/main.js"></script>
   </body>
 </html>

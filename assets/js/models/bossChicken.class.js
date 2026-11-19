@@ -1,19 +1,15 @@
-class Boss extends MovableObject {
-  health = 100;
-  armour = 100;
-  isActivated = false;
+/**
+ * Endboss El Pollo Loco controlling arena entry, patrol movement, salvos, and animations.
+ */
+class Boss extends BossCombat {
   hasEnteredArena = false;
-  isDead = false;
-  isAttacking = false;
   readyToSpawnSpecial = false;
-  deadTime = 0;
-  lastHit = 0;
+  isDoingSpecial = false;
   lastSpecialTime = 0;
   nextAttackTime = 0;
-  attackStartTime = 0;
   salvoCount = 0;
   lastSalvoTime = 0;
-  backHitCount = 0;
+  specialStartTime = 0;
 
   IMAGES_WALK = [
     "assets/img/4_enemie_boss_chicken/1_walk/G1.png",
@@ -48,9 +44,21 @@ class Boss extends MovableObject {
     "assets/img/4_enemie_boss_chicken/3_attack/G19.png",
     "assets/img/4_enemie_boss_chicken/3_attack/G20.png",
   ];
-  IMAGES_HURT = ["assets/img/4_enemie_boss_chicken/4_hurt/G21.png", "assets/img/4_enemie_boss_chicken/4_hurt/G22.png", "assets/img/4_enemie_boss_chicken/4_hurt/G23.png"];
-  IMAGES_DEAD = ["assets/img/4_enemie_boss_chicken/5_dead/G24.png", "assets/img/4_enemie_boss_chicken/5_dead/G25.png", "assets/img/4_enemie_boss_chicken/5_dead/G26.png"];
+  IMAGES_HURT = [
+    "assets/img/4_enemie_boss_chicken/4_hurt/G21.png",
+    "assets/img/4_enemie_boss_chicken/4_hurt/G22.png",
+    "assets/img/4_enemie_boss_chicken/4_hurt/G23.png",
+  ];
+  IMAGES_DEAD = [
+    "assets/img/4_enemie_boss_chicken/5_dead/G24.png",
+    "assets/img/4_enemie_boss_chicken/5_dead/G25.png",
+    "assets/img/4_enemie_boss_chicken/5_dead/G26.png",
+  ];
 
+  /**
+   * Initializes boss sprites, physical bounds, and arena patrol limits.
+   * @param {HTMLCanvasElement} canvas - The game canvas.
+   */
   constructor(canvas) {
     super(canvas);
     this.loadAllImages();
@@ -58,6 +66,10 @@ class Boss extends MovableObject {
     this.setPositionLimits();
   }
 
+  /**
+   * Preloads all boss sprite animations.
+   * @returns {void}
+   */
   loadAllImages() {
     this.loadImages(this.IMAGES_WALK);
     this.loadImages(this.IMAGES_ALERT);
@@ -67,6 +79,10 @@ class Boss extends MovableObject {
     this.loadImages(this.IMAGES_DEAD);
   }
 
+  /**
+   * Configures initial boss dimensions, speed, spawn coordinate, and hitbox.
+   * @returns {void}
+   */
   setMainParameter() {
     this.img = this.imageCache[this.IMAGES_ALERT[0]];
     this.width = this.canvasWidth * 0.25;
@@ -77,12 +93,20 @@ class Boss extends MovableObject {
     this.offset = this.setOffsetParameter();
   }
 
+  /**
+   * Calculates horizontal arena patrol boundaries and entry target.
+   * @returns {void}
+   */
   setPositionLimits() {
     this.pos1X = this.canvasWidth * 0.15;
     this.pos2X = this.canvasWidth * 2 - this.canvasWidth * 0.15 - this.width;
     this.entryTargetX = this.canvasWidth * 2 - this.width;
   }
 
+  /**
+   * Builds the collision offset box for the boss.
+   * @returns {{top: number, bottom: number, left: number, right: number}} Hitbox offsets.
+   */
   setOffsetParameter() {
     return {
       top: this.height * 0.15,
@@ -92,6 +116,10 @@ class Boss extends MovableObject {
     };
   }
 
+  /**
+   * Updates boss AI state and plays the appropriate animation each frame.
+   * @returns {void}
+   */
   update() {
     if (this.isDead) {
       this.playAnimation(this.IMAGES_DEAD);
@@ -104,6 +132,10 @@ class Boss extends MovableObject {
     this.runActiveBossBehavior();
   }
 
+  /**
+   * Runs arena walk-in or full combat patrol and attack logic.
+   * @returns {void}
+   */
   runActiveBossBehavior() {
     if (!this.hasEnteredArena) {
       this.moveIntoArena();
@@ -114,6 +146,10 @@ class Boss extends MovableObject {
     }
   }
 
+  /**
+   * Walks the boss into the arena before starting its first salvo.
+   * @returns {void}
+   */
   moveIntoArena() {
     this.x -= this.speed;
     this.playAnimation(this.IMAGES_WALK);
@@ -125,6 +161,10 @@ class Boss extends MovableObject {
     }
   }
 
+  /**
+   * Starts a 3-wave bullet-hell bottle salvo sequence.
+   * @returns {void}
+   */
   triggerSpecialAttack() {
     const now = performance.now();
     this.isDoingSpecial = true;
@@ -137,6 +177,11 @@ class Boss extends MovableObject {
     this.frameTick = 0;
   }
 
+  /**
+   * Fires remaining waves of an active salvo every 450ms.
+   * @param {number} now - Current high-resolution timestamp.
+   * @returns {void}
+   */
   updateSpecialSalvos(now) {
     if (!this.isDoingSpecial || this.salvoCount >= 3) {
       return;
@@ -148,6 +193,10 @@ class Boss extends MovableObject {
     }
   }
 
+  /**
+   * Evaluates timers for special salvos and random melee attacks.
+   * @returns {void}
+   */
   updateCombatCycle() {
     const now = performance.now();
     const cooldown = this.getSalvoCooldown();
@@ -160,6 +209,10 @@ class Boss extends MovableObject {
     this.checkSpecialEnd(now);
   }
 
+  /**
+   * Returns 8s salvo cooldown in rage mode (0 armor) or 15s otherwise.
+   * @returns {number} Cooldown in milliseconds.
+   */
   getSalvoCooldown() {
     if (this.armour <= 0) {
       return 8000;
@@ -167,6 +220,11 @@ class Boss extends MovableObject {
     return 15000;
   }
 
+  /**
+   * Starts a melee attack state when the random timer elapses.
+   * @param {number} now - Current timestamp.
+   * @returns {void}
+   */
   checkAttackStart(now) {
     if (!this.isAttacking && !this.isDoingSpecial && now >= this.nextAttackTime) {
       this.isAttacking = true;
@@ -174,6 +232,11 @@ class Boss extends MovableObject {
     }
   }
 
+  /**
+   * Ends melee attack state after 800ms and schedules the next one.
+   * @param {number} now - Current timestamp.
+   * @returns {void}
+   */
   checkAttackEnd(now) {
     if (this.isAttacking && now - this.attackStartTime >= 800) {
       this.isAttacking = false;
@@ -181,17 +244,30 @@ class Boss extends MovableObject {
     }
   }
 
+  /**
+   * Ends the special attack visual state after 1500ms.
+   * @param {number} now - Current timestamp.
+   * @returns {void}
+   */
   checkSpecialEnd(now) {
     if (this.isDoingSpecial && now - this.specialStartTime >= 1500) {
       this.isDoingSpecial = false;
     }
   }
 
+  /**
+   * Schedules the next melee attack between 2 and 5 seconds ahead.
+   * @returns {void}
+   */
   setNextRandomAttack() {
     const randomDelay = 2000 + Math.random() * 3000;
     this.nextAttackTime = performance.now() + randomDelay;
   }
 
+  /**
+   * Moves the boss horizontally across its patrol corridor.
+   * @returns {void}
+   */
   movePatrol() {
     if (this.otherDirection) {
       this.x += this.speed;
@@ -201,6 +277,10 @@ class Boss extends MovableObject {
     this.checkPatrolBoundaries();
   }
 
+  /**
+   * Reverses boss direction at left and right patrol bounds.
+   * @returns {void}
+   */
   checkPatrolBoundaries() {
     if (this.x <= this.pos1X) {
       this.otherDirection = true;
@@ -209,6 +289,10 @@ class Boss extends MovableObject {
     }
   }
 
+  /**
+   * Plays hurt, special, attack, or walk animation based on priority.
+   * @returns {void}
+   */
   updateCombatAnimation() {
     if (this.isHurt()) {
       this.playAnimation(this.IMAGES_HURT);
@@ -219,82 +303,5 @@ class Boss extends MovableObject {
     } else {
       this.playAnimation(this.IMAGES_WALK);
     }
-  }
-
-  isHurt() {
-    return performance.now() - this.lastHit < 600;
-  }
-
-  applyZoneHit(bottle) {
-    if (!this.isActivated || this.isDead) {
-      return;
-    }
-    const damage = this.calculateZoneDamage(bottle);
-    this.takeDamage(damage);
-    this.checkBackHitReaction(bottle);
-  }
-
-  checkBackHitReaction(bottle) {
-    if (this.isHitFromBehind(bottle)) {
-      this.backHitCount += 1;
-      if (this.backHitCount >= 3) {
-        this.executeTurnAroundCombo();
-      }
-    }
-  }
-
-  isHitFromBehind(bottle) {
-    const bottleCenter = bottle.x + bottle.width * 0.5;
-    const bossCenter = this.x + this.width * 0.5;
-    if (this.otherDirection) {
-      return bottleCenter < bossCenter;
-    } else {
-      return bottleCenter > bossCenter;
-    }
-  }
-
-  executeTurnAroundCombo() {
-    this.backHitCount = 0;
-    this.otherDirection = !this.otherDirection;
-    this.isAttacking = true;
-    this.attackStartTime = performance.now();
-    this.triggerSpecialAttack();
-  }
-
-  calculateZoneDamage(bottle) {
-    const hitY = bottle.y + bottle.height * 0.5 - this.y;
-    const relY = hitY / this.height;
-    if (relY <= 0.2) {
-      return 20;
-    } else if (relY <= 0.5) {
-      return 10;
-    } else if (relY <= 0.8) {
-      return 5;
-    }
-    return 2;
-  }
-
-  takeDamage(damage) {
-    const leftover = this.absorbArmourDamage(damage);
-    this.health -= leftover;
-    this.lastHit = performance.now();
-    if (this.health <= 0) {
-      this.health = 0;
-      this.isDead = true;
-      this.deadTime = performance.now();
-    }
-  }
-
-  absorbArmourDamage(damage) {
-    if (this.armour <= 0) {
-      return damage;
-    }
-    if (this.armour >= damage) {
-      this.armour -= damage;
-      return 0;
-    }
-    const rest = damage - this.armour;
-    this.armour = 0;
-    return rest;
   }
 }

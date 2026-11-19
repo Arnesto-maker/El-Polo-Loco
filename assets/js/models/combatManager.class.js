@@ -1,0 +1,169 @@
+/**
+ * Coordinates player bottle throws, boss fight activation, timers, and boss salvos.
+ */
+class CombatManager {
+  /**
+   * Creates a combat manager connected to the active GameEngine.
+   * @param {GameEngine} engine - Parent GameEngine instance.
+   */
+  constructor(engine) {
+    this.engine = engine;
+  }
+
+  /**
+   * Starts throw animation on Enter press and spawns the bottle projectile when ready.
+   * @param {Character} char - Player character instance.
+   * @returns {void}
+   */
+  updateThrowWorkflow(char) {
+    if (this.engine.controller.enter && this.engine.statusBar.bottleCount > 0) {
+      char.startThrowSequence();
+    }
+    if (char.readyToSpawnBottle) {
+      this.initBottleThrow(char);
+    }
+  }
+
+  /**
+   * Deducts one bottle and computes launch coordinates from Pepe's position.
+   * @param {Character} char - Player character instance.
+   * @returns {void}
+   */
+  initBottleThrow(char) {
+    char.readyToSpawnBottle = false;
+    this.engine.statusBar.bottleCount -= 1;
+    const startX = this.getBottleStartX(char);
+    const startY = char.y + char.height * 0.25;
+    const yMax = char.canvasHeight - char.canvasHeight * 0.1 - char.floor;
+    this.spawnThrownBottle(startX, startY, char.otherDirection, yMax);
+  }
+
+  /**
+   * Calculates horizontal bottle launch offset based on facing direction.
+   * @param {Character} char - Player character instance.
+   * @returns {number} Launch X coordinate.
+   */
+  getBottleStartX(char) {
+    if (char.otherDirection) {
+      return char.x;
+    }
+    return char.x + char.width * 0.7;
+  }
+
+  /**
+   * Adds a new ThrowableBottle projectile to the world and updates render frames.
+   * @param {number} startX - Launch X coordinate.
+   * @param {number} startY - Launch Y coordinate.
+   * @param {boolean} otherDirection - True if thrown left.
+   * @param {number} yMax - Ground splash Y coordinate.
+   * @returns {void}
+   */
+  spawnThrownBottle(startX, startY, otherDirection, yMax) {
+    const bottle = new ThrowableBottle(this.engine.ctx.canvas, startX, startY, otherDirection, yMax);
+    this.engine.world.throwableBottles.push(bottle);
+    this.engine.refreshFrameObjects();
+  }
+
+  /**
+   * Activates the boss once all chickens are defeated and updates boss fight state.
+   * @returns {void}
+   */
+  updateBossFightState() {
+    const boss = this.engine.world.boss;
+    if (!boss || boss.isDead) {
+      return;
+    }
+    if (!boss.isActivated && this.engine.world.enemies.length === 0) {
+      this.activateBossFight(boss);
+    }
+    if (boss.isActivated) {
+      this.updateBossHudAndSpecial(boss);
+    }
+  }
+
+  /**
+   * Enables boss AI, shows boss HUD, initializes bonus score, and opens the dossier.
+   * @param {Boss} boss - Endboss instance.
+   * @returns {void}
+   */
+  activateBossFight(boss) {
+    boss.isActivated = true;
+    this.engine.statusBar.showBossHud = true;
+    this.engine.statusBar.bossBonus = 10000;
+    this.engine.lastBossTick = performance.now();
+    this.engine.bossDossier.openPopup();
+  }
+
+  /**
+   * Syncs boss stats to the HUD and fires bottle salvos when signaled.
+   * @param {Boss} boss - Endboss instance.
+   * @returns {void}
+   */
+  updateBossHudAndSpecial(boss) {
+    this.updateBossTimerAndScore();
+    this.engine.statusBar.bossHealth = boss.health;
+    this.engine.statusBar.bossArmour = boss.armour;
+    this.engine.statusBar.updateBossHealthImage();
+    if (boss.readyToSpawnSpecial) {
+      boss.readyToSpawnSpecial = false;
+      this.spawnBossSpecialBottles(boss);
+    }
+  }
+
+  /**
+   * Advances boss timer delta and reduces the time-based boss score bonus.
+   * @returns {void}
+   */
+  updateBossTimerAndScore() {
+    const now = performance.now();
+    const dt = now - this.engine.lastBossTick;
+    this.engine.lastBossTick = now;
+    this.engine.statusBar.bossTimeMs += dt;
+    this.reduceBossScoreBonus(dt);
+  }
+
+  /**
+   * Decays remaining boss bonus based on elapsed milliseconds.
+   * @param {number} dt - Frame delta in milliseconds.
+   * @returns {void}
+   */
+  reduceBossScoreBonus(dt) {
+    if (this.engine.statusBar.bossBonus > 0) {
+      const penalty = Math.floor(dt * 0.1);
+      this.engine.statusBar.bossBonus = Math.max(0, this.engine.statusBar.bossBonus - penalty);
+    }
+  }
+
+  /**
+   * Spawns a 6-bottle radial volley from the Endboss.
+   * @param {Boss} boss - Endboss instance.
+   * @returns {void}
+   */
+  spawnBossSpecialBottles(boss) {
+    const velocitiesX = [-14, -9.5, -5, 5, 9.5, 14];
+    const startX = boss.x + boss.width * 0.4;
+    const startY = boss.y + boss.height * 0.1;
+    for (let i = 0; i < velocitiesX.length; i++) {
+      const bottle = new BossBottle(this.engine.ctx.canvas, startX, startY, velocitiesX[i], -21);
+      this.engine.world.bossBottles.push(bottle);
+    }
+    this.engine.refreshFrameObjects();
+  }
+
+  /**
+   * Finalizes boss bonus points and compiles the player's victory statistics.
+   * @returns {{health: number, coins: number, bottles: number, score: number}} Final win stats.
+   */
+  collectWinStats() {
+    const bar = this.engine.statusBar;
+    bar.score += bar.bossBonus;
+    bar.bossBonus = 0;
+    bar.showBossHud = false;
+    return {
+      health: this.engine.world.character.health,
+      coins: bar.coinCount,
+      bottles: bar.bottleCount,
+      score: bar.score,
+    };
+  }
+}

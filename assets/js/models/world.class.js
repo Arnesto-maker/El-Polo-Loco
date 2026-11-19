@@ -1,4 +1,11 @@
+/**
+ * Holds all level entities and assembles the ordered draw/update frame package.
+ */
 class World {
+  /**
+   * Initializes world collections, background, boss, character, and spawns collectibles.
+   * @param {HTMLCanvasElement} canvas - The game canvas.
+   */
   constructor(canvas) {
     this.bgPackage = new BackgroundPackage(canvas).getBgPackage();
     this.enemies = [];
@@ -8,92 +15,38 @@ class World {
     this.bossBottles = [];
     this.boss = new Boss(canvas);
     this.character = new Character(canvas);
-    this.initWorldSpawning(canvas);
+    const spawner = new WorldSpawner(this, canvas);
+    spawner.populateWorld();
   }
 
-  initWorldSpawning(canvas) {
-    this.spawnBottlesForFrame(0, canvas);
-    this.spawnBottlesForFrame(1, canvas);
-    this.spawnEnemies(8, canvas);
-    this.spawnCoinsForFrame(0, canvas);
-    this.spawnCoinsForFrame(1, canvas);
-  }
-
-  spawnEnemies(count, canvas) {
-    const startOffset = 350;
-    const totalEnd = canvas.width * 2 - 300;
-    const sectorWidth = (totalEnd - startOffset) / count;
-    for (let i = 0; i < count; i++) {
-      const sectorMinX = startOffset + i * sectorWidth;
-      const sectorMaxX = sectorMinX + sectorWidth;
-      const enemy = new Chicken(canvas, sectorMinX, sectorMaxX);
-      this.enemies.push(enemy);
-    }
-  }
-
-  setCoinCount(minCoins, maxCoins) {
-    return Math.floor(minCoins + Math.random() * (maxCoins - minCoins + 1));
-  }
-
-  initCoinSpawning(coinCount, stepX, yHigh, yLow, startX, canvas) {
-    for (let i = 0; i < coinCount; i++) {
-      const progress = i / (coinCount - 1);
-      const x = startX + i * stepX;
-      const angle = progress * 2 * 2 * Math.PI;
-      const normalizedSin = (1 - Math.sin(angle)) / 2;
-      const y = yHigh + normalizedSin * (yLow - yHigh);
-      this.coins.push(new Coin(canvas, x, y));
-    }
-  }
-
-  spawnCoinsForFrame(frameIndex, canvas) {
-    const coinCount = this.setCoinCount(10, 16);
-    let startX = frameIndex * canvas.width + 100;
-    let endX = (frameIndex + 1) * canvas.width - canvas.width * 0.06 - 100;
-    const stepX = (endX - startX) / (coinCount - 1);
-    const yHigh = canvas.height * 0.35;
-    const yLow = canvas.height * 0.52;
-    this.initCoinSpawning(coinCount, stepX, yHigh, yLow, startX, canvas);
-  }
-
-  setBottleCount(minBottles, maxBottles) {
-    return Math.floor(minBottles + Math.random() * (maxBottles - minBottles + 1));
-  }
-
-  spawnBottlesForFrame(frameIndex, canvas) {
-    const bottleCount = this.setBottleCount(4, 7);
-    let startX = frameIndex * canvas.width + 300;
-    let endX = (frameIndex + 1) * canvas.width - canvas.width * 0.05 - 300;
-    const sectorWidth = (endX - startX) / bottleCount;
-    this.initBottleSpawning(bottleCount, startX, sectorWidth, canvas);
-  }
-
-  initBottleSpawning(bottleCount, startX, sectorWidth, canvas) {
-    for (let i = 0; i < bottleCount; i++) {
-      const sectorMinX = startX + i * sectorWidth;
-      const sectorMaxX = sectorMinX + sectorWidth;
-      this.bottles.push(new Bottle(canvas, sectorMinX, sectorMaxX));
-    }
-  }
-
+  /**
+   * Appends all elements of a source array to the target render list.
+   * @param {Array<Object>} sourceArray - Collection of drawable entities.
+   * @param {Array<Object>} targetArray - Master frame list.
+   * @returns {void}
+   */
   addArrayToFrame(sourceArray, targetArray) {
     for (let i = 0; i < sourceArray.length; i++) {
       targetArray.push(sourceArray[i]);
     }
   }
 
+  /**
+   * Builds the Z-ordered flat array of all active objects for the render loop.
+   * @returns {Array<Object>} Flat array of game objects.
+   */
   getFramePackages() {
-    let componentsFrames = [];
-    this.addArrayToFrame(this.bgPackage, componentsFrames);
-    this.addArrayToFrame(this.coins, componentsFrames);
-    this.addArrayToFrame(this.bottles, componentsFrames);
-    this.addArrayToFrame(this.enemies, componentsFrames);
-    this.addArrayToFrame(this.throwableBottles, componentsFrames);
-    this.addArrayToFrame(this.bossBottles, componentsFrames);
+    const components = [];
+    this.addArrayToFrame(this.bgPackage, components);
+    this.addArrayToFrame(this.coins, components);
+    this.addArrayToFrame(this.bottles, components);
+    this.addArrayToFrame(this.enemies, components);
+    this.addArrayToFrame(this.throwableBottles, components);
+    this.addArrayToFrame(this.bossBottles, components);
     if (this.boss) {
-      componentsFrames.push(this.boss);
+      components.push(this.boss);
     }
-    componentsFrames.push(this.character);
-    return componentsFrames;
+    components.push(this.character);
+    return components;
   }
 }

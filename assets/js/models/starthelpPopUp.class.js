@@ -1,5 +1,11 @@
-
+/**
+ * Controls the Start Help modal shown at game start and from the pause menu.
+ */
 class StartHelpPopup {
+  /**
+   * Opens the Start Help overlay immediately upon game start.
+   * @param {GameEngine} engine - Active GameEngine instance.
+   */
   constructor(engine) {
     this.engine = engine;
     this.isOpen = true;
@@ -8,26 +14,41 @@ class StartHelpPopup {
     this.showOverlay();
   }
 
+  /**
+   * Shows the Start Help overlay element.
+   * @returns {void}
+   */
   showOverlay() {
     if (this.overlayElement) {
       this.overlayElement.classList.remove("d-none");
     }
   }
 
+  /**
+   * Hides the Start Help overlay element.
+   * @returns {void}
+   */
   hideOverlay() {
     if (this.overlayElement) {
       this.overlayElement.classList.add("d-none");
     }
   }
 
+  /**
+   * Closes the help overlay when Enter is pressed.
+   * @param {string} key - Logical key name.
+   * @returns {void}
+   */
   handleKeyDown(key) {
-    if (this.isOpen) {
-      if (key === "Enter") {
-        this.closePopup();
-      }
+    if (this.isOpen && key === "Enter") {
+      this.closePopup();
     }
   }
 
+  /**
+   * Resumes gameplay and hides the Start Help overlay.
+   * @returns {void}
+   */
   closePopup() {
     this.isOpen = false;
     this.engine.isPaused = false;
@@ -36,6 +57,10 @@ class StartHelpPopup {
     this.hideOverlay();
   }
 
+  /**
+   * Re-opens the Start Help overlay and pauses the engine.
+   * @returns {void}
+   */
   openPopup() {
     this.isOpen = true;
     this.engine.isPaused = true;
@@ -43,8 +68,12 @@ class StartHelpPopup {
   }
 }
 
-function closeStartHelpFromDom() {
-  if (window.gameEngine && window.gameEngine.startHelpPopup) {
-    window.gameEngine.startHelpPopup.closePopup();
+/**
+ * Closes the Start Help popup from its DOM footer click handler.
+ * @returns {void}
+ */
+const closeStartHelpFromDom = () => {
+  if (window.gameEngine && window.gameEngine.startHelp) {
+    window.gameEngine.startHelp.closePopup();
   }
-}
+};

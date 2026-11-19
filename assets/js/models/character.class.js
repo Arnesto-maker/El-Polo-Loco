@@ -1,4 +1,7 @@
-class Character extends MovableObject {
+/**
+ * Playable hero Pepe handling movement, jumping, throwing, camera follow, and idle sprites.
+ */
+class Character extends CharacterHealth {
   vXChar = 7;
   isJumping = false;
   isMoving = false;
@@ -6,17 +9,9 @@ class Character extends MovableObject {
   readyToSpawnBottle = false;
   idleTimer = 0;
   cameraX = 0;
-  health = 100;
-  lastHit = 0;
-  hurtTriggerTime = 0;
-  nextHurtThreshold = 80;
   lastThrowTime = 0;
   throwCooldown = 500;
   throwDuration = 400;
-  deathAnimationStarted = false;
-  deathFinishedTime = 0;
-  deathHoldDuration = 1200;
-  isReadyForGameOver = false;
 
   IMAGE_0 = "assets/img/2_character_pepe/1_idle/idle/I-1.png";
   IMAGES_LONG_IDLE = [
@@ -66,26 +61,21 @@ class Character extends MovableObject {
     "assets/img/2_character_pepe/6_throw/T-3.png",
     "assets/img/2_character_pepe/6_throw/T-4.png",
   ];
-  IMAGES_HURT = [
-    "assets/img/2_character_pepe/4_hurt/H-41.png",
-    "assets/img/2_character_pepe/4_hurt/H-42.png",
-    "assets/img/2_character_pepe/4_hurt/H-43.png",
-  ];
-  IMAGES_DEATH = [
-    "assets/img/2_character_pepe/5_dead/D-51.png",
-    "assets/img/2_character_pepe/5_dead/D-52.png",
-    "assets/img/2_character_pepe/5_dead/D-53.png",
-    "assets/img/2_character_pepe/5_dead/D-54.png",
-    "assets/img/2_character_pepe/5_dead/D-55.png",
-    "assets/img/2_character_pepe/5_dead/D-56.png",
-  ];
 
+  /**
+   * Initializes Pepe's sprites, dimensions, and spawn position.
+   * @param {HTMLCanvasElement} canvas - The game canvas.
+   */
   constructor(canvas) {
     super(canvas);
     this.loadAllImages();
     this.setMainParameter();
   }
 
+  /**
+   * Sets initial size, spawn coordinates, jump limit, and hitbox offsets.
+   * @returns {void}
+   */
   setMainParameter() {
     this.img = this.imageCache[this.IMAGE_0];
     this.width = this.canvasWidth * 0.14;
@@ -96,6 +86,10 @@ class Character extends MovableObject {
     this.offset = this.setOffsetParameter();
   }
 
+  /**
+   * Builds the collision offset box for Pepe.
+   * @returns {{top: number, bottom: number, left: number, right: number}} Hitbox offsets.
+   */
   setOffsetParameter() {
     return {
       top: this.height * 0.38,
@@ -105,6 +99,10 @@ class Character extends MovableObject {
     };
   }
 
+  /**
+   * Preloads all movement, action, and health animation sequences.
+   * @returns {void}
+   */
   loadAllImages() {
     this.loadImages([this.IMAGE_0]);
     this.loadImages(this.IMAGES_IDLE);
@@ -112,10 +110,13 @@ class Character extends MovableObject {
     this.loadImages(this.IMAGES_JUMP);
     this.loadImages(this.IMAGES_MOVING);
     this.loadImages(this.IMAGES_THROWING);
-    this.loadImages(this.IMAGES_HURT);
-    this.loadImages(this.IMAGES_DEATH);
+    this.loadHealthImages();
   }
 
+  /**
+   * Updates horizontal camera offset clamped between frame 1 and frame 2 boundaries.
+   * @returns {void}
+   */
   updateCameraControl() {
     const startFollowX = this.canvasWidth / 2;
     const stopFollowX = this.canvasWidth / 2 + this.canvasWidth;
@@ -128,6 +129,11 @@ class Character extends MovableObject {
     }
   }
 
+  /**
+   * Draws Pepe with a slight vertical adjustment during bottle throws.
+   * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
+   * @returns {void}
+   */
   draw(ctx) {
     const savedY = this.y;
     if (this.isThrowing) {
@@ -137,57 +143,55 @@ class Character extends MovableObject {
     this.y = savedY;
   }
 
+  /**
+   * Runs per-frame movement, gravity, camera, and animation updates.
+   * @param {Controller} controller - Active input controller.
+   * @returns {void}
+   */
   update(controller) {
     this.checkHurtThreshold();
     const isLocked = this.isDead() || this.isHurtAnimationActive();
     if (!isLocked && !this.isThrowing) {
       this.moveRight(controller);
-      this.moveleft(controller);
+      this.moveLeft(controller);
     }
     this.updateJumpOrGravity(controller, isLocked);
     this.updateCameraControl();
     this.updateAnimation(controller);
   }
 
+  /**
+   * Processes jump input or applies gravity when movement is locked.
+   * @param {Controller} controller - Active input controller.
+   * @param {boolean} isLocked - Whether controls are temporarily locked.
+   * @returns {void}
+   */
   updateJumpOrGravity(controller, isLocked) {
     if (!isLocked) {
       this.jump(controller);
     } else if (this.isJumping || this.isAboveGround()) {
-      this.setJumpingSequenz();
+      this.setJumpingSequence();
     }
   }
 
-  checkHurtThreshold() {
-    if (this.health <= 0 || this.nextHurtThreshold <= 0) {
-      return;
-    }
-    if (this.health < this.nextHurtThreshold) {
-      this.hurtTriggerTime = performance.now();
-      this.resetAnimationFrame();
-      this.advanceHurtThreshold();
-    }
-  }
-
-  advanceHurtThreshold() {
-    if (this.health < 20) {
-      this.nextHurtThreshold = 0;
-    } else if (this.health < 40) {
-      this.nextHurtThreshold = 20;
-    } else if (this.health < 60) {
-      this.nextHurtThreshold = 40;
-    } else if (this.health < 80) {
-      this.nextHurtThreshold = 60;
-    }
-  }
-
+  /**
+   * Routes animation selection between hurt/death and standard actions.
+   * @param {Controller} controller - Active input controller.
+   * @returns {void}
+   */
   updateAnimation(controller) {
     if (this.isDead() || this.isHurtAnimationActive()) {
-      this.evaluateNodeS(controller);
+      this.selectUpperHealthAnimation(controller);
       return;
     }
     this.updateStandardAnimation(controller);
   }
 
+  /**
+   * Selects throwing, jumping, walking, or idle animation.
+   * @param {Controller} controller - Active input controller.
+   * @returns {void}
+   */
   updateStandardAnimation(controller) {
     const isMoving = controller.right || controller.left;
     if (this.isThrowing) {
@@ -201,112 +205,29 @@ class Character extends MovableObject {
       this.playAnimation(this.IMAGES_MOVING);
     } else {
       this.idleTimer++;
-      this.startIdleSequenz();
+      this.startIdleSequence();
     }
   }
 
-  evaluateNodeS(controller) {
-    if (this.health < 80 && this.health >= 60) {
-      this.startHurtAnimation();
-      this.executeNodeX(controller);
-    } else if (this.health < 60 && this.health >= 40) {
-      this.startHurtAnimation();
-      this.executeNodeX(controller);
-    } else {
-      this.evaluateNode2a(controller);
-    }
-  }
-
-  evaluateNode2a(controller) {
-    if (this.health < 40 && this.health >= 20) {
-      this.startHurtAnimation();
-      this.executeNodeX(controller);
-    } else if (this.health < 20 && this.health > 0) {
-      this.startHurtAnimation();
-      this.executeNodeX(controller);
-    } else {
-      this.evaluateNode2b(controller);
-    }
-  }
-
-  evaluateNode2b(controller) {
-    if (this.health > 0) {
-      this.updateStandardAnimation(controller);
-    } else {
-      this.startDeathAnimation();
-    }
-  }
-
-  executeNodeX(controller) {
-    const otherAnimRunning = this.isOtherAnimationRunning(controller);
-    if (otherAnimRunning) {
-      this.startHurtAnimationAsPriority();
-    } else {
-      this.startHurtAnimationAsPriority();
-    }
-  }
-
-  isOtherAnimationRunning(controller) {
-    const isMoving = controller.right || controller.left;
-    return this.isThrowing || this.isJumping || isMoving || this.idleTimer > 0;
-  }
-
-  startHurtAnimation() {
-    this.idleTimer = 0;
-  }
-
-  startHurtAnimationAsPriority() {
-    this.isThrowing = false;
-    this.idleTimer = 0;
-    this.playAnimation(this.IMAGES_HURT);
-  }
-
-  startDeathAnimation() {
-    this.initDeathSequence();
-    const lastFrame = this.IMAGES_DEATH[this.IMAGES_DEATH.length - 1];
-    if (this.deathFinishedTime === 0) {
-      this.playDeathFrames(lastFrame);
-    } else {
-      this.holdLastDeathFrame(lastFrame);
-    }
-  }
-
-  initDeathSequence() {
-    if (!this.deathAnimationStarted) {
-      this.deathAnimationStarted = true;
-      this.deathFinishedTime = 0;
-      this.resetAnimationFrame();
-    }
-    this.isThrowing = false;
-    this.idleTimer = 0;
-  }
-
-  playDeathFrames(lastFrame) {
-    this.playAnimation(this.IMAGES_DEATH);
-    if (this.imageCounter >= this.IMAGES_DEATH.length - 1) {
-      this.img = this.imageCache[lastFrame];
-      this.deathFinishedTime = performance.now();
-    }
-  }
-
-  holdLastDeathFrame(lastFrame) {
-    this.img = this.imageCache[lastFrame];
-    if (performance.now() - this.deathFinishedTime >= this.deathHoldDuration) {
-      this.isReadyForGameOver = true;
-    }
-  }
-
-  startIdleSequenz() {
+  /**
+   * Advances between static pose, short idle, and sleeping idle based on timer.
+   * @returns {void}
+   */
+  startIdleSequence() {
     if (this.idleTimer < 120) {
       this.img = this.imageCache[this.IMAGE_0];
       this.resetAnimationFrame();
     } else if (this.idleTimer < 360) {
       this.startIdleAnimation();
     } else {
-      this.startLongidleAnimation();
+      this.startLongIdleAnimation();
     }
   }
 
+  /**
+   * Plays the standard standing idle sprite cycle.
+   * @returns {void}
+   */
   startIdleAnimation() {
     if (this.idleTimer === 120) {
       this.resetAnimationFrame();
@@ -314,23 +235,31 @@ class Character extends MovableObject {
     this.playAnimation(this.IMAGES_IDLE);
   }
 
-  startLongidleAnimation() {
+  /**
+   * Plays the sleeping long-idle sprite cycle.
+   * @returns {void}
+   */
+  startLongIdleAnimation() {
     if (this.idleTimer === 360) {
       this.resetAnimationFrame();
     }
     this.playAnimation(this.IMAGES_LONG_IDLE);
   }
 
+  /**
+   * Resets frames and starts playing the jump animation.
+   * @returns {void}
+   */
   startJumpingAnimation() {
     this.resetAnimationFrame();
     this.playAnimation(this.IMAGES_JUMP);
   }
 
-  resetAnimationFrame() {
-    this.imageCounter = 0;
-    this.frameTick = 0;
-  }
-
+  /**
+   * Moves Pepe right within the world boundary.
+   * @param {Controller} controller - Active input controller.
+   * @returns {void}
+   */
   moveRight(controller) {
     const maxWorldX = this.canvasWidth * 2 - this.width;
     if (controller.right && this.x < maxWorldX) {
@@ -339,13 +268,23 @@ class Character extends MovableObject {
     }
   }
 
-  moveleft(controller) {
+  /**
+   * Moves Pepe left within the world boundary.
+   * @param {Controller} controller - Active input controller.
+   * @returns {void}
+   */
+  moveLeft(controller) {
     if (controller.left && this.x > 0) {
       this.x -= this.vXChar;
       this.otherDirection = true;
     }
   }
 
+  /**
+   * Initiates a jump when Space is pressed and updates airborne motion.
+   * @param {Controller} controller - Active input controller.
+   * @returns {void}
+   */
   jump(controller) {
     if (controller.space && !this.isJumping) {
       this.isJumping = true;
@@ -353,20 +292,28 @@ class Character extends MovableObject {
       this.imageCounter = 0;
     }
     if (this.isJumping) {
-      this.setJumpingSequenz()
+      this.setJumpingSequence();
     }
   }
 
+  /**
+   * Triggers a bounce jump after stomping an enemy.
+   * @returns {void}
+   */
   initGeneralJumpAction() {
     this.isJumping = true;
     this.vg = -20;
     this.imageCounter = 0;
     if (this.isJumping) {
-      this.setJumpingSequenz();
+      this.setJumpingSequence();
     }
   }
 
-  setJumpingSequenz() {
+  /**
+   * Applies gravity during a jump and lands Pepe on the ground line.
+   * @returns {void}
+   */
+  setJumpingSequence() {
     this.setGravitation();
     const groundLine = this.getGroundLine();
     if (this.y >= groundLine) {
@@ -375,6 +322,11 @@ class Character extends MovableObject {
     }
   }
 
+  /**
+   * Determines whether Pepe is falling onto an enemy from above.
+   * @param {MovableObject} enemy - Target enemy object.
+   * @returns {boolean} True when a valid stomp collision occurs.
+   */
   isStomping(enemy) {
     if (!this.isColliding(enemy) || enemy.isDead) {
       return false;
@@ -382,36 +334,13 @@ class Character extends MovableObject {
     const isFallingDown = this.isAboveGround() && this.vg > 0;
     const charBottom = this.y + this.height - this.offset.bottom;
     const enemyCenterY = enemy.y + enemy.height * 0.8;
-    if (isFallingDown && charBottom <= enemyCenterY && !enemy.isDead) {
-      return true;
-    } else {
-      return false;
-    }
+    return isFallingDown && charBottom <= enemyCenterY;
   }
 
-  hit() {
-    this.health -= 5;
-    if (this.health <= 0) {
-      this.health = 0;
-    } else {
-      this.lastHit = performance.now();
-    }
-  }
-
-  isHurt() {
-    const timePassed = performance.now() - this.lastHit;
-    return timePassed < 750 && this.health > 0;
-  }
-
-  isHurtAnimationActive() {
-    const timePassed = performance.now() - this.hurtTriggerTime;
-    return timePassed < 750 && this.health > 0;
-  }
-
-  isDead() {
-    return this.health <= 0;
-  }
-
+  /**
+   * Begins the bottle-throwing animation if cooldown allows.
+   * @returns {void}
+   */
   startThrowSequence() {
     if (this.isHurtAnimationActive() || this.isDead()) {
       return;
@@ -425,6 +354,10 @@ class Character extends MovableObject {
     this.resetAnimationFrame();
   }
 
+  /**
+   * Plays throwing sprites and flags bottle spawn once duration completes.
+   * @returns {void}
+   */
   handleThrowAnimation() {
     const timeThrowing = performance.now() - this.lastThrowTime;
     this.playAnimation(this.IMAGES_THROWING);
@@ -433,6 +366,10 @@ class Character extends MovableObject {
     }
   }
 
+  /**
+   * Ends throwing state and requests projectile instantiation.
+   * @returns {void}
+   */
   resetThrowParameter() {
     this.isThrowing = false;
     this.readyToSpawnBottle = true;

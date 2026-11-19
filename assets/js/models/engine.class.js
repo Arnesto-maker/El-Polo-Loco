@@ -1,19 +1,34 @@
+/**
+ * Central 60 FPS game loop coordinating rendering, popups, combat, and collisions.
+ */
 class GameEngine {
+  /**
+   * Initializes canvas context, managers, HUD, popups, and starts the loop.
+   * @param {HTMLCanvasElement} canvasElement - The game canvas.
+   * @param {Controller} inputController - Unified input controller instance.
+   * @param {Array<Object>} gameFrames - Initial Z-ordered render objects.
+   * @param {World} world - Active level World instance.
+   */
   constructor(canvasElement, inputController, gameFrames, world) {
     this.world = world;
     this.ctx = canvasElement.getContext("2d");
     this.controller = inputController;
     this.frameObjects = gameFrames;
     this.statusBar = new StatusBar(canvasElement);
+    this.combatManager = new CombatManager(this);
+    this.collisionManager = new CollisionManager(this);
     this.lastBossTick = 0;
     this.isPaused = false;
     this.isRunning = true;
     this.animationFrameId = null;
     this.initPopups();
-    this.bindPopupEvents();
     this.renderLoop();
   }
 
+  /**
+   * Instantiates all in-game popup controllers.
+   * @returns {void}
+   */
   initPopups() {
     this.startHelp = new StartHelpPopup(this);
     this.bossDossier = new BossDossierPopup(this);
@@ -21,16 +36,19 @@ class GameEngine {
     this.pausePopup = new PausePopup(this);
   }
 
-  bindPopupEvents() {
-    if (window.activePopupKeyHandler) {
-      window.removeEventListener("keydown", window.activePopupKeyHandler);
-    }
-    window.activePopupKeyHandler = (e) => {
-      this.routePopupKeyDown(e.key);
-    };
-    window.addEventListener("keydown", window.activePopupKeyHandler);
+  /**
+   * Rebuilds the cached render list from the World instance.
+   * @returns {void}
+   */
+  refreshFrameObjects() {
+    this.frameObjects = this.world.getFramePackages();
   }
 
+  /**
+   * Routes discrete control keys from Controller to the highest-priority open popup.
+   * @param {string} key - Logical key name (Tab, Enter, b, ArrowLeft, ArrowRight).
+   * @returns {void}
+   */
   routePopupKeyDown(key) {
     if (!this.isRunning) {
       return;
@@ -39,13 +57,17 @@ class GameEngine {
       this.startHelp.handleKeyDown(key);
     } else if (this.bossDossier.isOpen) {
       this.bossDossier.handleKeyDown(key);
-    } else if (key === "Escape" || this.pausePopup.isOpen) {
+    } else if (key === "Tab" || this.pausePopup.isOpen) {
       this.pausePopup.handleKeyDown(key);
     } else {
       this.coinConverter.handleKeyDown(key);
     }
   }
 
+  /**
+   * Executes one frame of game logic, collision handling, camera draw, and HUD draw.
+   * @returns {void}
+   */
   renderLoop() {
     if (!this.isRunning || !this.world) {
       return;
@@ -57,291 +79,69 @@ class GameEngine {
       if (!this.isRunning) {
         return;
       }
-      this.checkAllCollisions(char);
+      this.collisionManager.checkAllCollisions(char);
     }
-    this.drawWorldWithCamera(char);
-    this.statusBar.draw(this.ctx);
-    this.drawActivePopups();
+    this.drawScene(char);
     this.animationFrameId = requestAnimationFrame(() => this.renderLoop());
   }
 
-  drawActivePopups() {
+  /**
+   * Renders world sprites, HUD overlay, and canvas popups.
+   * @param {Character} char - Player character for camera translation.
+   * @returns {void}
+   */
+  drawScene(char) {
+    this.drawWorldWithCamera(char);
+    this.statusBar.draw(this.ctx);
     this.coinConverter.draw(this.ctx);
   }
 
+  /**
+   * Translates canvas context by camera offset, draws all entities, and restores offset.
+   * @param {Character} char - Player character holding cameraX.
+   * @returns {void}
+   */
   drawWorldWithCamera(char) {
     this.ctx.translate(char.cameraX, 0);
     this.drawFrame();
     this.ctx.translate(-char.cameraX, 0);
   }
 
+  /**
+   * Advances combat, entity updates, object cleanup, and checks game-over condition.
+   * @param {Character} char - Player character instance.
+   * @returns {void}
+   */
   updateLogic(char) {
     if (!char.isDead() && !char.isHurtAnimationActive()) {
-      this.updateThrowWorkflow(char);
+      this.combatManager.updateThrowWorkflow(char);
     }
     if (!char.isDead()) {
-      this.updateBossFightState();
+      this.combatManager.updateBossFightState();
     }
+    this.updateAllFrameObjects();
+    this.collisionManager.cleanupObjects();
+    if (char.isReadyForGameOver) {
+      this.triggerGameOverFlow();
+    }
+  }
+
+  /**
+   * Invokes the update method on every active frame object.
+   * @returns {void}
+   */
+  updateAllFrameObjects() {
     for (let i = 0; i < this.frameObjects.length; i++) {
       if (this.frameObjects[i].update) {
         this.frameObjects[i].update(this.controller);
       }
     }
-    this.cleanupObjects();
-    if (char.isReadyForGameOver) {
-      this.executeNode2c();
-    }
   }
 
-  executeNode2c() {
-    showGameOverFrame();
-  }
-
-  cleanupObjects() {
-    this.removeDeadChicken();
-    this.removeSplashedBottles();
-    this.removeSplashedBossBottles();
-    this.removeDeadBoss();
-  }
-
-  updateBossFightState() {
-    const boss = this.world.boss;
-    if (!boss || boss.isDead) {
-      return;
-    }
-    if (!boss.isActivated && this.world.enemies.length === 0) {
-      this.activateBossFight(boss);
-    }
-    if (boss.isActivated) {
-      this.updateBossHudAndSpecial(boss);
-    }
-  }
-
-  activateBossFight(boss) {
-    boss.isActivated = true;
-    this.statusBar.showBossHud = true;
-    this.statusBar.bossBonus = 10000;
-    this.lastBossTick = performance.now();
-    this.bossDossier.openPopup();
-  }
-
-  updateBossHudAndSpecial(boss) {
-    this.updateBossTimerAndScore();
-    this.statusBar.bossHealth = boss.health;
-    this.statusBar.bossArmour = boss.armour;
-    this.statusBar.updateBossHealthImage();
-    if (boss.readyToSpawnSpecial) {
-      boss.readyToSpawnSpecial = false;
-      this.spawnBossSpecialBottles(boss);
-    }
-  }
-
-  updateBossTimerAndScore() {
-    const now = performance.now();
-    const dt = now - this.lastBossTick;
-    this.lastBossTick = now;
-    this.statusBar.bossTimeMs += dt;
-    this.reduceBossScoreBonus(dt);
-  }
-
-  reduceBossScoreBonus(dt) {
-    if (this.statusBar.bossBonus > 0) {
-      const penalty = Math.floor(dt * 0.1);
-      this.statusBar.bossBonus = Math.max(0, this.statusBar.bossBonus - penalty);
-    }
-  }
-
-  spawnBossSpecialBottles(boss) {
-    const velocitiesX = [-14, -9.5, -5, 5, 9.5, 14];
-    const startX = boss.x + boss.width * 0.4;
-    const startY = boss.y + boss.height * 0.1;
-    for (let i = 0; i < velocitiesX.length; i++) {
-      const b = new BossBottle(this.ctx.canvas, startX, startY, velocitiesX[i], -21);
-      this.world.bossBottles.push(b);
-    }
-    this.frameObjects = this.world.getFramePackages();
-  }
-
-  updateThrowWorkflow(char) {
-    if (this.controller.enter && this.statusBar.bottleCount > 0) {
-      char.startThrowSequence();
-    }
-    if (char.readyToSpawnBottle) {
-      this.initBottleThrow(char);
-    }
-  }
-
-  initBottleThrow(char) {
-    char.readyToSpawnBottle = false;
-    this.statusBar.bottleCount -= 1;
-    const startX = this.getBottleStartX(char);
-    const startY = char.y + char.height * 0.25;
-    const yMax = char.canvasHeight - char.canvasHeight * 0.1 - char.floor;
-    this.spawnThrownBottle(startX, startY, char.otherDirection, yMax);
-  }
-
-  getBottleStartX(char) {
-    if (char.otherDirection) {
-      return char.x;
-    } else {
-      return char.x + char.width * 0.7;
-    }
-  }
-
-  spawnThrownBottle(startX, startY, otherDirection, yMax) {
-    const bottle = new ThrowableBottle(this.ctx.canvas, startX, startY, otherDirection, yMax);
-    this.world.throwableBottles.push(bottle);
-    this.frameObjects = this.world.getFramePackages();
-  }
-
-  checkAllCollisions(char) {
-    if (char.isDead()) {
-      return;
-    }
-    this.checkChickenCollision(char);
-    this.checkCoinCollisions(char);
-    this.checkBottleCollisions(char);
-    this.checkThrownBottleCollisions();
-    this.checkBossCollisions(char);
-    this.checkBossBottleCollisions(char);
-  }
-
-  checkThrownBottleCollisions() {
-    const bottles = this.world.throwableBottles;
-    for (let i = 0; i < bottles.length; i++) {
-      if (!bottles[i].isSplashing) {
-        this.checkBottleHitsEnemy(bottles[i]);
-      }
-    }
-  }
-
-  checkBottleHitsEnemy(bottle) {
-    const enemies = this.world.enemies;
-    for (let i = 0; i < enemies.length; i++) {
-      if (!enemies[i].isDead && bottle.isColliding(enemies[i])) {
-        bottle.startSplashSequenz();
-        enemies[i].die();
-        this.statusBar.score += 500;
-      }
-    }
-    this.checkBottleHitsBoss(bottle);
-  }
-
-  checkBottleHitsBoss(bottle) {
-    const boss = this.world.boss;
-    if (boss && !boss.isDead && bottle.isColliding(boss)) {
-      bottle.startSplashSequenz();
-      boss.applyZoneHit(bottle);
-      this.statusBar.bossHealth = boss.health;
-      this.statusBar.bossArmour = boss.armour;
-      this.statusBar.updateBossHealthImage();
-    }
-  }
-
-  checkBossCollisions(char) {
-    const boss = this.world.boss;
-    if (!boss || !boss.isActivated || boss.isDead) {
-      return;
-    }
-    if (char.isColliding(boss) && !char.isHurt()) {
-      this.applyBossContactDamage(char, boss);
-    }
-  }
-
-  applyBossContactDamage(char, boss) {
-    if (boss.isAttacking) {
-      char.health = Math.max(0, char.health - 10);
-    } else {
-      char.health = Math.max(0, char.health - 2);
-    }
-    char.lastHit = performance.now();
-    this.statusBar.health = char.health;
-    this.statusBar.updateHealthImage();
-  }
-
-  checkBossBottleCollisions(char) {
-    const bottles = this.world.bossBottles;
-    for (let i = 0; i < bottles.length; i++) {
-      if (!bottles[i].isSplashing && char.isColliding(bottles[i])) {
-        bottles[i].startSplashSequenz();
-        if (!char.isHurt()) {
-          this.startCharHitSequence(char);
-        }
-      }
-    }
-  }
-
-  removeSplashedBottles() {
-    const prevLength = this.world.throwableBottles.length;
-    this.world.throwableBottles = this.world.throwableBottles.filter((bottle) => {
-      return this.isBottleStillActive(bottle);
-    });
-    if (this.world.throwableBottles.length !== prevLength) {
-      this.frameObjects = this.world.getFramePackages();
-    }
-  }
-
-  removeSplashedBossBottles() {
-    const prevLength = this.world.bossBottles.length;
-    this.world.bossBottles = this.world.bossBottles.filter((bottle) => {
-      return this.isBottleStillActive(bottle);
-    });
-    if (this.world.bossBottles.length !== prevLength) {
-      this.frameObjects = this.world.getFramePackages();
-    }
-  }
-
-  isBottleStillActive(bottle) {
-    if (bottle.isSplashing) {
-      const timeSplashing = performance.now() - bottle.splashTime;
-      return timeSplashing < 400;
-    }
-    return true;
-  }
-
-  removeDeadChicken() {
-    const prevLength = this.world.enemies.length;
-    this.world.enemies = this.world.enemies.filter((obj) => {
-      return this.isChickenStillActive(obj);
-    });
-    if (this.world.enemies.length !== prevLength) {
-      this.frameObjects = this.world.getFramePackages();
-    }
-  }
-
-  isChickenStillActive(obj) {
-    if (obj.isDead) {
-      const timeDead = performance.now() - obj.deadTime;
-      return timeDead < 500;
-    }
-    return true;
-  }
-
-  removeDeadBoss() {
-    const boss = this.world.boss;
-    if (boss && boss.isDead && performance.now() - boss.deadTime >= 1000) {
-      const winStats = this.collectWinStats();
-      this.world.boss = null;
-      this.executeYouWonSequence(winStats);
-    }
-  }
-
-  collectWinStats() {
-    this.statusBar.score += this.statusBar.bossBonus;
-    this.statusBar.bossBonus = 0;
-    this.statusBar.showBossHud = false;
-    return {
-      health: this.world.character.health,
-      coins: this.statusBar.coinCount,
-      bottles: this.statusBar.bottleCount,
-      score: this.statusBar.score,
-    };
-  }
-
-  executeYouWonSequence(winStats) {
-    startYouWonFlow(winStats);
-  }
-
+  /**
+   * Draws every entity in the current Z-ordered frame array.
+   * @returns {void}
+   */
   drawFrame() {
     for (let i = 0; i < this.frameObjects.length; i++) {
       if (this.frameObjects[i].draw) {
@@ -350,66 +150,11 @@ class GameEngine {
     }
   }
 
-  startCharStompingSequence(char, obj) {
-    char.initGeneralJumpAction(char.y);
-    this.statusBar.score += 500;
-    char.startJumpingAnimation();
-    obj.die();
-  }
-
-  startCharHitSequence(char) {
-    char.hit();
-    this.statusBar.health = char.health;
-    this.statusBar.updateHealthImage();
-  }
-
-  updateChickenCollision(char, obj) {
-    if (obj.isDead) {
-      return;
-    }
-    if (char.isStomping(obj)) {
-      this.startCharStompingSequence(char, obj);
-    } else if (char.isColliding(obj)) {
-      if (!char.isHurt()) {
-        this.startCharHitSequence(char);
-      }
-    }
-  }
-
-  checkChickenCollision(char) {
-    for (let i = 0; i < this.world.enemies.length; i++) {
-      this.updateChickenCollision(char, this.world.enemies[i]);
-    }
-  }
-
-  setCollectingCoinSequence(char, index) {
-    const obj = this.world.coins[index];
-    if (char.isColliding(obj)) {
-      this.world.coins.splice(index, 1);
-      this.statusBar.coinCount += 1;
-      this.statusBar.score += 100;
-      this.frameObjects = this.world.getFramePackages();
-    }
-  }
-
-  checkCoinCollisions(char) {
-    for (let i = this.world.coins.length - 1; i >= 0; i--) {
-      this.setCollectingCoinSequence(char, i);
-    }
-  }
-
-  setCollectingBottleSequence(char, index) {
-    const obj = this.world.bottles[index];
-    if (char.isColliding(obj)) {
-      this.world.bottles.splice(index, 1);
-      this.statusBar.bottleCount += 1;
-      this.frameObjects = this.world.getFramePackages();
-    }
-  }
-
-  checkBottleCollisions(char) {
-    for (let i = this.world.bottles.length - 1; i >= 0; i--) {
-      this.setCollectingBottleSequence(char, i);
-    }
+  /**
+   * Transitions the application into the Game Over screen.
+   * @returns {void}
+   */
+  triggerGameOverFlow() {
+    showGameOverFrame();
   }
 }
