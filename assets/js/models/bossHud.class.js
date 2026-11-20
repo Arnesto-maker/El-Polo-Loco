@@ -1,5 +1,5 @@
 /**
- * Renders the Endboss health bar, armor readout, timer, and decaying bonus score.
+ * Renders the Endboss health bar, armor readout, tactical hints, timer, and decaying bonus score.
  */
 class BossHud {
   /**
@@ -21,6 +21,8 @@ class BossHud {
     }
     this.drawBossHealthBar(ctx);
     this.drawBossArmourText(ctx);
+    this.drawBossJumpThrowHint(ctx);
+    this.drawBossArmourHint(ctx);
     this.drawBossTimerGroup(ctx);
   }
 
@@ -48,6 +50,48 @@ class BossHud {
     const armourY = this.bar.y + this.bar.height + this.bar.canvasHeight * 0.035;
     ctx.strokeText(armourText, armourX, armourY);
     ctx.fillText(armourText, armourX, armourY);
+  }
+
+  /**
+   * Draws pulsing Hint A advising Jump-Throw attacks beneath the boss armor readout.
+   * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
+   * @returns {void}
+   */
+  drawBossJumpThrowHint(ctx) {
+    const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.07;
+    const fontSize = Math.floor(this.bar.canvasHeight * 0.019 * pulse);
+    const hintX = this.bar.canvasWidth * 0.98;
+    const hintY = this.bar.y + this.bar.height + this.bar.canvasHeight * 0.068;
+    const text = "Use Jump Throw to deal more damage";
+    ctx.save();
+    ctx.font = `${fontSize}px PolloFont`;
+    ctx.textAlign = "right";
+    ctx.strokeText(text, hintX, hintY);
+    ctx.fillText(text, hintX, hintY);
+    ctx.restore();
+  }
+
+  /**
+   * Draws Hint B in warning red while the boss armor shield is still above zero.
+   * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
+   * @returns {void}
+   */
+  drawBossArmourHint(ctx) {
+    if (this.bar.bossArmour <= 0) {
+      return;
+    }
+    const fontSize = Math.floor(this.bar.canvasHeight * 0.018);
+    const hintX = this.bar.canvasWidth * 0.98;
+    const hintY = this.bar.y + this.bar.height + this.bar.canvasHeight * 0.1;
+    const text = "Armour activated! Break armour to reduce health";
+    ctx.save();
+    ctx.font = `${fontSize}px PolloFont`;
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#b71c1c";
+    ctx.strokeStyle = "#b71c1c";
+    ctx.strokeText(text, hintX, hintY);
+    ctx.fillText(text, hintX, hintY);
+    ctx.restore();
   }
 
   /**

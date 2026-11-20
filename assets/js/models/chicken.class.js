@@ -1,5 +1,5 @@
 /**
- * Standard patrolling chicken enemy supporting stomp kills and dt-scaled movement.
+ * Standard patrolling chicken enemy supporting stomp kills, collision reversal, and dt-scaled movement.
  */
 class Chicken extends MovableObject {
   IMAGE_0 = "assets/img/3_enemies_chicken/chicken_normal/1_walk/1_w.png";
@@ -97,6 +97,18 @@ class Chicken extends MovableObject {
       this.x = this.minPatrolX;
       this.direction = 1;
     }
+    this.registerDirectionChange();
+  }
+
+  /**
+   * Reverses horizontal walking direction immediately on player collision.
+   * @returns {void}
+   */
+  reverseDirection() {
+    if (this.isDead) {
+      return;
+    }
+    this.direction = -this.direction;
     this.registerDirectionChange();
   }
 

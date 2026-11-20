@@ -1,5 +1,5 @@
 /**
- * Handles all gameplay hit detection, sound triggers, and expired entity cleanup.
+ * Handles all gameplay hit detection, collision reversals, sound triggers, and expired entity cleanup.
  */
 class CollisionManager {
   /**
@@ -85,7 +85,7 @@ class CollisionManager {
   }
 
   /**
-   * Checks contact damage between Pepe and the active boss.
+   * Checks horizontal contact collision between Pepe and the active boss.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
@@ -100,7 +100,7 @@ class CollisionManager {
   }
 
   /**
-   * Deducts higher melee attack damage or light contact damage from Pepe and plays hurt SFX.
+   * Deducts boss contact damage, triggers Pepe hurt animation, and reverses boss heading.
    * @param {Character} char - Player character instance.
    * @param {Boss} boss - Active Endboss instance.
    * @returns {void}
@@ -113,6 +113,17 @@ class CollisionManager {
     }
     playHurtSound();
     char.lastHit = performance.now();
+    char.triggerHurtAnimation();
+    boss.reverseDirection();
+    this.syncPlayerHealthHud(char);
+  }
+
+  /**
+   * Updates the player health HUD sprite to match current health.
+   * @param {Character} char - Player character instance.
+   * @returns {void}
+   */
+  syncPlayerHealthHud(char) {
     this.engine.statusBar.health = char.health;
     this.engine.statusBar.updateHealthImage();
   }
@@ -147,7 +158,7 @@ class CollisionManager {
   }
 
   /**
-   * Resolves a stomp kill or contact damage against one chicken enemy.
+   * Resolves a stomp kill or horizontal collision with hurt animation and enemy reversal.
    * @param {Character} char - Player character instance.
    * @param {Chicken} enemy - Target chicken enemy.
    * @returns {void}
@@ -160,6 +171,7 @@ class CollisionManager {
       this.startCharStompingSequence(char, enemy);
     } else if (char.isColliding(enemy) && !char.isHurt()) {
       this.startCharHitSequence(char);
+      enemy.reverseDirection();
     }
   }
 
@@ -177,14 +189,13 @@ class CollisionManager {
   }
 
   /**
-   * Damages Pepe and refreshes the HUD health bar.
+   * Damages Pepe, triggers hurt animation, and refreshes the HUD health bar.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
   startCharHitSequence(char) {
     char.hit();
-    this.engine.statusBar.health = char.health;
-    this.engine.statusBar.updateHealthImage();
+    this.syncPlayerHealthHud(char);
   }
 
   /**

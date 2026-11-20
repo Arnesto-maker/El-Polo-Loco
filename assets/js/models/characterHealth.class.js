@@ -1,11 +1,10 @@
 /**
- * Base health, hurt-threshold, and death animation controller for the player character.
+ * Base health, collision hurt feedback, and death animation controller for the player character.
  */
 class CharacterHealth extends MovableObject {
   health = 100;
   lastHit = 0;
   hurtTriggerTime = 0;
-  nextHurtThreshold = 80;
   deathAnimationStarted = false;
   deathFinishedTime = 0;
   deathHoldDuration = 1200;
@@ -53,87 +52,43 @@ class CharacterHealth extends MovableObject {
   }
 
   /**
-   * Checks whether health dropped below the next hurt animation milestone.
+   * Starts the hurt sprite sequence immediately on every horizontal collision hit.
    * @returns {void}
    */
-  checkHurtThreshold() {
-    if (this.health <= 0 || this.nextHurtThreshold <= 0) {
+  triggerHurtAnimation() {
+    if (this.health <= 0) {
       return;
     }
-    if (this.health < this.nextHurtThreshold) {
-      this.hurtTriggerTime = performance.now();
-      this.resetAnimationFrame();
-      this.advanceHurtThreshold();
-    }
+    this.hurtTriggerTime = performance.now();
+    this.currentAnimation = null;
+    this.resetAnimationFrame();
   }
 
   /**
-   * Lowers the next hurt animation threshold based on remaining health.
-   * @returns {void}
-   */
-  advanceHurtThreshold() {
-    if (this.health < 20) {
-      this.nextHurtThreshold = 0;
-    } else if (this.health < 40) {
-      this.nextHurtThreshold = 20;
-    } else if (this.health < 60) {
-      this.nextHurtThreshold = 40;
-    } else if (this.health < 80) {
-      this.nextHurtThreshold = 60;
-    }
-  }
-
-  /**
-   * Selects upper health band hurt animations or delegates lower bands.
+   * Routes health-priority animations between death, active hurt, and standard states.
    * @param {Controller} controller - Active input controller.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
   selectUpperHealthAnimation(controller, scale = 1) {
-    if (this.health < 80 && this.health >= 40) {
-      this.applyHurtPriorityAnimation(scale);
-    } else {
-      this.selectLowerHealthAnimation(controller, scale);
-    }
-  }
-
-  /**
-   * Selects lower health band hurt animations or delegates to death sequence.
-   * @param {Controller} controller - Active input controller.
-   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
-   * @returns {void}
-   */
-  selectLowerHealthAnimation(controller, scale = 1) {
-    if (this.health < 40 && this.health > 0) {
-      this.applyHurtPriorityAnimation(scale);
-    } else {
-      this.selectFallbackOrDeathAnimation(controller, scale);
-    }
-  }
-
-  /**
-   * Runs standard animation if alive or starts the death sequence at zero health.
-   * @param {Controller} controller - Active input controller.
-   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
-   * @returns {void}
-   */
-  selectFallbackOrDeathAnimation(controller, scale = 1) {
-    if (this.health > 0) {
-      this.updateStandardAnimation(controller, scale);
-    } else {
+    if (this.isDead()) {
       this.startDeathAnimation(scale);
+    } else if (this.isHurtAnimationActive()) {
+      this.applyHurtPriorityAnimation(scale);
+    } else {
+      this.updateStandardAnimation(controller, scale);
     }
   }
 
   /**
-   * Interrupts active actions and plays the hurt sprite sequence.
+   * Interrupts throw/idle state and plays the hurt sprite sequence.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
   applyHurtPriorityAnimation(scale = 1) {
     this.isThrowing = false;
     this.idleTimer = 0;
-    this.playAnimation(this.IMAGES_HURT, scale);
+    this.playAnimation(this.IMAGES_HURT, scale, 6);
   }
 
   /**
@@ -159,6 +114,7 @@ class CharacterHealth extends MovableObject {
     if (!this.deathAnimationStarted) {
       this.deathAnimationStarted = true;
       this.deathFinishedTime = 0;
+      this.currentAnimation = null;
       this.resetAnimationFrame();
     }
     this.isThrowing = false;
@@ -192,16 +148,15 @@ class CharacterHealth extends MovableObject {
   }
 
   /**
-   * Applies standard enemy contact damage to the character and plays hurt SFX.
+   * Applies standard enemy contact damage to the character and triggers hurt feedback.
    * @returns {void}
    */
   hit() {
-    this.health -= 5;
+    this.health = Math.max(0, this.health - 5);
     playHurtSound();
-    if (this.health <= 0) {
-      this.health = 0;
-    } else {
+    if (this.health > 0) {
       this.lastHit = performance.now();
+      this.triggerHurtAnimation();
     }
   }
 
@@ -215,12 +170,12 @@ class CharacterHealth extends MovableObject {
   }
 
   /**
-   * Returns true while a threshold hurt animation locks player controls.
-   * @returns {boolean} True if hurt animation is running.
+   * Returns true while the hurt sprite feedback animation is running.
+   * @returns {boolean} True if hurt animation is active.
    */
   isHurtAnimationActive() {
     const timePassed = performance.now() - this.hurtTriggerTime;
-    return timePassed < 750 && this.health > 0;
+    return timePassed < 600 && this.health > 0;
   }
 
   /**
