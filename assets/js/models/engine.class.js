@@ -1,9 +1,9 @@
 /**
- * Central 60 FPS game loop coordinating rendering, popups, combat, and collisions.
+ * Central seconds-based dt game loop coordinating rendering, popups, combat, collisions, and portrait lock.
  */
 class GameEngine {
   /**
-   * Initializes canvas context, managers, HUD, popups, and starts the loop.
+   * Initializes canvas context, managers, HUD, popups, and starts the dt loop.
    * @param {HTMLCanvasElement} canvasElement - The game canvas.
    * @param {Controller} inputController - Unified input controller instance.
    * @param {Array<Object>} gameFrames - Initial Z-ordered render objects.
@@ -17,12 +17,23 @@ class GameEngine {
     this.statusBar = new StatusBar(canvasElement);
     this.combatManager = new CombatManager(this);
     this.collisionManager = new CollisionManager(this);
+    this.initLoopState();
+    this.initPopups();
+    this.animationFrameId = requestAnimationFrame((ts) => this.renderLoop(ts));
+  }
+
+  /**
+   * Initializes loop flags and seconds-based delta timing state.
+   * @returns {void}
+   */
+  initLoopState() {
     this.lastBossTick = 0;
     this.isPaused = false;
     this.isRunning = true;
     this.animationFrameId = null;
-    this.initPopups();
-    this.renderLoop();
+    this.lastFrameTime = 0;
+    this.dtSec = 1 / 60;
+    this.frameScale = 1;
   }
 
   /**
@@ -42,6 +53,28 @@ class GameEngine {
    */
   refreshFrameObjects() {
     this.frameObjects = this.world.getFramePackages();
+  }
+
+  /**
+   * Pauses simulation and clears held input flags when portrait Sperrframe activates.
+   * @returns {void}
+   */
+  pauseForLandscapeLock() {
+    this.isPaused = true;
+    this.lastFrameTime = 0;
+    this.controller.resetStates();
+  }
+
+  /**
+   * Keeps simulation paused and triggers the Pause Popup when returning to landscape.
+   * @returns {void}
+   */
+  resumeAfterLandscapeLock() {
+    this.isPaused = true;
+    this.lastFrameTime = 0;
+    if (this.pausePopup) {
+      this.pausePopup.openPauseFromLandscapeLock();
+    }
   }
 
   /**
@@ -65,24 +98,52 @@ class GameEngine {
   }
 
   /**
-   * Executes one frame of game logic, collision handling, camera draw, and HUD draw.
+   * Executes one display frame with clamped seconds-based dt scaling.
+   * @param {number} timestamp - High-resolution timestamp from requestAnimationFrame.
    * @returns {void}
    */
-  renderLoop() {
+  renderLoop(timestamp) {
     if (!this.isRunning || !this.world) {
       return;
     }
+    this.updateDeltaSeconds(timestamp || performance.now());
     const char = this.world.character;
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    if (!this.isPaused) {
-      this.updateLogic(char);
+    if (!this.isPaused && !isLandscapeLocked()) {
+      this.stepSimulation(char);
       if (!this.isRunning) {
         return;
       }
-      this.collisionManager.checkAllCollisions(char);
     }
     this.drawScene(char);
-    this.animationFrameId = requestAnimationFrame(() => this.renderLoop());
+    this.animationFrameId = requestAnimationFrame((ts) => this.renderLoop(ts));
+  }
+
+  /**
+   * Calculates frame delta in seconds (clamped to 0.05s) and normalizes to a 60-FPS scale.
+   * @param {number} now - Current timestamp in milliseconds.
+   * @returns {void}
+   */
+  updateDeltaSeconds(now) {
+    if (this.lastFrameTime === 0) {
+      this.lastFrameTime = now;
+    }
+    const rawSec = (now - this.lastFrameTime) / 1000;
+    this.lastFrameTime = now;
+    this.dtSec = Math.max(0, Math.min(rawSec, 0.05));
+    this.frameScale = this.dtSec * 60;
+  }
+
+  /**
+   * Advances one normalized simulation frame for logic, entities, and collisions.
+   * @param {Character} char - Player character instance.
+   * @returns {void}
+   */
+  stepSimulation(char) {
+    this.updateLogic(char);
+    if (this.isRunning) {
+      this.collisionManager.checkAllCollisions(char);
+    }
   }
 
   /**
@@ -117,7 +178,7 @@ class GameEngine {
       this.combatManager.updateThrowWorkflow(char);
     }
     if (!char.isDead()) {
-      this.combatManager.updateBossFightState();
+      this.combatManager.updateBossFightState(this.dtSec * 1000);
     }
     this.updateAllFrameObjects();
     this.collisionManager.cleanupObjects();
@@ -127,13 +188,13 @@ class GameEngine {
   }
 
   /**
-   * Invokes the update method on every active frame object.
+   * Invokes the dt-scaled update method on every active frame object.
    * @returns {void}
    */
   updateAllFrameObjects() {
     for (let i = 0; i < this.frameObjects.length; i++) {
       if (this.frameObjects[i].update) {
-        this.frameObjects[i].update(this.controller);
+        this.frameObjects[i].update(this.controller, this.frameScale);
       }
     }
   }

@@ -1,5 +1,5 @@
 /**
- * Manages the in-game pause menu overlay and transitions to Settings, Help, or Menu.
+ * Manages the in-game pause menu overlay, Sperrframe resume flow, and transitions to Settings, Help, or Menu.
  */
 class PausePopup {
   /**
@@ -60,6 +60,17 @@ class PausePopup {
   }
 
   /**
+   * Opens the pause overlay after returning from portrait lock unless another popup is active.
+   * @returns {void}
+   */
+  openPauseFromLandscapeLock() {
+    if (this.isAnotherPopupOpen() || isSettingsOverlayOpen()) {
+      return;
+    }
+    this.openPause();
+  }
+
+  /**
    * Checks whether Start Help, Boss Dossier, or Coin Converter is currently open.
    * @returns {boolean} True if another popup blocks pausing.
    */
@@ -87,6 +98,7 @@ class PausePopup {
   resumeGame() {
     this.isOpen = false;
     this.engine.isPaused = false;
+    this.engine.lastFrameTime = 0;
     this.engine.lastBossTick = performance.now();
     this.hideOverlay();
     blurActiveElement();

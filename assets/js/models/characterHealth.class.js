@@ -86,61 +86,66 @@ class CharacterHealth extends MovableObject {
   /**
    * Selects upper health band hurt animations or delegates lower bands.
    * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  selectUpperHealthAnimation(controller) {
+  selectUpperHealthAnimation(controller, scale = 1) {
     if (this.health < 80 && this.health >= 40) {
-      this.applyHurtPriorityAnimation();
+      this.applyHurtPriorityAnimation(scale);
     } else {
-      this.selectLowerHealthAnimation(controller);
+      this.selectLowerHealthAnimation(controller, scale);
     }
   }
 
   /**
    * Selects lower health band hurt animations or delegates to death sequence.
    * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  selectLowerHealthAnimation(controller) {
+  selectLowerHealthAnimation(controller, scale = 1) {
     if (this.health < 40 && this.health > 0) {
-      this.applyHurtPriorityAnimation();
+      this.applyHurtPriorityAnimation(scale);
     } else {
-      this.selectFallbackOrDeathAnimation(controller);
+      this.selectFallbackOrDeathAnimation(controller, scale);
     }
   }
 
   /**
    * Runs standard animation if alive or starts the death sequence at zero health.
    * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  selectFallbackOrDeathAnimation(controller) {
+  selectFallbackOrDeathAnimation(controller, scale = 1) {
     if (this.health > 0) {
-      this.updateStandardAnimation(controller);
+      this.updateStandardAnimation(controller, scale);
     } else {
-      this.startDeathAnimation();
+      this.startDeathAnimation(scale);
     }
   }
 
   /**
    * Interrupts active actions and plays the hurt sprite sequence.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  applyHurtPriorityAnimation() {
+  applyHurtPriorityAnimation(scale = 1) {
     this.isThrowing = false;
     this.idleTimer = 0;
-    this.playAnimation(this.IMAGES_HURT);
+    this.playAnimation(this.IMAGES_HURT, scale);
   }
 
   /**
    * Executes the death animation frames and holds the final pose before game over.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  startDeathAnimation() {
+  startDeathAnimation(scale = 1) {
     this.initDeathSequence();
     const lastFrame = this.IMAGES_DEATH[this.IMAGES_DEATH.length - 1];
     if (this.deathFinishedTime === 0) {
-      this.playDeathFrames(lastFrame);
+      this.playDeathFrames(lastFrame, scale);
     } else {
       this.holdLastDeathFrame(lastFrame);
     }
@@ -163,10 +168,11 @@ class CharacterHealth extends MovableObject {
   /**
    * Plays through death sprites until the final frame is reached.
    * @param {string} lastFrame - Path to the last death sprite.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  playDeathFrames(lastFrame) {
-    this.playAnimation(this.IMAGES_DEATH);
+  playDeathFrames(lastFrame, scale = 1) {
+    this.playAnimation(this.IMAGES_DEATH, scale);
     if (this.imageCounter >= this.IMAGES_DEATH.length - 1) {
       this.img = this.imageCache[lastFrame];
       this.deathFinishedTime = performance.now();
@@ -186,11 +192,12 @@ class CharacterHealth extends MovableObject {
   }
 
   /**
-   * Applies standard enemy contact damage to the character.
+   * Applies standard enemy contact damage to the character and plays hurt SFX.
    * @returns {void}
    */
   hit() {
     this.health -= 5;
+    playHurtSound();
     if (this.health <= 0) {
       this.health = 0;
     } else {

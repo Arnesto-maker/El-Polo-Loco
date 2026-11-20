@@ -1,3 +1,6 @@
+/**
+ * Standard patrolling chicken enemy supporting stomp kills and dt-scaled movement.
+ */
 class Chicken extends MovableObject {
   IMAGE_0 = "assets/img/3_enemies_chicken/chicken_normal/1_walk/1_w.png";
   IMAGES_WALK = [
@@ -7,17 +10,31 @@ class Chicken extends MovableObject {
   ];
   IMAGE_DEAD = ["assets/img/3_enemies_chicken/chicken_normal/2_dead/dead.png"];
   isDead = false;
-  V = 0;
-  diection = 1;
+  deadTime = 0;
+  v = 0;
+  direction = 1;
+
+  /**
+   * Initializes chicken sprites, randomized speed, patrol bounds, and hitbox.
+   * @param {HTMLCanvasElement} canvas - The game canvas.
+   * @param {number} minX - Left spawn sector limit.
+   * @param {number} maxX - Right spawn sector limit.
+   */
   constructor(canvas, minX, maxX) {
     super(canvas);
     this.loadAllImages();
-    this.setMainparameter(minX, maxX);
+    this.setMainParameter(minX, maxX);
     this.setPatrolRange();
     this.offset = this.setOffsetParameter();
   }
 
-  setMainparameter(minX, maxX) {
+  /**
+   * Configures dimensions, random spawn position, velocity, and initial heading.
+   * @param {number} minX - Left spawn sector limit.
+   * @param {number} maxX - Right spawn sector limit.
+   * @returns {void}
+   */
+  setMainParameter(minX, maxX) {
     this.img = this.imageCache[this.IMAGE_0];
     this.width = this.canvasWidth * 0.06;
     this.height = this.canvasHeight * 0.11;
@@ -31,6 +48,10 @@ class Chicken extends MovableObject {
     }
   }
 
+  /**
+   * Builds the collision offset box for the chicken enemy.
+   * @returns {{top: number, bottom: number, left: number, right: number}} Hitbox offsets.
+   */
   setOffsetParameter() {
     return {
       top: this.height * 0.1,
@@ -40,6 +61,10 @@ class Chicken extends MovableObject {
     };
   }
 
+  /**
+   * Computes clamped horizontal patrol limits around the spawn point.
+   * @returns {void}
+   */
   setPatrolRange() {
     this.xMax = 0.25 * this.canvasWidth;
     const levelMinX = 300;
@@ -48,14 +73,23 @@ class Chicken extends MovableObject {
     this.maxPatrolX = Math.min(levelMaxX, this.x + this.xMax);
   }
 
+  /**
+   * Preloads walking and defeated chicken sprites.
+   * @returns {void}
+   */
   loadAllImages() {
     this.loadImages([this.IMAGE_0]);
     this.loadImages(this.IMAGES_WALK);
     this.loadImages(this.IMAGE_DEAD);
   }
 
-  updateMovement() {
-    this.x += this.v * this.direction;
+  /**
+   * Advances horizontal patrol movement scaled to 60-FPS delta time.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
+   * @returns {void}
+   */
+  updateMovement(scale = 1) {
+    this.x += this.v * this.direction * scale;
     if (this.x >= this.maxPatrolX) {
       this.x = this.maxPatrolX;
       this.direction = -1;
@@ -66,6 +100,10 @@ class Chicken extends MovableObject {
     this.registerDirectionChange();
   }
 
+  /**
+   * Synchronizes sprite mirroring flag with current walking direction.
+   * @returns {void}
+   */
   registerDirectionChange() {
     if (this.direction === 1) {
       this.otherDirection = true;
@@ -74,17 +112,27 @@ class Chicken extends MovableObject {
     }
   }
 
+  /**
+   * Marks the chicken defeated, stops movement, and displays the dead sprite.
+   * @returns {void}
+   */
   die() {
     this.isDead = true;
     this.v = 0;
-    this.img = this.imageCache[this.IMAGE_DEAD];
+    this.img = this.imageCache[this.IMAGE_DEAD[0]];
     this.deadTime = performance.now();
   }
 
-  update() {
+  /**
+   * Updates movement and walking animation while alive.
+   * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
+   * @returns {void}
+   */
+  update(controller, scale = 1) {
     if (!this.isDead) {
-      this.updateMovement();
-      this.playAnimation(this.IMAGES_WALK);
+      this.updateMovement(scale);
+      this.playAnimation(this.IMAGES_WALK, scale);
     }
   }
 }

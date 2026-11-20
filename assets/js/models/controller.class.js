@@ -26,6 +26,8 @@ class Controller {
     this.left = false;
     this.space = false;
     this.enter = false;
+    this.sliderPointerId = null;
+    this.lastSliderDir = 0;
     this.resetSliderVisuals();
   }
 
@@ -76,11 +78,14 @@ class Controller {
   }
 
   /**
-   * Routes discrete control keys to active game popups or menu screens.
+   * Routes discrete control keys to active game popups or menu screens unless portrait-locked.
    * @param {string} key - Logical key name.
    * @returns {void}
    */
   routeDiscreteKey(key) {
+    if (isLandscapeLocked()) {
+      return;
+    }
     if (isSettingsOverlayOpen() && key === "Tab") {
       closeSettingsOverlay();
       return;
@@ -93,7 +98,7 @@ class Controller {
   }
 
   /**
-   * Binds multi-touch pointer events to the horizontal movement slider.
+   * Binds multi-touch pointer events and blocks native browser panning on the slider.
    * @returns {void}
    */
   bindTouchSlider() {
@@ -101,10 +106,21 @@ class Controller {
     if (!slider) {
       return;
     }
+    this.blockBrowserTouchScroll(slider);
     slider.addEventListener("pointerdown", (e) => this.startSliderDrag(e, slider));
     slider.addEventListener("pointermove", (e) => this.moveSliderDrag(e, slider));
     slider.addEventListener("pointerup", (e) => this.endSliderDrag(e));
     slider.addEventListener("pointercancel", (e) => this.endSliderDrag(e));
+  }
+
+  /**
+   * Prevents mobile browsers from scrolling or swiping when dragging a touch control.
+   * @param {HTMLElement} element - Touch control container.
+   * @returns {void}
+   */
+  blockBrowserTouchScroll(element) {
+    element.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
+    element.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
   }
 
   /**
@@ -212,8 +228,12 @@ class Controller {
       knob.style.transform = "translateX(0px)";
       knob.classList.remove("is-active");
     }
-    if (leftArrow) leftArrow.classList.remove("is-active");
-    if (rightArrow) rightArrow.classList.remove("is-active");
+    if (leftArrow) {
+      leftArrow.classList.remove("is-active");
+    }
+    if (rightArrow) {
+      rightArrow.classList.remove("is-active");
+    }
   }
 
   /**

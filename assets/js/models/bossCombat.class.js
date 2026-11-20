@@ -29,7 +29,7 @@ class BossCombat extends MovableObject {
   }
 
   /**
-   * Applies vertical hit-zone damage and tracks sneak attacks from behind.
+   * Applies vertical hit-zone damage, plays impact SFX, and tracks back-hits.
    * @param {ThrowableBottle} bottle - Impacting salsa bottle.
    * @returns {void}
    */
@@ -39,6 +39,7 @@ class BossCombat extends MovableObject {
     }
     const damage = this.calculateZoneDamage(bottle);
     this.takeDamage(damage);
+    playBossHitSound();
     this.checkBackHitReaction(bottle);
   }
 

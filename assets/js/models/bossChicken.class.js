@@ -1,5 +1,5 @@
 /**
- * Endboss El Pollo Loco controlling arena entry, patrol movement, salvos, and animations.
+ * Endboss El Pollo Loco controlling dt-scaled arena entry, patrol movement, salvos, and animations.
  */
 class Boss extends BossCombat {
   hasEnteredArena = false;
@@ -44,8 +44,17 @@ class Boss extends BossCombat {
     "assets/img/4_enemie_boss_chicken/3_attack/G19.png",
     "assets/img/4_enemie_boss_chicken/3_attack/G20.png",
   ];
-  IMAGES_HURT = ["assets/img/4_enemie_boss_chicken/4_hurt/G21.png", "assets/img/4_enemie_boss_chicken/4_hurt/G22.png", "assets/img/4_enemie_boss_chicken/4_hurt/G23.png"];
-  IMAGES_DEAD = ["assets/img/4_enemie_boss_chicken/5_dead/G24.png", "assets/img/4_enemie_boss_chicken/5_dead/G25.png", "assets/img/4_enemie_boss_chicken/5_dead/G26.png"];
+  IMAGES_HURT = [
+    "assets/img/4_enemie_boss_chicken/4_hurt/G21.png",
+    "assets/img/4_enemie_boss_chicken/4_hurt/G22.png",
+    "assets/img/4_enemie_boss_chicken/4_hurt/G23.png",
+  ];
+  IMAGES_DEAD = [
+    "assets/img/4_enemie_boss_chicken/5_dead/G24.png",
+    "assets/img/4_enemie_boss_chicken/5_dead/G25.png",
+    "assets/img/4_enemie_boss_chicken/5_dead/G26.png",
+  ];
+
   /**
    * Initializes boss sprites, physical bounds, and arena patrol limits.
    * @param {HTMLCanvasElement} canvas - The game canvas.
@@ -108,42 +117,46 @@ class Boss extends BossCombat {
   }
 
   /**
-   * Updates boss AI state and plays the appropriate animation each frame.
+   * Updates boss AI state and plays dt-scaled animations each frame.
+   * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  update() {
+  update(controller, scale = 1) {
     if (this.isDead) {
-      this.playAnimation(this.IMAGES_DEAD);
+      this.playAnimation(this.IMAGES_DEAD, scale);
       return;
     }
     if (!this.isActivated) {
-      this.playAnimation(this.IMAGES_ALERT);
+      this.playAnimation(this.IMAGES_ALERT, scale);
       return;
     }
-    this.runActiveBossBehavior();
+    this.runActiveBossBehavior(scale);
   }
 
   /**
    * Runs arena walk-in or full combat patrol and attack logic.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  runActiveBossBehavior() {
+  runActiveBossBehavior(scale = 1) {
     if (!this.hasEnteredArena) {
-      this.moveIntoArena();
+      this.moveIntoArena(scale);
     } else {
       this.updateCombatCycle();
-      this.movePatrol();
-      this.updateCombatAnimation();
+      this.movePatrol(scale);
+      this.updateCombatAnimation(scale);
     }
   }
 
   /**
    * Walks the boss into the arena before starting its first salvo.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  moveIntoArena() {
-    this.x -= this.speed;
-    this.playAnimation(this.IMAGES_WALK);
+  moveIntoArena(scale = 1) {
+    this.x -= this.speed * scale;
+    this.playAnimation(this.IMAGES_WALK, scale);
     if (this.x <= this.entryTargetX) {
       this.x = this.entryTargetX;
       this.hasEnteredArena = true;
@@ -256,14 +269,15 @@ class Boss extends BossCombat {
   }
 
   /**
-   * Moves the boss horizontally across its patrol corridor.
+   * Moves the boss horizontally across its patrol corridor using dt scale.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  movePatrol() {
+  movePatrol(scale = 1) {
     if (this.otherDirection) {
-      this.x += this.speed;
+      this.x += this.speed * scale;
     } else {
-      this.x -= this.speed;
+      this.x -= this.speed * scale;
     }
     this.checkPatrolBoundaries();
   }
@@ -282,17 +296,18 @@ class Boss extends BossCombat {
 
   /**
    * Plays hurt, special, attack, or walk animation based on priority.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  updateCombatAnimation() {
+  updateCombatAnimation(scale = 1) {
     if (this.isHurt()) {
-      this.playAnimation(this.IMAGES_HURT);
+      this.playAnimation(this.IMAGES_HURT, scale);
     } else if (this.isDoingSpecial) {
-      this.playAnimation(this.IMAGES_SPECIAL_ATTACK);
+      this.playAnimation(this.IMAGES_SPECIAL_ATTACK, scale);
     } else if (this.isAttacking) {
-      this.playAnimation(this.IMAGES_ATTACK);
+      this.playAnimation(this.IMAGES_ATTACK, scale);
     } else {
-      this.playAnimation(this.IMAGES_WALK);
+      this.playAnimation(this.IMAGES_WALK, scale);
     }
   }
 }

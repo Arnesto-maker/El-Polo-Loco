@@ -1,5 +1,5 @@
 /**
- * Playable hero Pepe handling movement, jumping, throwing, camera follow, and idle sprites.
+ * Playable hero Pepe handling dt-scaled movement, jumping, throwing, camera follow, and idle sprites.
  */
 class Character extends CharacterHealth {
   vXChar = 7;
@@ -8,6 +8,7 @@ class Character extends CharacterHealth {
   isThrowing = false;
   readyToSpawnBottle = false;
   idleTimer = 0;
+  idleStage = 0;
   cameraX = 0;
   lastThrowTime = 0;
   throwCooldown = 500;
@@ -144,106 +145,125 @@ class Character extends CharacterHealth {
   }
 
   /**
-   * Runs per-frame movement, gravity, camera, and animation updates.
+   * Runs per-frame dt-scaled movement, gravity, camera, and animation updates.
    * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  update(controller) {
+  update(controller, scale = 1) {
     this.checkHurtThreshold();
     const isLocked = this.isDead() || this.isHurtAnimationActive();
     if (!isLocked && !this.isThrowing) {
-      this.moveRight(controller);
-      this.moveLeft(controller);
+      this.moveRight(controller, scale);
+      this.moveLeft(controller, scale);
     }
-    this.updateJumpOrGravity(controller, isLocked);
+    this.updateJumpOrGravity(controller, isLocked, scale);
     this.updateCameraControl();
-    this.updateAnimation(controller);
+    this.updateAnimation(controller, scale);
   }
 
   /**
    * Processes jump input or applies gravity when movement is locked.
    * @param {Controller} controller - Active input controller.
    * @param {boolean} isLocked - Whether controls are temporarily locked.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  updateJumpOrGravity(controller, isLocked) {
+  updateJumpOrGravity(controller, isLocked, scale = 1) {
     if (!isLocked) {
-      this.jump(controller);
+      this.jump(controller, scale);
     } else if (this.isJumping || this.isAboveGround()) {
-      this.setJumpingSequence();
+      this.setJumpingSequence(scale);
     }
   }
 
   /**
    * Routes animation selection between hurt/death and standard actions.
    * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  updateAnimation(controller) {
+  updateAnimation(controller, scale = 1) {
     if (this.isDead() || this.isHurtAnimationActive()) {
-      this.selectUpperHealthAnimation(controller);
+      this.selectUpperHealthAnimation(controller, scale);
       return;
     }
-    this.updateStandardAnimation(controller);
+    this.updateStandardAnimation(controller, scale);
   }
 
   /**
    * Selects throwing, jumping, walking, or idle animation.
    * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  updateStandardAnimation(controller) {
+  updateStandardAnimation(controller, scale = 1) {
     const isMoving = controller.right || controller.left;
     if (this.isThrowing) {
-      this.idleTimer = 0;
-      this.handleThrowAnimation();
+      this.resetIdleState();
+      this.handleThrowAnimation(scale);
     } else if (this.isJumping) {
-      this.idleTimer = 0;
-      this.playAnimation(this.IMAGES_JUMP);
+      this.resetIdleState();
+      this.playAnimation(this.IMAGES_JUMP, scale);
     } else if (isMoving) {
-      this.idleTimer = 0;
-      this.playAnimation(this.IMAGES_MOVING);
+      this.resetIdleState();
+      this.playAnimation(this.IMAGES_MOVING, scale);
     } else {
-      this.idleTimer++;
-      this.startIdleSequence();
+      this.idleTimer += scale;
+      this.startIdleSequence(scale);
     }
   }
 
   /**
-   * Advances between static pose, short idle, and sleeping idle based on timer.
+   * Clears idle timer and stage when Pepe performs an active action.
    * @returns {void}
    */
-  startIdleSequence() {
+  resetIdleState() {
+    this.idleTimer = 0;
+    this.idleStage = 0;
+  }
+
+  /**
+   * Advances between static pose, short idle, and sleeping idle based on dt timer.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
+   * @returns {void}
+   */
+  startIdleSequence(scale = 1) {
     if (this.idleTimer < 120) {
+      this.idleStage = 0;
       this.img = this.imageCache[this.IMAGE_0];
       this.resetAnimationFrame();
     } else if (this.idleTimer < 360) {
-      this.startIdleAnimation();
+      this.startIdleAnimation(scale);
     } else {
-      this.startLongIdleAnimation();
+      this.startLongIdleAnimation(scale);
     }
   }
 
   /**
    * Plays the standard standing idle sprite cycle.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  startIdleAnimation() {
-    if (this.idleTimer === 120) {
+  startIdleAnimation(scale = 1) {
+    if (this.idleStage !== 1) {
+      this.idleStage = 1;
       this.resetAnimationFrame();
     }
-    this.playAnimation(this.IMAGES_IDLE);
+    this.playAnimation(this.IMAGES_IDLE, scale);
   }
 
   /**
    * Plays the sleeping long-idle sprite cycle.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  startLongIdleAnimation() {
-    if (this.idleTimer === 360) {
+  startLongIdleAnimation(scale = 1) {
+    if (this.idleStage !== 2) {
+      this.idleStage = 2;
       this.resetAnimationFrame();
     }
-    this.playAnimation(this.IMAGES_LONG_IDLE);
+    this.playAnimation(this.IMAGES_LONG_IDLE, scale);
   }
 
   /**
@@ -252,47 +272,51 @@ class Character extends CharacterHealth {
    */
   startJumpingAnimation() {
     this.resetAnimationFrame();
-    this.playAnimation(this.IMAGES_JUMP);
+    this.playAnimation(this.IMAGES_JUMP, 1);
   }
 
   /**
-   * Moves Pepe right within the world boundary.
+   * Moves Pepe right within the world boundary scaled to 60-FPS delta time.
    * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  moveRight(controller) {
+  moveRight(controller, scale = 1) {
     const maxWorldX = this.canvasWidth * 2 - this.width;
     if (controller.right && this.x < maxWorldX) {
-      this.x += this.vXChar;
+      this.x += this.vXChar * scale;
       this.otherDirection = false;
     }
   }
 
   /**
-   * Moves Pepe left within the world boundary.
+   * Moves Pepe left within the world boundary scaled to 60-FPS delta time.
    * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  moveLeft(controller) {
+  moveLeft(controller, scale = 1) {
     if (controller.left && this.x > 0) {
-      this.x -= this.vXChar;
+      this.x -= this.vXChar * scale;
       this.otherDirection = true;
     }
   }
 
   /**
-   * Initiates a jump when Space is pressed and updates airborne motion.
+   * Initiates a jump with SFX when Space is pressed and updates airborne motion.
    * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  jump(controller) {
+  jump(controller, scale = 1) {
     if (controller.space && !this.isJumping) {
       this.isJumping = true;
       this.vg = -25;
       this.imageCounter = 0;
+      playJumpSound();
     }
     if (this.isJumping) {
-      this.setJumpingSequence();
+      this.setJumpingSequence(scale);
     }
   }
 
@@ -304,17 +328,15 @@ class Character extends CharacterHealth {
     this.isJumping = true;
     this.vg = -20;
     this.imageCounter = 0;
-    if (this.isJumping) {
-      this.setJumpingSequence();
-    }
   }
 
   /**
-   * Applies gravity during a jump and lands Pepe on the ground line.
+   * Applies dt-scaled gravity during a jump and lands Pepe on the ground line.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  setJumpingSequence() {
-    this.setGravitation();
+  setJumpingSequence(scale = 1) {
+    this.setGravitation(scale);
     const groundLine = this.getGroundLine();
     if (this.y >= groundLine) {
       this.isJumping = false;
@@ -356,11 +378,12 @@ class Character extends CharacterHealth {
 
   /**
    * Plays throwing sprites and flags bottle spawn once duration completes.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  handleThrowAnimation() {
+  handleThrowAnimation(scale = 1) {
     const timeThrowing = performance.now() - this.lastThrowTime;
-    this.playAnimation(this.IMAGES_THROWING);
+    this.playAnimation(this.IMAGES_THROWING, scale);
     if (timeThrowing >= this.throwDuration) {
       this.resetThrowParameter();
     }

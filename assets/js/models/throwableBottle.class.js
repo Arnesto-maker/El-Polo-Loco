@@ -1,3 +1,6 @@
+/**
+ * Player-thrown salsa bottle projectile with dt-normalized flight arc and splash animation.
+ */
 class ThrowableBottle extends MovableObject {
   isSplashing = false;
   splashTime = 0;
@@ -18,6 +21,14 @@ class ThrowableBottle extends MovableObject {
     "assets/img/6_salsa_bottle/bottle_rotation/bottle_splash/6_bottle_splash.png",
   ];
 
+  /**
+   * Creates a thrown salsa bottle launched from Pepe's position.
+   * @param {HTMLCanvasElement} canvas - The game canvas.
+   * @param {number} startX - Launch X coordinate.
+   * @param {number} startY - Launch Y coordinate.
+   * @param {boolean} otherDirection - True when thrown left.
+   * @param {number} yMax - Ground splash Y limit.
+   */
   constructor(canvas, startX, startY, otherDirection, yMax) {
     super(canvas);
     this.loadAllImages();
@@ -25,11 +36,23 @@ class ThrowableBottle extends MovableObject {
     this.setDirectionParameter(otherDirection);
   }
 
+  /**
+   * Preloads bottle rotation and splash sprite frames.
+   * @returns {void}
+   */
   loadAllImages() {
     this.loadImages(this.IMAGES_ROTATION);
     this.loadImages(this.IMAGES_SPLASH);
   }
 
+  /**
+   * Configures dimensions, velocity, gravity, and hitbox offsets.
+   * @param {number} startX - Launch X coordinate.
+   * @param {number} startY - Launch Y coordinate.
+   * @param {boolean} otherDirection - True when thrown left.
+   * @param {number} yMax - Ground splash Y limit.
+   * @returns {void}
+   */
   setMainParameter(startX, startY, otherDirection, yMax) {
     this.img = this.imageCache[this.IMAGES_ROTATION[0]];
     this.width = this.canvasWidth * 0.05;
@@ -43,6 +66,11 @@ class ThrowableBottle extends MovableObject {
     this.offset = this.setOffsetParameter();
   }
 
+  /**
+   * Computes horizontal direction sign and straight-flight threshold before gravity applies.
+   * @param {boolean} otherDirection - True when thrown left.
+   * @returns {void}
+   */
   setDirectionParameter(otherDirection) {
     if (otherDirection) {
       this.dir = -1;
@@ -52,6 +80,10 @@ class ThrowableBottle extends MovableObject {
     this.xWMax = this.x + this.dir * (this.canvasWidth * 0.15);
   }
 
+  /**
+   * Builds the collision offset box for the thrown bottle.
+   * @returns {{top: number, bottom: number, left: number, right: number}} Hitbox offsets.
+   */
   setOffsetParameter() {
     return {
       top: this.height * 0.15,
@@ -61,32 +93,52 @@ class ThrowableBottle extends MovableObject {
     };
   }
 
-  update() {
+  /**
+   * Updates bottle flight physics or splash animation scaled to 60-FPS delta time.
+   * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
+   * @returns {void}
+   */
+  update(controller, scale = 1) {
     if (this.isSplashing) {
-      this.playAnimation(this.IMAGES_SPLASH);
+      this.playAnimation(this.IMAGES_SPLASH, scale);
       return;
     }
-    this.setFlightSequenz();
-    this.playAnimation(this.IMAGES_ROTATION);
+    this.setFlightSequenz(scale);
+    this.playAnimation(this.IMAGES_ROTATION, scale);
     this.checkGroundHit();
   }
 
-  setFlightSequenz() {
-    this.x += this.speed * this.dir;
+  /**
+   * Advances horizontal travel and midpoint gravity drop once past xWMax.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
+   * @returns {void}
+   */
+  setFlightSequenz(scale = 1) {
+    this.x += this.speed * this.dir * scale;
     if (this.hasPassedXWMax()) {
-      this.vg += this.gravity;
-      this.y += this.vg;
+      const halfGravity = this.gravity * scale * 0.5;
+      this.vg += halfGravity;
+      this.y += this.vg * scale;
+      this.vg += halfGravity;
     }
   }
 
+  /**
+   * Checks whether the bottle has traveled past its straight-flight apex distance.
+   * @returns {boolean} True when gravity arc should begin.
+   */
   hasPassedXWMax() {
     if (this.otherDirection) {
       return this.x <= this.xWMax;
-    } else {
-      return this.x >= this.xWMax;
     }
+    return this.x >= this.xWMax;
   }
 
+  /**
+   * Triggers bottle splash upon reaching the desert floor.
+   * @returns {void}
+   */
   checkGroundHit() {
     if (this.y >= this.yMax) {
       this.y = this.yMax;
@@ -94,6 +146,10 @@ class ThrowableBottle extends MovableObject {
     }
   }
 
+  /**
+   * Halts bottle motion, starts the shatter animation, and plays splash SFX.
+   * @returns {void}
+   */
   startSplashSequenz() {
     if (this.isSplashing) {
       return;
@@ -104,5 +160,6 @@ class ThrowableBottle extends MovableObject {
     this.imageCounter = 0;
     this.frameTick = 0;
     this.splashTime = performance.now();
+    playBottleSplashSound();
   }
 }

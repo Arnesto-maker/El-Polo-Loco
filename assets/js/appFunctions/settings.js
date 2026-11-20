@@ -3,6 +3,7 @@ const settingsState = {
   fullscreenEnabled: false,
   isOpen: false,
   origin: "menu",
+  isLandscapeLocked: false,
 };
 
 /**
@@ -21,6 +22,58 @@ const blurActiveElement = () => {
  */
 const isSettingsOverlayOpen = () => {
   return settingsState.isOpen;
+};
+
+/**
+ * Checks whether the portrait landscape-lock overlay is currently active.
+ * @returns {boolean} True when Sperrframe lock is active.
+ */
+const isLandscapeLocked = () => {
+  return settingsState.isLandscapeLocked;
+};
+
+/**
+ * Evaluates whether the current viewport is in portrait orientation.
+ * @returns {boolean} True when viewport height exceeds width.
+ */
+const isPortraitViewport = () => {
+  return window.innerHeight > window.innerWidth;
+};
+
+/**
+ * Handles orientation transitions between portrait lock and landscape pause workflow.
+ * @returns {void}
+ */
+const handleOrientationCheck = () => {
+  if (isPortraitViewport()) {
+    applyLandscapeLock();
+  } else if (settingsState.isLandscapeLocked) {
+    releaseLandscapeLock();
+  }
+};
+
+/**
+ * Shows the portrait Sperrframe overlay and pauses an active GameEngine.
+ * @returns {void}
+ */
+const applyLandscapeLock = () => {
+  settingsState.isLandscapeLocked = true;
+  toggleElement("landscape-lock-overlay", true);
+  if (window.gameEngine && window.gameEngine.isRunning) {
+    window.gameEngine.pauseForLandscapeLock();
+  }
+};
+
+/**
+ * Hides the Sperrframe overlay and opens the Pause Popup when returning to landscape.
+ * @returns {void}
+ */
+const releaseLandscapeLock = () => {
+  settingsState.isLandscapeLocked = false;
+  toggleElement("landscape-lock-overlay", false);
+  if (window.gameEngine && window.gameEngine.isRunning) {
+    window.gameEngine.resumeAfterLandscapeLock();
+  }
 };
 
 /**
@@ -67,6 +120,7 @@ const toggleSoundSetting = () => {
   blurActiveElement();
   settingsState.soundEnabled = !settingsState.soundEnabled;
   renderSettingsButtons(settingsState.soundEnabled, settingsState.fullscreenEnabled);
+  syncMusicWithSoundSetting();
 };
 
 /**

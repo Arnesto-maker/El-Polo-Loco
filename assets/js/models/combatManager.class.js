@@ -1,5 +1,5 @@
 /**
- * Coordinates player bottle throws, boss fight activation, timers, and boss salvos.
+ * Coordinates player bottle throws, boss fight activation, dt timers, music, and boss salvos.
  */
 class CombatManager {
   /**
@@ -25,13 +25,14 @@ class CombatManager {
   }
 
   /**
-   * Deducts one bottle and computes launch coordinates from Pepe's position.
+   * Deducts one bottle, plays throw SFX, and computes launch coordinates.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
   initBottleThrow(char) {
     char.readyToSpawnBottle = false;
     this.engine.statusBar.bottleCount -= 1;
+    playThrowSound();
     const startX = this.getBottleStartX(char);
     const startY = char.y + char.height * 0.25;
     const yMax = char.canvasHeight - char.canvasHeight * 0.1 - char.floor;
@@ -66,9 +67,10 @@ class CombatManager {
 
   /**
    * Activates the boss once all chickens are defeated and updates boss fight state.
+   * @param {number} dtMs - Elapsed active frame time in milliseconds.
    * @returns {void}
    */
-  updateBossFightState() {
+  updateBossFightState(dtMs) {
     const boss = this.engine.world.boss;
     if (!boss || boss.isDead) {
       return;
@@ -77,12 +79,12 @@ class CombatManager {
       this.activateBossFight(boss);
     }
     if (boss.isActivated) {
-      this.updateBossHudAndSpecial(boss);
+      this.updateBossHudAndSpecial(boss, dtMs);
     }
   }
 
   /**
-   * Enables boss AI, shows boss HUD, initializes bonus score, and opens the dossier.
+   * Enables boss AI, switches to boss music, shows boss HUD, and opens the dossier.
    * @param {Boss} boss - Endboss instance.
    * @returns {void}
    */
@@ -91,16 +93,18 @@ class CombatManager {
     this.engine.statusBar.showBossHud = true;
     this.engine.statusBar.bossBonus = 10000;
     this.engine.lastBossTick = performance.now();
+    startBackgroundMusic("boss");
     this.engine.bossDossier.openPopup();
   }
 
   /**
    * Syncs boss stats to the HUD and fires bottle salvos when signaled.
    * @param {Boss} boss - Endboss instance.
+   * @param {number} dtMs - Elapsed active frame time in milliseconds.
    * @returns {void}
    */
-  updateBossHudAndSpecial(boss) {
-    this.updateBossTimerAndScore();
+  updateBossHudAndSpecial(boss, dtMs) {
+    this.updateBossTimerAndScore(dtMs);
     this.engine.statusBar.bossHealth = boss.health;
     this.engine.statusBar.bossArmour = boss.armour;
     this.engine.statusBar.updateBossHealthImage();
@@ -111,25 +115,23 @@ class CombatManager {
   }
 
   /**
-   * Advances boss timer delta and reduces the time-based boss score bonus.
+   * Advances boss timer using clamped active dt and reduces the time-based boss score bonus.
+   * @param {number} dtMs - Elapsed active frame time in milliseconds.
    * @returns {void}
    */
-  updateBossTimerAndScore() {
-    const now = performance.now();
-    const dt = now - this.engine.lastBossTick;
-    this.engine.lastBossTick = now;
-    this.engine.statusBar.bossTimeMs += dt;
-    this.reduceBossScoreBonus(dt);
+  updateBossTimerAndScore(dtMs) {
+    this.engine.statusBar.bossTimeMs += dtMs;
+    this.reduceBossScoreBonus(dtMs);
   }
 
   /**
    * Decays remaining boss bonus based on elapsed milliseconds.
-   * @param {number} dt - Frame delta in milliseconds.
+   * @param {number} dtMs - Active frame delta in milliseconds.
    * @returns {void}
    */
-  reduceBossScoreBonus(dt) {
+  reduceBossScoreBonus(dtMs) {
     if (this.engine.statusBar.bossBonus > 0) {
-      const penalty = Math.floor(dt * 0.1);
+      const penalty = Math.floor(dtMs * 0.1);
       this.engine.statusBar.bossBonus = Math.max(0, this.engine.statusBar.bossBonus - penalty);
     }
   }

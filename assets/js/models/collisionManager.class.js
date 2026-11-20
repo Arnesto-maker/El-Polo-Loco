@@ -1,5 +1,5 @@
 /**
- * Handles all gameplay hit detection and expired entity cleanup without array helpers.
+ * Handles all gameplay hit detection, sound triggers, and expired entity cleanup.
  */
 class CollisionManager {
   /**
@@ -100,7 +100,7 @@ class CollisionManager {
   }
 
   /**
-   * Deducts higher melee attack damage or light contact damage from Pepe.
+   * Deducts higher melee attack damage or light contact damage from Pepe and plays hurt SFX.
    * @param {Character} char - Player character instance.
    * @param {Boss} boss - Active Endboss instance.
    * @returns {void}
@@ -111,6 +111,7 @@ class CollisionManager {
     } else {
       char.health = Math.max(0, char.health - 2);
     }
+    playHurtSound();
     char.lastHit = performance.now();
     this.engine.statusBar.health = char.health;
     this.engine.statusBar.updateHealthImage();
@@ -163,7 +164,7 @@ class CollisionManager {
   }
 
   /**
-   * Bounces Pepe, awards points, and kills the stomped chicken.
+   * Bounces Pepe, awards points, plays stomp SFX, and kills the stomped chicken.
    * @param {Character} char - Player character instance.
    * @param {Chicken} enemy - Stomped chicken enemy.
    * @returns {void}
@@ -173,6 +174,7 @@ class CollisionManager {
     this.engine.statusBar.score += 500;
     char.startJumpingAnimation();
     enemy.die();
+    playStompSound();
   }
 
   /**
@@ -187,7 +189,7 @@ class CollisionManager {
   }
 
   /**
-   * Collects coins overlapping Pepe's hitbox.
+   * Collects coins overlapping Pepe's hitbox and plays coin SFX.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
@@ -198,13 +200,14 @@ class CollisionManager {
         coins.splice(i, 1);
         this.engine.statusBar.coinCount += 1;
         this.engine.statusBar.score += 100;
+        playCoinSound();
         this.engine.refreshFrameObjects();
       }
     }
   }
 
   /**
-   * Collects ground salsa bottles overlapping Pepe's hitbox.
+   * Collects ground salsa bottles overlapping Pepe's hitbox and plays pickup SFX.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
@@ -214,6 +217,7 @@ class CollisionManager {
       if (char.isColliding(bottles[i])) {
         bottles.splice(i, 1);
         this.engine.statusBar.bottleCount += 1;
+        playBottlePickupSound();
         this.engine.refreshFrameObjects();
       }
     }

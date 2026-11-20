@@ -12,7 +12,7 @@ const ensureAppController = () => {
 };
 
 /**
- * Initializes the application on body load, setting up Controller and Start Menu.
+ * Initializes the application on body load, setting up Controller, Start Menu, and orientation lock.
  * @returns {void}
  */
 const initMenu = () => {
@@ -22,10 +22,11 @@ const initMenu = () => {
   toggleElement("start-overlay", true);
   setMenuVisibility(true, false, false, false);
   initPendingSyncOnLoad();
+  handleOrientationCheck();
 };
 
 /**
- * Starts a fresh game session and displays the responsive touch HUD.
+ * Starts a fresh game session, displays responsive touch HUD, and starts level music.
  * @returns {void}
  */
 const startNewGame = () => {
@@ -36,6 +37,8 @@ const startNewGame = () => {
   setMenuVisibility(false, true, false, false);
   toggleElement("touch-controls", true);
   initGameEngine();
+  startBackgroundMusic("level");
+  handleOrientationCheck();
 };
 
 /**
@@ -50,10 +53,11 @@ const initGameEngine = () => {
 };
 
 /**
- * Closes all in-game overlays, resets controller flags, and halts the game loop.
+ * Closes all in-game overlays, stops music, resets controller flags, and halts the game loop.
  * @returns {void}
  */
 const resetAllGamePopups = () => {
+  stopBackgroundMusic();
   resetSettingsOverlay();
   toggleElement("pause-overlay", false);
   toggleElement("start-help-overlay", false);

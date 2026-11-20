@@ -152,11 +152,12 @@ const showFrame2 = () => {
 };
 
 /**
- * Stops gameplay and displays the Game Over overlay.
+ * Stops gameplay, plays game-over sound, and displays the Game Over overlay.
  * @returns {void}
  */
 const showGameOverFrame = () => {
   resetAllGamePopups();
+  playGameOverSound();
   currentMenuFrame = 5;
   toggleElement("touch-controls", false);
   setMenuVisibility(false, false, false, true);

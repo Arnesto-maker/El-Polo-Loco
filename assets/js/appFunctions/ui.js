@@ -9,13 +9,14 @@ const isValidPlayerName = (name) => {
 };
 
 /**
- * Starts the post-victory overlay sequence after boss defeat.
+ * Starts the post-victory overlay sequence and plays victory fanfare after boss defeat.
  * @param {{health: number, coins: number, bottles: number, score: number}} winStats - Final stats.
  * @returns {void}
  */
 const startYouWonFlow = (winStats) => {
   calculateWinSummary(winStats);
   resetAllGamePopups();
+  playWinSound();
   currentMenuFrame = 6;
   showOnlyOverlayFrame("you-won-frame");
 };

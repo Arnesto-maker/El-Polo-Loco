@@ -1,5 +1,15 @@
+/**
+ * Collectible desert gold coin with dt-normalized spinning animation.
+ */
 class Coin extends DrawableObject {
   IMAGES_COIN = ["assets/img/8_coin/coin_1.png", "assets/img/8_coin/coin_2.png"];
+
+  /**
+   * Initializes coin sprite, dimensions, coordinates, and collision offsets.
+   * @param {HTMLCanvasElement} canvas - The game canvas.
+   * @param {number} x - Horizontal world position.
+   * @param {number} y - Vertical world position.
+   */
   constructor(canvas, x, y) {
     super(canvas);
     this.loadImages(this.IMAGES_COIN);
@@ -11,6 +21,10 @@ class Coin extends DrawableObject {
     this.offset = this.setOffsetParameter();
   }
 
+  /**
+   * Builds the collision offset box for the coin.
+   * @returns {{top: number, bottom: number, left: number, right: number}} Hitbox offsets.
+   */
   setOffsetParameter() {
     return {
       top: this.height * 0.3,
@@ -20,7 +34,13 @@ class Coin extends DrawableObject {
     };
   }
 
-  update() {
-    this.playAnimation(this.IMAGES_COIN);
+  /**
+   * Updates the coin shimmer animation scaled by delta time.
+   * @param {Controller} controller - Active input controller.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
+   * @returns {void}
+   */
+  update(controller, scale = 1) {
+    this.playAnimation(this.IMAGES_COIN, scale);
   }
 }

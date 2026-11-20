@@ -84,37 +84,6 @@ body {
   touch-action: none;
 }
 
-.slider-track {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: clamp(120px, 20dvw, 220px);
-  height: clamp(42px, 10dvh, 66px);
-  background-color: rgba(20, 20, 20, 0.35);
-  border: 2px solid rgba(255, 255, 255, 0.45);
-  border-radius: 36px;
-}
-
-.touch-btn {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: clamp(48px, 12dvh, 76px);
-  height: clamp(48px, 12dvh, 76px);
-  border-radius: 50%;
-  background-color: rgba(20, 20, 20, 0.35);
-  border: 2px solid rgba(255, 255, 255, 0.45);
-  color: rgba(255, 255, 255, 0.9);
-  font-family: Arial, sans-serif;
-  font-size: clamp(11px, 2.5dvh, 18px);
-  font-weight: bold;
-  pointer-events: auto;
-  touch-action: none;
-  cursor: pointer;
-}
-
 .slider-arrow {
   display: flex;
   justify-content: center;
@@ -137,10 +106,9 @@ body {
   align-items: center;
   width: clamp(120px, 20dvw, 220px);
   height: clamp(42px, 10dvh, 66px);
-  background-color: rgba(255, 255, 255, 0.14);
-  border: 2px solid rgba(255, 255, 255, 0.42);
+  background-color: rgba(20, 20, 20, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.45);
   border-radius: 36px;
-  backdrop-filter: blur(4px);
 }
 
 .slider-knob {
@@ -166,9 +134,8 @@ body {
   width: clamp(48px, 12dvh, 76px);
   height: clamp(48px, 12dvh, 76px);
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.16);
+  background-color: rgba(20, 20, 20, 0.35);
   border: 2px solid rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(4px);
   color: rgba(255, 255, 255, 0.9);
   font-family: Arial, sans-serif;
   font-size: clamp(11px, 2.5dvh, 18px);
@@ -206,6 +173,93 @@ body {
   right: 4dvw;
   bottom: 14dvh;
   color: rgba(130, 177, 255, 0.95);
+}
+
+.landscape-lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100dvw;
+  height: 100dvh;
+  padding: 6dvh 7dvw;
+  background-image: url("assets/img/5_background/first_half_background.png");
+  background-size: cover;
+  background-position: center;
+  touch-action: none;
+}
+
+.lock-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3dvh;
+  width: 100%;
+  max-width: 460px;
+  padding: 4dvh 6dvw;
+  background-color: rgba(238, 138, 69, 0.88);
+  border: 4px solid #000000;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.lock-spinner-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 120px;
+  height: 120px;
+}
+
+.lock-spinner-ring {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  border: 5px dashed #c62828;
+  border-top-color: #000000;
+  border-radius: 50%;
+  animation: winSpin 2.4s linear infinite;
+}
+
+.lock-bottle-img {
+  display: flex;
+  height: 76px;
+  width: auto;
+  object-fit: contain;
+}
+
+.lock-subtitle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(18px, 4.5dvw, 28px);
+  color: #000000;
+  border-bottom: 3px solid #000000;
+  padding-bottom: 1dvh;
+}
+
+.lock-oops {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(26px, 7dvw, 42px);
+  font-weight: bold;
+  color: #c62828;
+}
+
+.lock-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: clamp(15px, 4.2dvw, 22px);
+  font-weight: bold;
+  line-height: 1.4;
+  color: #000000;
 }
 
 .start-overlay {

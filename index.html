@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="assets/img/7_statusbars/3_icons/icon_salsa_bottle.png" />
   </head>
-  <body onload="initMenu()">
+  <body onload="initMenu()" onresize="handleOrientationCheck()">
     <main id="game-container">
       <canvas id="gameCanvas" width="2048" height="1280"></canvas>
       <section id="touch-controls" class="touch-controls d-none" aria-label="Touch Controls">
@@ -76,6 +76,7 @@
           <button class="menu-btn about-back-btn" onclick="showFrame2()">Back</button>
         </article>
       </section>
+
       <section id="settings-overlay" class="help-overlay d-none">
         <div class="settings-box">
           <h2 class="settings-title">Settings</h2>
@@ -90,6 +91,7 @@
           <button class="menu-btn settings-back-btn" type="button" onclick="closeSettingsOverlay()">Back (Tab)</button>
         </div>
       </section>
+
       <section id="start-help-overlay" class="help-overlay d-none">
         <div class="help-box">
           <div class="help-inner">
@@ -129,6 +131,18 @@
         </nav>
       </section>
 
+      <section id="landscape-lock-overlay" class="landscape-lock-overlay d-none" aria-live="polite">
+        <div class="lock-card">
+          <div class="lock-spinner-wrap">
+            <div class="lock-spinner-ring"></div>
+            <img src="assets/img/6_salsa_bottle/salsa_bottle.png" alt="Rotate device to landscape" class="lock-bottle-img" />
+          </div>
+          <h2 class="lock-subtitle">El Pollo Loco Tactical Edition</h2>
+          <p class="lock-oops">Oops...!</p>
+          <p class="lock-message">El-Pollo Loco supports only landscape screen, please turn your phone to Landscape Mode</p>
+        </div>
+      </section>
+
       <section id="game-over-frame" class="game-over-frame d-none" onclick="handleGameOverTouchOrClick(event)" ontouchstart="handleGameOverTouchOrClick(event)">
         <img src="assets/img/You won, you lost/Game Over.png" alt="Game Over" class="game-over-bild-02" />
         <p class="game-over-text">Press Enter, touch, click to continue</p>
@@ -144,7 +158,6 @@
       <section id="local-save-error-frame" class="win-overlay-frame d-none"></section>
       <section id="highscore-frame" class="win-overlay-frame d-none"></section>
     </main>
-
     <script src="assets/js/appFunctions/firebaseConfig.js"></script>
     <script src="assets/js/models/movableObject.class.js"></script>
     <script src="assets/js/models/drawableObject.class.js"></script>
@@ -177,6 +190,8 @@
     <script src="assets/js/appFunctions/render.js"></script>
     <script src="assets/js/appFunctions/ui.js"></script>
     <script src="assets/js/appFunctions/settings.js"></script>
+    <script src="assets/js/appFunctions/sound.js"></script>
+    <script src="assets/js/appFunctions/music.js"></script>
     <script src="assets/js/appFunctions/menuNavigation.js"></script>
     <script src="assets/js/main.js"></script>
   </body>
