@@ -12,16 +12,18 @@ const ensureAppController = () => {
 };
 
 /**
- * Initializes the application on body load, setting up Controller, Start Menu, and orientation lock.
+ * Initializes the application on body load, setting up Controller, Start Menu, music, and orientation lock.
  * @returns {void}
  */
 const initMenu = () => {
   ensureAppController();
+  bindAudioUnlockListeners();
   currentMenuFrame = 1;
   toggleElement("touch-controls", false);
   toggleElement("start-overlay", true);
   setMenuVisibility(true, false, false, false);
   initPendingSyncOnLoad();
+  startBackgroundMusic("menu");
   handleOrientationCheck();
 };
 
@@ -106,7 +108,7 @@ const clearGameCanvas = () => {
 };
 
 /**
- * Stops gameplay and returns to the Frame 2 main menu.
+ * Stops gameplay, returns to the Frame 2 main menu, and resumes menu music.
  * @returns {void}
  */
 const returnToFrame2FromGame = () => {
@@ -115,6 +117,7 @@ const returnToFrame2FromGame = () => {
   toggleElement("touch-controls", false);
   toggleElement("start-overlay", true);
   setMenuVisibility(false, true, false, false);
+  startBackgroundMusic("menu");
 };
 
 /**

@@ -1,8 +1,22 @@
 const bgmState = {
   timerId: null,
   stepIndex: 0,
-  mode: "level",
+  mode: "menu",
 };
+
+const MENU_MELODY = [
+  330, 0, 349, 415, 440, 0, 415, 349,
+  330, 0, 0, 330, 415, 440, 494, 0,
+  523, 0, 494, 440, 415, 0, 349, 330,
+  349, 0, 415, 349, 330, 0, 0, 0,
+];
+
+const MENU_BASS = [
+  110, 0, 165, 0, 110, 0, 165, 0,
+  82, 0, 123, 0, 82, 0, 123, 0,
+  110, 0, 165, 0, 87, 0, 131, 0,
+  82, 0, 123, 0, 82, 0, 0, 0,
+];
 
 const LEVEL_MELODY = [
   330, 0, 392, 440, 494, 0, 440, 392,
@@ -30,12 +44,15 @@ const BOSS_BASS = [
 
 /**
  * Returns the sequencer step interval in milliseconds for the given mode.
- * @param {string} mode - Music mode ("level" or "boss").
+ * @param {string} mode - Music mode ("menu", "level", or "boss").
  * @returns {number} Step interval in milliseconds.
  */
 const getMusicStepMs = (mode) => {
   if (mode === "boss") {
     return 135;
+  }
+  if (mode === "menu") {
+    return 220;
   }
   return 185;
 };
@@ -48,6 +65,9 @@ const getActiveMelody = () => {
   if (bgmState.mode === "boss") {
     return BOSS_MELODY;
   }
+  if (bgmState.mode === "menu") {
+    return MENU_MELODY;
+  }
   return LEVEL_MELODY;
 };
 
@@ -58,6 +78,9 @@ const getActiveMelody = () => {
 const getActiveBass = () => {
   if (bgmState.mode === "boss") {
     return BOSS_BASS;
+  }
+  if (bgmState.mode === "menu") {
+    return MENU_BASS;
   }
   return LEVEL_BASS;
 };
@@ -81,19 +104,22 @@ const getMusicNoteDuration = () => {
   if (bgmState.mode === "boss") {
     return 0.12;
   }
+  if (bgmState.mode === "menu") {
+    return 0.19;
+  }
   return 0.16;
 };
 
 /**
  * Starts or switches the synthesized background music loop.
- * @param {string} [mode="level"] - Music mode ("level" or "boss").
+ * @param {string} [mode="level"] - Music mode ("menu", "level", or "boss").
  * @returns {void}
  */
 const startBackgroundMusic = (mode = "level") => {
   stopBackgroundMusic();
   bgmState.mode = mode;
   bgmState.stepIndex = 0;
-  if (typeof settingsState !== "undefined" && !settingsState.soundEnabled) {
+  if (!isSoundEnabled()) {
     return;
   }
   const stepMs = getMusicStepMs(mode);
@@ -112,17 +138,29 @@ const stopBackgroundMusic = () => {
 };
 
 /**
- * Checks whether background music should skip playback due to mute or pause.
- * @returns {boolean} True when muted, locked, or game engine is paused.
+ * Checks whether the browser AudioContext is unlocked and actively running.
+ * @returns {boolean} True when audio output is ready without queueing.
+ */
+const isAudioReadyForMusic = () => {
+  const ctx = getActiveAudioContext();
+  if (!ctx || ctx.state !== "running") {
+    return false;
+  }
+  return true;
+};
+
+/**
+ * Checks whether background music should skip playback due to mute, lock, pause, or autoplay.
+ * @returns {boolean} True when muted, portrait-locked, paused, or awaiting unlock.
  */
 const isMusicPausedOrMuted = () => {
-  if (typeof settingsState !== "undefined" && !settingsState.soundEnabled) {
+  if (!isSoundEnabled() || isLandscapeLocked()) {
     return true;
   }
   if (window.gameEngine && window.gameEngine.isPaused) {
     return true;
   }
-  return false;
+  return !isAudioReadyForMusic();
 };
 
 /**
@@ -150,11 +188,25 @@ const playMusicNote = (melodyHz, bassHz) => {
   const wave = getMusicWaveform();
   const dur = getMusicNoteDuration();
   if (melodyHz > 0) {
-    playTone(melodyHz, melodyHz, dur, wave, 0.06);
+    playTone(melodyHz, melodyHz, dur, wave, 0.22);
   }
   if (bassHz > 0) {
-    playTone(bassHz, bassHz, dur, "sine", 0.08);
+    playTone(bassHz, bassHz, dur, "sine", 0.26);
   }
+};
+
+/**
+ * Checks whether music should resume when Sound is toggled back on in Settings.
+ * @returns {boolean} True when in an active menu or running gameplay session.
+ */
+const shouldRestartMusicOnUnmute = () => {
+  if (bgmState.timerId !== null) {
+    return false;
+  }
+  if (window.gameEngine && window.gameEngine.isRunning) {
+    return true;
+  }
+  return bgmState.mode === "menu" && currentMenuFrame >= 1 && currentMenuFrame <= 4;
 };
 
 /**
@@ -169,7 +221,7 @@ const syncMusicWithSoundSetting = () => {
     stopBackgroundMusic();
     return;
   }
-  if (window.gameEngine && window.gameEngine.isRunning && bgmState.timerId === null) {
+  if (shouldRestartMusicOnUnmute()) {
     startBackgroundMusic(bgmState.mode);
   }
 };

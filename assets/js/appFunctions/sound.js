@@ -1,4 +1,5 @@
 let audioCtx = null;
+let audioUnlockBound = false;
 
 /**
  * Checks whether global sound output is currently enabled in Settings.
@@ -19,6 +20,29 @@ const resumeAudioContext = () => {
   if (audioCtx && audioCtx.state === "suspended") {
     audioCtx.resume().catch(() => {});
   }
+};
+
+/**
+ * Unlocks and resumes the AudioContext on the first user gesture.
+ * @returns {void}
+ */
+const unlockAudioContext = () => {
+  getActiveAudioContext();
+};
+
+/**
+ * Registers one-time interaction listeners so browser autoplay locks lift immediately.
+ * @returns {void}
+ */
+const bindAudioUnlockListeners = () => {
+  if (audioUnlockBound) {
+    return;
+  }
+  audioUnlockBound = true;
+  window.addEventListener("pointerdown", unlockAudioContext, { once: true });
+  window.addEventListener("click", unlockAudioContext, { once: true });
+  window.addEventListener("keydown", unlockAudioContext, { once: true });
+  window.addEventListener("touchstart", unlockAudioContext, { once: true });
 };
 
 /**
