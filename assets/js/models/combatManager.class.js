@@ -1,5 +1,5 @@
 /**
- * Coordinates player bottle throws, boss fight activation, dt timers, music, and boss salvos.
+ * Coordinates player bottle throws, boss fight activation, economy soft-lock checks, music, and boss salvos.
  */
 class CombatManager {
   /**
@@ -66,7 +66,7 @@ class CombatManager {
   }
 
   /**
-   * Activates the boss once all chickens are defeated and updates boss fight state.
+   * Activates the boss once all chickens are defeated, updates boss state, and checks economy soft-lock.
    * @param {number} dtMs - Elapsed active frame time in milliseconds.
    * @returns {void}
    */
@@ -81,6 +81,44 @@ class CombatManager {
     if (boss.isActivated) {
       this.updateBossHudAndSpecial(boss, dtMs);
     }
+    this.checkEconomyGameOver();
+  }
+
+  /**
+   * Triggers Game Over with Hint B whenever bottles are completely gone and coins are below 2.
+   * @returns {void}
+   */
+  checkEconomyGameOver() {
+    const char = this.engine.world.character;
+    if (!char || char.isDead()) {
+      return;
+    }
+    if (this.isEconomyDepleted()) {
+      showGameOverFrame("hintB");
+    }
+  }
+
+  /**
+   * Evaluates whether no player bottles remain anywhere and current coins are below 2.
+   * @returns {boolean} True when no bottle is available or collectible and coins are below 2.
+   */
+  isEconomyDepleted() {
+    if (this.hasActivePlayerBottle()) {
+      return false;
+    }
+    return this.engine.statusBar.coinCount < 2;
+  }
+
+  /**
+   * Checks if Pepe holds, is throwing, has in flight, or can still collect any bottle.
+   * @returns {boolean} True when at least one bottle remains available.
+   */
+  hasActivePlayerBottle() {
+    const world = this.engine.world;
+    const char = world.character;
+    const hasInventory = this.engine.statusBar.bottleCount > 0;
+    const hasWorldBottle = world.bottles.length > 0 || world.throwableBottles.length > 0;
+    return hasInventory || hasWorldBottle || char.isThrowing || char.readyToSpawnBottle;
   }
 
   /**

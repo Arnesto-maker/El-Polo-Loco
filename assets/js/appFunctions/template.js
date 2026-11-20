@@ -13,6 +13,28 @@ const getHighscoreDataTemplate = (playerName, playerScore) => {
 };
 
 /**
+ * Returns HTML markup for Game Over Hint A (Boss Combat tip).
+ * @returns {string} HTML string.
+ */
+const getGameOverHintATemplate = () => {
+  return `
+    <p class="game-over-hint-line">Use Jump Throw to attack boss Head and shred the armour. After that you can kill him.</p>
+    <p class="game-over-hint-line">Dodge Salvo attack.</p>
+  `;
+};
+
+/**
+ * Returns HTML markup for Game Over Hint B (Resource Economy tip).
+ * @returns {string} HTML string.
+ */
+const getGameOverHintBTemplate = () => {
+  return `
+    <p class="game-over-hint-line">Watch out for your economy.</p>
+    <p class="game-over-hint-line">Use money and bottle wisely.</p>
+  `;
+};
+
+/**
  * Returns HTML markup for the post-victory summary overlay.
  * @returns {string} HTML string.
  */

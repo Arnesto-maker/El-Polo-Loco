@@ -14,6 +14,36 @@ const renderTextValues = (textMap) => {
 };
 
 /**
+ * Returns the HTML template matching a Game Over hint key.
+ * @param {string} hintType - Hint identifier ("hintA", "hintB", or "").
+ * @returns {string} HTML markup for the hint box.
+ */
+const getGameOverHintTemplate = (hintType) => {
+  if (hintType === "hintA") {
+    return getGameOverHintATemplate();
+  }
+  if (hintType === "hintB") {
+    return getGameOverHintBTemplate();
+  }
+  return "";
+};
+
+/**
+ * Renders or hides the contextual Game Over hint box.
+ * @param {string} hintType - Hint identifier ("hintA", "hintB", or "").
+ * @returns {void}
+ */
+const renderGameOverHint = (hintType) => {
+  const container = document.getElementById("game-over-hint");
+  if (!container) {
+    return;
+  }
+  const html = getGameOverHintTemplate(hintType);
+  container.innerHTML = html;
+  toggleElement("game-over-hint", Boolean(html));
+};
+
+/**
  * Formats victory summary numbers into display strings keyed by DOM id.
  * @param {Object} s - Calculated summary object.
  * @returns {Object<string, string>} Formatted id-to-text map.

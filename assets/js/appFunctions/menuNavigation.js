@@ -163,6 +163,49 @@ const handleGameOverTouchOrClick = (event) => {
 };
 
 /**
+ * Checks whether the Endboss battle is currently active and ongoing.
+ * @param {World} world - Active World instance.
+ * @returns {boolean} True when boss is activated and still alive.
+ */
+const isBossFightActive = (world) => {
+  return Boolean(world && world.boss && world.boss.isActivated && !world.boss.isDead);
+};
+
+/**
+ * Checks whether the player died with fewer than 2 coins and no bottles left.
+ * @param {GameEngine} engine - Active GameEngine instance.
+ * @returns {boolean} True when gold is below 2 and bottle count is 0.
+ */
+const isPlayerOutOfEconomy = (engine) => {
+  if (!engine || !engine.statusBar) {
+    return false;
+  }
+  return engine.statusBar.coinCount < 2 && engine.statusBar.bottleCount <= 0;
+};
+
+/**
+ * Determines which contextual Game Over hint to display based on game state.
+ * @param {string} forcedHintType - Explicit hint override ("hintB") or empty string.
+ * @returns {string} Resolved hint key ("hintA", "hintB", or "").
+ */
+const resolveGameOverHint = (forcedHintType) => {
+  if (forcedHintType) {
+    return forcedHintType;
+  }
+  const engine = window.gameEngine;
+  if (!engine || !engine.world) {
+    return "";
+  }
+  if (isBossFightActive(engine.world)) {
+    return "hintA";
+  }
+  if (isPlayerOutOfEconomy(engine)) {
+    return "hintB";
+  }
+  return "";
+};
+
+/**
  * Opens the Frame 2 main menu and hides touch HUD controls.
  * @returns {void}
  */
@@ -174,11 +217,14 @@ const showFrame2 = () => {
 };
 
 /**
- * Stops gameplay, plays game-over sound, and displays the Game Over overlay.
+ * Stops gameplay, renders the matching Game Over hint, and displays the Game Over overlay.
+ * @param {string} [forcedHintType=""] - Optional explicit hint key ("hintB").
  * @returns {void}
  */
-const showGameOverFrame = () => {
+const showGameOverFrame = (forcedHintType = "") => {
+  const hintType = resolveGameOverHint(forcedHintType);
   resetAllGamePopups();
+  renderGameOverHint(hintType);
   playGameOverSound();
   currentMenuFrame = 5;
   toggleElement("touch-controls", false);
