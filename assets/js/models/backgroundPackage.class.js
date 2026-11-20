@@ -31,21 +31,23 @@ class BackgroundPackage {
     ];
   }
 
-  /**
-   * Creates the stacked sky and desert landscape background layers.
+/**
+   * Creates stacked sky and desert background layers with 2px seam overlap.
    * @param {HTMLCanvasElement} canvas - The game canvas.
    * @returns {Array<Background>} Instantiated Background array.
    */
   createBackgroundLayers(canvas) {
+    const w = canvas.width;
+    const h = canvas.height;
     return [
-      new Background(canvas, "assets/img/5_background/layers/air.png", 0, 0, canvas.width, canvas.height),
-      new Background(canvas, "assets/img/5_background/layers/3_third_layer/1.png", 0, 0, canvas.width, canvas.height),
-      new Background(canvas, "assets/img/5_background/layers/2_second_layer/1.png", 0, 0, canvas.width, canvas.height),
-      new Background(canvas, "assets/img/5_background/layers/1_first_layer/1.png", 0, 0, canvas.width, canvas.height),
-      new Background(canvas, "assets/img/5_background/layers/air.png", canvas.width, 0, canvas.width, canvas.height),
-      new Background(canvas, "assets/img/5_background/layers/3_third_layer/2.png", canvas.width, 0, canvas.width, canvas.height),
-      new Background(canvas, "assets/img/5_background/layers/2_second_layer/2.png", canvas.width, 0, canvas.width, canvas.height),
-      new Background(canvas, "assets/img/5_background/layers/1_first_layer/2.png", canvas.width, 0, canvas.width, canvas.height),
+      new Background(canvas, "assets/img/5_background/layers/air.png", 0, 0, w + 2, h),
+      new Background(canvas, "assets/img/5_background/layers/air.png", w, 0, w + 2, h),
+      new Background(canvas, "assets/img/5_background/layers/3_third_layer/1.png", 0, 0, w + 2, h),
+      new Background(canvas, "assets/img/5_background/layers/3_third_layer/2.png", w, 0, w + 2, h),
+      new Background(canvas, "assets/img/5_background/layers/2_second_layer/1.png", 0, 0, w + 2, h),
+      new Background(canvas, "assets/img/5_background/layers/2_second_layer/2.png", w, 0, w + 2, h),
+      new Background(canvas, "assets/img/5_background/layers/1_first_layer/1.png", 0, 0, w + 2, h),
+      new Background(canvas, "assets/img/5_background/layers/1_first_layer/2.png", w, 0, w + 2, h),
     ];
   }
 

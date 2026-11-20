@@ -16,6 +16,7 @@ class MovableObject {
   imageCache = {};
   imageCounter = 0;
   frameTick = 0;
+  currentAnimation = null;
   offset = {
     top: 0,
     bottom: 0,
@@ -157,20 +158,46 @@ class MovableObject {
   }
 
   /**
-   * Advances sprite animation frames normalized to a 60-FPS delta scale.
+   * Advances sprite animation frames immediately on state switch and normalized to dt scale.
    * @param {Array<string>} pathsArray - Ordered animation image paths.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
+   * @param {number} [frameDelay=8] - Tick threshold between animation frames.
    * @returns {void}
    */
-  playAnimation(pathsArray, scale = 1) {
-    this.frameTick += scale;
-    if (this.frameTick >= 8) {
-      this.frameTick = 0;
-      const index = this.imageCounter % pathsArray.length;
-      const path = pathsArray[index];
-      this.img = this.imageCache[path];
-      this.imageCounter += 1;
+  playAnimation(pathsArray, scale = 1, frameDelay = 8) {
+    if (this.currentAnimation !== pathsArray) {
+      this.startNewAnimation(pathsArray);
+      return;
     }
+    this.frameTick += scale;
+    if (this.frameTick >= frameDelay) {
+      this.frameTick = 0;
+      this.applyAnimationFrame(pathsArray);
+    }
+  }
+
+  /**
+   * Switches immediately to frame 0 of a newly triggered animation sequence.
+   * @param {Array<string>} pathsArray - Ordered animation image paths.
+   * @returns {void}
+   */
+  startNewAnimation(pathsArray) {
+    this.currentAnimation = pathsArray;
+    this.imageCounter = 0;
+    this.frameTick = 0;
+    this.applyAnimationFrame(pathsArray);
+  }
+
+  /**
+   * Assigns the active sprite frame from cache and increments the frame counter.
+   * @param {Array<string>} pathsArray - Ordered animation image paths.
+   * @returns {void}
+   */
+  applyAnimationFrame(pathsArray) {
+    const index = this.imageCounter % pathsArray.length;
+    const path = pathsArray[index];
+    this.img = this.imageCache[path];
+    this.imageCounter += 1;
   }
 
   /**

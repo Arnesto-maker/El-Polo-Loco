@@ -1,9 +1,38 @@
+const SOUND_STORAGE_KEY = "el_pollo_loco_sound_enabled";
+
 const settingsState = {
   soundEnabled: true,
   fullscreenEnabled: false,
   isOpen: false,
   origin: "menu",
   isLandscapeLocked: false,
+};
+
+/**
+ * Loads the persisted sound preference from localStorage and syncs the Settings UI.
+ * @returns {void}
+ */
+const loadSoundSetting = () => {
+  try {
+    const saved = localStorage.getItem(SOUND_STORAGE_KEY);
+    if (saved === "false") {
+      settingsState.soundEnabled = false;
+    } else if (saved === "true") {
+      settingsState.soundEnabled = true;
+    }
+  } catch (err) {}
+  renderSettingsButtons(settingsState.soundEnabled, settingsState.fullscreenEnabled);
+};
+
+/**
+ * Saves the current sound preference to localStorage safely.
+ * @param {boolean} isEnabled - Current sound enabled state.
+ * @returns {void}
+ */
+const saveSoundSetting = (isEnabled) => {
+  try {
+    localStorage.setItem(SOUND_STORAGE_KEY, String(isEnabled));
+  } catch (err) {}
 };
 
 /**
@@ -129,12 +158,13 @@ const closeSettingsOverlay = () => {
 };
 
 /**
- * Toggles global sound setting between on and off immediately.
+ * Toggles global sound setting between on and off and persists it locally.
  * @returns {void}
  */
 const toggleSoundSetting = () => {
   blurActiveElement();
   settingsState.soundEnabled = !settingsState.soundEnabled;
+  saveSoundSetting(settingsState.soundEnabled);
   renderSettingsButtons(settingsState.soundEnabled, settingsState.fullscreenEnabled);
   syncMusicWithSoundSetting();
 };
@@ -149,7 +179,7 @@ const toggleFullscreenSetting = () => {
     exitFullscreen();
   } else {
     enterFullscreen();
-  } 
+  }
 };
 
 /**

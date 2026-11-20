@@ -12,11 +12,12 @@ const ensureAppController = () => {
 };
 
 /**
- * Initializes the application on body load, setting up Controller, Start Menu, music, and orientation lock.
+ * Initializes the application on body load, restoring sound settings, menu, music, and orientation lock.
  * @returns {void}
  */
 const initMenu = () => {
   ensureAppController();
+  loadSoundSetting();
   bindAudioUnlockListeners();
   currentMenuFrame = 1;
   toggleElement("touch-controls", false);
@@ -62,7 +63,7 @@ const resetAllGamePopups = () => {
   stopBackgroundMusic();
   resetSettingsOverlay();
   toggleElement("pause-overlay", false);
-  toggleElement("start-help-overlay", false);
+  toggleElement("frame-help", false);
   toggleElement("boss-dossier-overlay", false);
   if (appController) {
     appController.resetStates();

@@ -157,15 +157,16 @@ class GameEngine {
     this.coinConverter.draw(this.ctx);
   }
 
-  /**
-   * Translates canvas context by camera offset, draws all entities, and restores offset.
+/**
+   * Translates canvas context by integer-rounded camera offset, draws all entities, and restores offset.
    * @param {Character} char - Player character holding cameraX.
    * @returns {void}
    */
   drawWorldWithCamera(char) {
-    this.ctx.translate(char.cameraX, 0);
+    const camX = Math.round(char.cameraX);
+    this.ctx.translate(camX, 0);
     this.drawFrame();
-    this.ctx.translate(-char.cameraX, 0);
+    this.ctx.translate(-camX, 0);
   }
 
   /**

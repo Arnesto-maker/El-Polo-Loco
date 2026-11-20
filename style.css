@@ -309,13 +309,13 @@ body {
 
 .frame-2 {
   width: 48%;
-  height: 82%;
+  height: 88%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  gap: 1.5dvh;
-  padding: 2.5dvh 2.5dvw;
+  gap: 1dvh;
+  padding: 2dvh 2.5dvw;
   background-color: rgb(238 138 69 / 78%);
   border: 3px solid #000000;
   border-radius: 10px;
@@ -336,6 +336,13 @@ body {
   color: #000000;
   cursor: pointer;
   font-family: "PolloFont";
+}
+
+.frame-2 .menu-btn {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  font-size: clamp(13px, min(2dvw, 3.8dvh), 26px);
 }
 
 .menu-btn:hover,
@@ -418,7 +425,15 @@ body {
   overflow: hidden;
 }
 
+.frame-help-overlay {
+  position: absolute;
+  top: 2%;
+  left: 2%;
+  z-index: 55;
+}
+
 .about-title {
+  flex-shrink: 0;
   color: #000000;
   text-align: center;
 }
@@ -437,6 +452,170 @@ body {
   gap: 8px;
 }
 
+.help-content-wrap {
+  width: 94%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.4dvh;
+  padding: 1dvh 0;
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+.help-columns {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 2dvw;
+}
+
+.help-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.8dvh;
+  padding: 1.4dvh 1.6dvw;
+  background-color: rgba(255, 255, 255, 0.26);
+  border: 2px solid #000000;
+  border-radius: 10px;
+}
+
+.help-col-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 0.6dvh;
+  border-bottom: 2px solid #000000;
+  font-family: "PolloFont", Arial, sans-serif;
+  font-size: clamp(13px, 2.8dvh, 24px);
+  color: #000000;
+}
+
+.help-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1dvw;
+}
+
+.help-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5dvw;
+  flex-shrink: 0;
+}
+
+.key-badge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: clamp(32px, 4.5dvw, 64px);
+  padding: 0.35dvh 0.8dvw;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: 2px solid #000000;
+  border-bottom-width: 4px;
+  border-radius: 6px;
+  font-family: Arial, sans-serif;
+  font-size: clamp(10px, 2dvh, 17px);
+  font-weight: bold;
+}
+
+.touch-badge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: clamp(40px, 5.5dvw, 72px);
+  padding: 0.4dvh 0.9dvw;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 999px;
+  font-family: Arial, sans-serif;
+  font-size: clamp(10px, 2dvh, 17px);
+  font-weight: bold;
+}
+
+.touch-badge-slider {
+  color: #ff8a80;
+}
+
+.touch-badge-space {
+  color: #69f0ae;
+}
+
+.touch-badge-enter {
+  color: #82b1ff;
+}
+
+.touch-badge-b {
+  color: #ffeb3b;
+}
+
+.help-action {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: clamp(11px, 2.2dvh, 19px);
+  font-weight: bold;
+  color: #000000;
+  text-align: right;
+}
+
+.help-tips-box {
+  width: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5dvh;
+  padding: 1dvh 1.5dvw;
+  background-color: rgba(255, 255, 255, 0.26);
+  border: 2px solid #000000;
+  border-radius: 10px;
+}
+
+.help-tip-line {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  font-family: Arial, sans-serif;
+  font-size: clamp(11px, 2.1dvh, 18px);
+  color: #000000;
+  text-align: center;
+}
+
+.legal-scroll-body {
+  width: 82%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 6px;
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+.legal-heading {
+  display: flex;
+  margin-top: 4px;
+  font-family: Arial, sans-serif;
+  font-size: clamp(13px, 2.7dvh, 24px);
+  font-weight: bold;
+  color: #000000;
+}
+
 .about-item {
   font-family: Arial, sans-serif;
   color: #000000;
@@ -450,6 +629,7 @@ body {
 }
 
 .about-back-btn {
+  flex-shrink: 0;
   width: 45%;
   height: 12%;
 }

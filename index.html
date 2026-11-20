@@ -44,7 +44,6 @@
         <button id="touch-btn-space" class="touch-btn touch-btn-space" type="button">Space</button>
         <button id="touch-btn-enter" class="touch-btn touch-btn-enter" type="button">Enter</button>
       </section>
-
       <section id="start-overlay" class="start-overlay">
         <div id="frame-1" class="frame-1" onclick="showFrame2()">
           <p class="blink-text">Press Enter, Click or Touch to start</p>
@@ -53,7 +52,9 @@
           <button class="menu-btn" onclick="startNewGame()">New game</button>
           <button class="menu-btn" onclick="openHighScore()">High score</button>
           <button class="menu-btn" onclick="openSettingsOverlay('menu')">Settings</button>
+          <button class="menu-btn" onclick="openMenuHelp()">Help</button>
           <button class="menu-btn" onclick="openAbout()">About</button>
+          <button class="menu-btn" onclick="openLegalNotice()">Legal Notice</button>
           <button class="menu-btn" onclick="exitGame()">Exit.</button>
         </nav>
         <article id="frame-about" class="frame-about d-none">
@@ -75,8 +76,107 @@
           <p class="about-Author">Created by: Arnesto as a Project for developer Akademie</p>
           <button class="menu-btn about-back-btn" onclick="showFrame2()">Back</button>
         </article>
+        <article id="frame-legal" class="frame-about d-none">
+          <h2 class="about-title">LEGAL NOTICE</h2>
+          <div class="legal-scroll-body">
+            <h3 class="legal-heading">Information pursuant to § 5 DDG</h3>
+            <p class="about-item">
+              Arnesto Arnesto<br />
+              Schlossgasse 2A<br />
+              07743 Jena, Germany
+            </p>
+            <h3 class="legal-heading">Contact</h3>
+            <p class="about-item">Email: arnestoarnesto96@gmail.com</p>
+            <h3 class="legal-heading">Responsible for content pursuant to § 18 (2) MStV</h3>
+            <p class="about-item">Arnesto Arnesto, address as stated above.</p>
+            <h3 class="legal-heading">Disclaimer &amp; Copyright</h3>
+            <p class="about-item">
+              Non-commercial educational and portfolio project ("El Pollo Loco – Tactical Edition"). All sound effects and music are generated locally via the Web Audio API.
+              Image assets are provided by Developer Akademie GmbH; fonts remain the property of their respective copyright holders.
+            </p>
+          </div>
+          <button class="menu-btn about-back-btn" onclick="showFrame2()">Back</button>
+        </article>
       </section>
-
+      <article id="frame-help" class="frame-about frame-help-overlay d-none">
+        <h2 class="about-title">HOW TO PLAY</h2>
+        <div class="help-content-wrap">
+          <div class="help-columns">
+            <div class="help-col">
+              <h3 class="help-col-title">KEYBOARD</h3>
+              <div class="help-row">
+                <div class="help-badge-group">
+                  <span class="key-badge">A / D</span>
+                  <span class="key-badge">← / →</span>
+                </div>
+                <span class="help-action">Move Pepe</span>
+              </div>
+              <div class="help-row">
+                <div class="help-badge-group">
+                  <span class="key-badge">Space</span>
+                </div>
+                <span class="help-action">Jump</span>
+              </div>
+              <div class="help-row">
+                <div class="help-badge-group">
+                  <span class="key-badge">Enter</span>
+                </div>
+                <span class="help-action">Throw Bottle</span>
+              </div>
+              <div class="help-row">
+                <div class="help-badge-group">
+                  <span class="key-badge">B</span>
+                </div>
+                <span class="help-action">Buy Bottle (2 Coins)</span>
+              </div>
+              <div class="help-row">
+                <div class="help-badge-group">
+                  <span class="key-badge">Tab</span>
+                </div>
+                <span class="help-action">Pause / Back</span>
+              </div>
+            </div>
+            <div class="help-col">
+              <h3 class="help-col-title">TOUCH HUD</h3>
+              <div class="help-row">
+                <div class="help-badge-group">
+                  <span class="touch-badge touch-badge-slider">◀ ● ▶</span>
+                </div>
+                <span class="help-action">Slide to Move</span>
+              </div>
+              <div class="help-row">
+                <div class="help-badge-group">
+                  <span class="touch-badge touch-badge-space">Space</span>
+                </div>
+                <span class="help-action">Jump</span>
+              </div>
+              <div class="help-row">
+                <div class="help-badge-group">
+                  <span class="touch-badge touch-badge-enter">Enter</span>
+                </div>
+                <span class="help-action">Throw Bottle</span>
+              </div>
+              <div class="help-row">
+                <div class="help-badge-group">
+                  <span class="touch-badge touch-badge-b">B</span>
+                </div>
+                <span class="help-action">Buy Bottle (2 Coins)</span>
+              </div>
+              <div class="help-row">
+                <div class="help-badge-group">
+                  <span class="touch-badge">Tab</span>
+                </div>
+                <span class="help-action">Pause / Back</span>
+              </div>
+            </div>
+          </div>
+          <div class="help-tips-box">
+            <p class="help-tip-line"><strong>Tip:</strong> Press Space + Enter together for a Jump-Throw combo!</p>
+            <p class="help-tip-line"><strong>Mobile Tip:</strong> Turn on Fullscreen in Settings for the best experience.</p>
+          </div>
+        </div>
+        <button id="help-close-btn" class="menu-btn about-back-btn" type="button" onclick="closeHelpFrame()">Back</button>
+      </article>
       <section id="settings-overlay" class="help-overlay d-none">
         <div class="settings-box">
           <h2 class="settings-title">Settings</h2>
@@ -91,22 +191,6 @@
           <button class="menu-btn settings-back-btn" type="button" onclick="closeSettingsOverlay()">Back (Tab)</button>
         </div>
       </section>
-
-      <section id="start-help-overlay" class="help-overlay d-none">
-        <div class="help-box">
-          <div class="help-inner">
-            <p class="help-line">Welcome to El Pollo Loco</p>
-            <p class="help-line">Keyboard: A/D or Arrow Left / Right to move Pepe</p>
-            <p class="help-line">Touch: Slide the center circle left or right like a slider to move</p>
-            <p class="help-line">Space: Jump | Enter: Throw bottle | Space + Enter: Jump-Throw</p>
-            <p class="help-line">B: Buy bottle (Coin Converter) | Tab: Pause / Back</p>
-            <p class="help-line">Mobile tip: Fullscreen mode gives the best experience—turn it on in Settings!</p>
-          </div>
-          <p class="help-footer" onclick="closeStartHelpFromDom()">Enter = ok and exit</p>
-          </div>
-        </div>
-      </section>
-
       <section id="boss-dossier-overlay" class="help-overlay d-none">
         <div class="help-box">
           <div class="help-inner">
@@ -120,7 +204,6 @@
           <p class="help-footer" onclick="closeBossDossierFromDom()">Enter = ok and exit</p>
         </div>
       </section>
-
       <section id="pause-overlay" class="help-overlay d-none">
         <nav class="pause-box">
           <h2 class="pause-title">Paused</h2>
@@ -130,7 +213,6 @@
           <button class="menu-btn" onclick="exitToMenuFromPauseDom()">Exit</button>
         </nav>
       </section>
-
       <section id="landscape-lock-overlay" class="landscape-lock-overlay d-none" aria-live="polite">
         <div class="lock-card">
           <div class="lock-spinner-wrap">
@@ -142,7 +224,6 @@
           <p class="lock-message">El-Pollo Loco supports only landscape screen, please turn your phone to Landscape Mode</p>
         </div>
       </section>
-
       <section id="game-over-frame" class="game-over-frame d-none" onclick="handleGameOverTouchOrClick(event)" ontouchstart="handleGameOverTouchOrClick(event)">
         <img src="assets/img/You won, you lost/Game Over.png" alt="Game Over" class="game-over-bild-02" />
         <p class="game-over-text">Press Enter, touch, click to continue</p>

@@ -172,7 +172,6 @@ class CollisionManager {
   startCharStompingSequence(char, enemy) {
     char.initGeneralJumpAction();
     this.engine.statusBar.score += 500;
-    char.startJumpingAnimation();
     enemy.die();
     playStompSound();
   }

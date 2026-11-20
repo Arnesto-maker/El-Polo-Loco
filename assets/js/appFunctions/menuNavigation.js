@@ -19,6 +19,27 @@ const toggleElement = (id, show) => {
 };
 
 /**
+ * Updates the button label inside the unified Help frame.
+ * @param {string} label - Text label for the close button.
+ * @returns {void}
+ */
+const setHelpCloseLabel = (label) => {
+  const btn = document.getElementById("help-close-btn");
+  if (btn) {
+    btn.textContent = label;
+  }
+};
+
+/**
+ * Hides additional Frame 2 info overlays (Help and Legal Notice).
+ * @returns {void}
+ */
+const hideMenuSubFrames = () => {
+  toggleElement("frame-help", false);
+  toggleElement("frame-legal", false);
+};
+
+/**
  * Updates visibility across start menu frames, canvas, and Game Over overlay.
  * @param {boolean} showF1 - Show Start Frame 1.
  * @param {boolean} showF2 - Show Main Menu Frame 2 and Canvas.
@@ -28,6 +49,7 @@ const toggleElement = (id, show) => {
  */
 const setMenuVisibility = (showF1, showF2, showAbout, showGameOver) => {
   hideAllWinOverlays();
+  hideMenuSubFrames();
   toggleElement("frame-1", showF1);
   toggleElement("frame-2", showF2);
   toggleElement("gameCanvas", showF2);
@@ -168,8 +190,32 @@ const showGameOverFrame = () => {
  * @returns {void}
  */
 const openAbout = () => {
+  blurActiveElement();
   currentMenuFrame = 3;
   setMenuVisibility(false, false, true, false);
+};
+
+/**
+ * Opens the unified Help screen from the Frame 2 main menu.
+ * @returns {void}
+ */
+const openMenuHelp = () => {
+  blurActiveElement();
+  currentMenuFrame = 3;
+  setMenuVisibility(false, false, false, false);
+  setHelpCloseLabel("Back");
+  toggleElement("frame-help", true);
+};
+
+/**
+ * Opens the Legal Notice screen from the Frame 2 main menu.
+ * @returns {void}
+ */
+const openLegalNotice = () => {
+  blurActiveElement();
+  currentMenuFrame = 3;
+  setMenuVisibility(false, false, false, false);
+  toggleElement("frame-legal", true);
 };
 
 /**

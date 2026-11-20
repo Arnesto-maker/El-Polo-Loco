@@ -14,55 +14,6 @@ class Character extends CharacterHealth {
   throwCooldown = 500;
   throwDuration = 400;
 
-  IMAGE_0 = "assets/img/2_character_pepe/1_idle/idle/I-1.png";
-  IMAGES_LONG_IDLE = [
-    "assets/img/2_character_pepe/1_idle/long_idle/I-11.png",
-    "assets/img/2_character_pepe/1_idle/long_idle/I-12.png",
-    "assets/img/2_character_pepe/1_idle/long_idle/I-13.png",
-    "assets/img/2_character_pepe/1_idle/long_idle/I-14.png",
-    "assets/img/2_character_pepe/1_idle/long_idle/I-15.png",
-    "assets/img/2_character_pepe/1_idle/long_idle/I-16.png",
-    "assets/img/2_character_pepe/1_idle/long_idle/I-17.png",
-    "assets/img/2_character_pepe/1_idle/long_idle/I-18.png",
-    "assets/img/2_character_pepe/1_idle/long_idle/I-19.png",
-    "assets/img/2_character_pepe/1_idle/long_idle/I-20.png",
-  ];
-  IMAGES_IDLE = [
-    "assets/img/2_character_pepe/1_idle/idle/I-1.png",
-    "assets/img/2_character_pepe/1_idle/idle/I-2.png",
-    "assets/img/2_character_pepe/1_idle/idle/I-3.png",
-    "assets/img/2_character_pepe/1_idle/idle/I-4.png",
-    "assets/img/2_character_pepe/1_idle/idle/I-5.png",
-    "assets/img/2_character_pepe/1_idle/idle/I-6.png",
-    "assets/img/2_character_pepe/1_idle/idle/I-7.png",
-    "assets/img/2_character_pepe/1_idle/idle/I-8.png",
-    "assets/img/2_character_pepe/1_idle/idle/I-9.png",
-    "assets/img/2_character_pepe/1_idle/idle/I-10.png",
-  ];
-  IMAGES_JUMP = [
-    "assets/img/2_character_pepe/3_jump/J-33.png",
-    "assets/img/2_character_pepe/3_jump/J-34.png",
-    "assets/img/2_character_pepe/3_jump/J-35.png",
-    "assets/img/2_character_pepe/3_jump/J-36.png",
-    "assets/img/2_character_pepe/3_jump/J-37.png",
-    "assets/img/2_character_pepe/3_jump/J-38.png",
-    "assets/img/2_character_pepe/3_jump/J-39.png",
-  ];
-  IMAGES_MOVING = [
-    "assets/img/2_character_pepe/2_walk/W-21.png",
-    "assets/img/2_character_pepe/2_walk/W-22.png",
-    "assets/img/2_character_pepe/2_walk/W-23.png",
-    "assets/img/2_character_pepe/2_walk/W-24.png",
-    "assets/img/2_character_pepe/2_walk/W-25.png",
-    "assets/img/2_character_pepe/2_walk/W-26.png",
-  ];
-  IMAGES_THROWING = [
-    "assets/img/2_character_pepe/6_throw/T-1.png",
-    "assets/img/2_character_pepe/6_throw/T-2.png",
-    "assets/img/2_character_pepe/6_throw/T-3.png",
-    "assets/img/2_character_pepe/6_throw/T-4.png",
-  ];
-
   /**
    * Initializes Pepe's sprites, dimensions, and spawn position.
    * @param {HTMLCanvasElement} canvas - The game canvas.
@@ -71,6 +22,41 @@ class Character extends CharacterHealth {
     super(canvas);
     this.loadAllImages();
     this.setMainParameter();
+  }
+
+  /**
+   * Builds and preloads a sequential sprite path array for Pepe.
+   * @param {string} dir - Subfolder inside assets/img/2_character_pepe.
+   * @param {string} prefix - Filename prefix before the frame number.
+   * @param {number} start - First frame index.
+   * @param {number} end - Last frame index.
+   * @returns {Array<string>} Preloaded sprite path list.
+   */
+  loadSpriteRange(dir, prefix, start, end) {
+    const paths = [];
+    const base = `assets/img/2_character_pepe/${dir}/${prefix}`;
+    for (let i = start; i <= end; i++) {
+      paths.push(`${base}${i}.png`);
+    }
+    this.loadImages(paths);
+    return paths;
+  }
+
+  /**
+   * Initializes and preloads all movement, action, and health animation sequences.
+   * @returns {void}
+   */
+  loadAllImages() {
+    const w21 = "assets/img/2_character_pepe/2_walk/W-21.png";
+    this.IMAGE_0 = "assets/img/2_character_pepe/1_idle/idle/I-1.png";
+    this.IMAGES_IDLE = this.loadSpriteRange("1_idle/idle", "I-", 1, 10);
+    this.IMAGES_LONG_IDLE = this.loadSpriteRange("1_idle/long_idle", "I-", 11, 20);
+    this.IMAGES_JUMP = this.loadSpriteRange("3_jump", "J-", 33, 39);
+    this.IMAGES_MOVING = this.loadSpriteRange("2_walk", "W-", 22, 26);
+    this.IMAGES_MOVING.push(w21);
+    this.loadImages([this.IMAGE_0, w21]);
+    this.IMAGES_THROWING = this.loadSpriteRange("6_throw", "T-", 1, 4);
+    this.loadHealthImages();
   }
 
   /**
@@ -84,15 +70,7 @@ class Character extends CharacterHealth {
     this.x = this.canvasWidth * 0.05;
     this.y = this.canvasHeight - this.height - this.floor;
     this.yMax = this.y - this.canvasHeight * 0.5;
-    this.offset = this.setOffsetParameter();
-  }
-
-  /**
-   * Builds the collision offset box for Pepe.
-   * @returns {{top: number, bottom: number, left: number, right: number}} Hitbox offsets.
-   */
-  setOffsetParameter() {
-    return {
+    this.offset = {
       top: this.height * 0.38,
       bottom: this.height * 0.06,
       left: this.width * 0.22,
@@ -101,29 +79,15 @@ class Character extends CharacterHealth {
   }
 
   /**
-   * Preloads all movement, action, and health animation sequences.
-   * @returns {void}
-   */
-  loadAllImages() {
-    this.loadImages([this.IMAGE_0]);
-    this.loadImages(this.IMAGES_IDLE);
-    this.loadImages(this.IMAGES_LONG_IDLE);
-    this.loadImages(this.IMAGES_JUMP);
-    this.loadImages(this.IMAGES_MOVING);
-    this.loadImages(this.IMAGES_THROWING);
-    this.loadHealthImages();
-  }
-
-  /**
    * Updates horizontal camera offset clamped between frame 1 and frame 2 boundaries.
    * @returns {void}
    */
   updateCameraControl() {
     const startFollowX = this.canvasWidth / 2;
-    const stopFollowX = this.canvasWidth / 2 + this.canvasWidth;
+    const stopFollowX = startFollowX + this.canvasWidth;
     if (this.x <= startFollowX) {
       this.cameraX = 0;
-    } else if (this.x > startFollowX && this.x < stopFollowX) {
+    } else if (this.x < stopFollowX) {
       this.cameraX = -(this.x - startFollowX);
     } else {
       this.cameraX = -this.canvasWidth;
@@ -153,32 +117,17 @@ class Character extends CharacterHealth {
   update(controller, scale = 1) {
     this.checkHurtThreshold();
     const isLocked = this.isDead() || this.isHurtAnimationActive();
-    if (!isLocked && !this.isThrowing) {
-      this.moveRight(controller, scale);
-      this.moveLeft(controller, scale);
+    this.isMoving = Boolean(controller.right) !== Boolean(controller.left);
+    if (!isLocked && !this.isThrowing && this.isMoving) {
+      this.moveHorizontal(controller, scale);
     }
-    this.updateJumpOrGravity(controller, isLocked, scale);
+    this.jump(controller, isLocked, scale);
     this.updateCameraControl();
     this.updateAnimation(controller, scale);
   }
 
   /**
-   * Processes jump input or applies gravity when movement is locked.
-   * @param {Controller} controller - Active input controller.
-   * @param {boolean} isLocked - Whether controls are temporarily locked.
-   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
-   * @returns {void}
-   */
-  updateJumpOrGravity(controller, isLocked, scale = 1) {
-    if (!isLocked) {
-      this.jump(controller, scale);
-    } else if (this.isJumping || this.isAboveGround()) {
-      this.setJumpingSequence(scale);
-    }
-  }
-
-  /**
-   * Routes animation selection between hurt/death and standard actions.
+   * Routes animation selection between health, active actions, and idle sequences.
    * @param {Controller} controller - Active input controller.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
@@ -186,28 +135,10 @@ class Character extends CharacterHealth {
   updateAnimation(controller, scale = 1) {
     if (this.isDead() || this.isHurtAnimationActive()) {
       this.selectUpperHealthAnimation(controller, scale);
-      return;
-    }
-    this.updateStandardAnimation(controller, scale);
-  }
-
-  /**
-   * Selects throwing, jumping, walking, or idle animation.
-   * @param {Controller} controller - Active input controller.
-   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
-   * @returns {void}
-   */
-  updateStandardAnimation(controller, scale = 1) {
-    const isMoving = controller.right || controller.left;
-    if (this.isThrowing) {
-      this.resetIdleState();
-      this.handleThrowAnimation(scale);
-    } else if (this.isJumping) {
-      this.resetIdleState();
-      this.playAnimation(this.IMAGES_JUMP, scale);
-    } else if (isMoving) {
-      this.resetIdleState();
-      this.playAnimation(this.IMAGES_MOVING, scale);
+    } else if (this.isThrowing || this.isJumping || this.isMoving) {
+      this.idleTimer = 0;
+      this.idleStage = 0;
+      this.playActiveAnimation(scale);
     } else {
       this.idleTimer += scale;
       this.startIdleSequence(scale);
@@ -215,12 +146,18 @@ class Character extends CharacterHealth {
   }
 
   /**
-   * Clears idle timer and stage when Pepe performs an active action.
+   * Plays throwing, jumping, or walking animation with immediate state sync.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  resetIdleState() {
-    this.idleTimer = 0;
-    this.idleStage = 0;
+  playActiveAnimation(scale = 1) {
+    if (this.isThrowing) {
+      this.handleThrowAnimation(scale);
+    } else if (this.isJumping) {
+      this.playAnimation(this.IMAGES_JUMP, scale, 7);
+    } else if (this.isMoving) {
+      this.playAnimation(this.IMAGES_MOVING, scale, 5);
+    }
   }
 
   /**
@@ -231,102 +168,61 @@ class Character extends CharacterHealth {
   startIdleSequence(scale = 1) {
     if (this.idleTimer < 120) {
       this.idleStage = 0;
+      this.currentAnimation = null;
       this.img = this.imageCache[this.IMAGE_0];
       this.resetAnimationFrame();
     } else if (this.idleTimer < 360) {
-      this.startIdleAnimation(scale);
-    } else {
-      this.startLongIdleAnimation(scale);
-    }
-  }
-
-  /**
-   * Plays the standard standing idle sprite cycle.
-   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
-   * @returns {void}
-   */
-  startIdleAnimation(scale = 1) {
-    if (this.idleStage !== 1) {
       this.idleStage = 1;
-      this.resetAnimationFrame();
-    }
-    this.playAnimation(this.IMAGES_IDLE, scale);
-  }
-
-  /**
-   * Plays the sleeping long-idle sprite cycle.
-   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
-   * @returns {void}
-   */
-  startLongIdleAnimation(scale = 1) {
-    if (this.idleStage !== 2) {
+      this.playAnimation(this.IMAGES_IDLE, scale);
+    } else {
       this.idleStage = 2;
-      this.resetAnimationFrame();
+      this.playAnimation(this.IMAGES_LONG_IDLE, scale);
     }
-    this.playAnimation(this.IMAGES_LONG_IDLE, scale);
   }
 
   /**
-   * Resets frames and starts playing the jump animation.
-   * @returns {void}
-   */
-  startJumpingAnimation() {
-    this.resetAnimationFrame();
-    this.playAnimation(this.IMAGES_JUMP, 1);
-  }
-
-  /**
-   * Moves Pepe right within the world boundary scaled to 60-FPS delta time.
+   * Moves Pepe left or right within world boundaries scaled to 60-FPS delta time.
    * @param {Controller} controller - Active input controller.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  moveRight(controller, scale = 1) {
+  moveHorizontal(controller, scale = 1) {
     const maxWorldX = this.canvasWidth * 2 - this.width;
     if (controller.right && this.x < maxWorldX) {
       this.x += this.vXChar * scale;
       this.otherDirection = false;
-    }
-  }
-
-  /**
-   * Moves Pepe left within the world boundary scaled to 60-FPS delta time.
-   * @param {Controller} controller - Active input controller.
-   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
-   * @returns {void}
-   */
-  moveLeft(controller, scale = 1) {
-    if (controller.left && this.x > 0) {
+    } else if (controller.left && this.x > 0) {
       this.x -= this.vXChar * scale;
       this.otherDirection = true;
     }
   }
 
   /**
-   * Initiates a jump with SFX when Space is pressed and updates airborne motion.
+   * Initiates a jump on Space when unlocked and applies airborne gravity.
    * @param {Controller} controller - Active input controller.
+   * @param {boolean} isLocked - Whether controls are temporarily locked.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  jump(controller, scale = 1) {
-    if (controller.space && !this.isJumping) {
-      this.isJumping = true;
-      this.vg = -25;
-      this.imageCounter = 0;
+  jump(controller, isLocked, scale = 1) {
+    if (!isLocked && controller.space && !this.isJumping) {
+      this.initGeneralJumpAction(-25);
       playJumpSound();
     }
-    if (this.isJumping) {
+    if (this.isJumping || (isLocked && this.isAboveGround())) {
       this.setJumpingSequence(scale);
     }
   }
 
   /**
-   * Triggers a bounce jump after stomping an enemy.
+   * Triggers an upward jump impulse (default -20 for enemy stomp bounce).
+   * @param {number} [velocity=-20] - Initial vertical launch velocity.
    * @returns {void}
    */
-  initGeneralJumpAction() {
+  initGeneralJumpAction(velocity = -20) {
     this.isJumping = true;
-    this.vg = -20;
+    this.vg = velocity;
+    this.currentAnimation = null;
     this.imageCounter = 0;
   }
 
@@ -367,12 +263,13 @@ class Character extends CharacterHealth {
     if (this.isHurtAnimationActive() || this.isDead()) {
       return;
     }
-    const currentTime = performance.now();
-    if (this.isThrowing || currentTime - this.lastThrowTime < this.throwCooldown) {
+    const now = performance.now();
+    if (this.isThrowing || now - this.lastThrowTime < this.throwCooldown) {
       return;
     }
     this.isThrowing = true;
-    this.lastThrowTime = currentTime;
+    this.lastThrowTime = now;
+    this.currentAnimation = null;
     this.resetAnimationFrame();
   }
 
@@ -382,19 +279,11 @@ class Character extends CharacterHealth {
    * @returns {void}
    */
   handleThrowAnimation(scale = 1) {
-    const timeThrowing = performance.now() - this.lastThrowTime;
-    this.playAnimation(this.IMAGES_THROWING, scale);
-    if (timeThrowing >= this.throwDuration) {
-      this.resetThrowParameter();
+    const elapsed = performance.now() - this.lastThrowTime;
+    this.playAnimation(this.IMAGES_THROWING, scale, 6);
+    if (elapsed >= this.throwDuration) {
+      this.isThrowing = false;
+      this.readyToSpawnBottle = true;
     }
-  }
-
-  /**
-   * Ends throwing state and requests projectile instantiation.
-   * @returns {void}
-   */
-  resetThrowParameter() {
-    this.isThrowing = false;
-    this.readyToSpawnBottle = true;
   }
 }
