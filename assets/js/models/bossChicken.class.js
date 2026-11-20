@@ -44,17 +44,8 @@ class Boss extends BossCombat {
     "assets/img/4_enemie_boss_chicken/3_attack/G19.png",
     "assets/img/4_enemie_boss_chicken/3_attack/G20.png",
   ];
-  IMAGES_HURT = [
-    "assets/img/4_enemie_boss_chicken/4_hurt/G21.png",
-    "assets/img/4_enemie_boss_chicken/4_hurt/G22.png",
-    "assets/img/4_enemie_boss_chicken/4_hurt/G23.png",
-  ];
-  IMAGES_DEAD = [
-    "assets/img/4_enemie_boss_chicken/5_dead/G24.png",
-    "assets/img/4_enemie_boss_chicken/5_dead/G25.png",
-    "assets/img/4_enemie_boss_chicken/5_dead/G26.png",
-  ];
-
+  IMAGES_HURT = ["assets/img/4_enemie_boss_chicken/4_hurt/G21.png", "assets/img/4_enemie_boss_chicken/4_hurt/G22.png", "assets/img/4_enemie_boss_chicken/4_hurt/G23.png"];
+  IMAGES_DEAD = ["assets/img/4_enemie_boss_chicken/5_dead/G24.png", "assets/img/4_enemie_boss_chicken/5_dead/G25.png", "assets/img/4_enemie_boss_chicken/5_dead/G26.png"];
   /**
    * Initializes boss sprites, physical bounds, and arena patrol limits.
    * @param {HTMLCanvasElement} canvas - The game canvas.

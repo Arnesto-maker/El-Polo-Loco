@@ -59,19 +59,60 @@ body {
   position: absolute;
   inset: 0;
   z-index: 45;
-  display: flex;
+  display: none;
   pointer-events: none;
+}
+
+@media (max-width: 1366px), (pointer: coarse) {
+  .touch-controls:not(.d-none) {
+    display: flex;
+  }
 }
 
 .touch-slider-wrap {
   position: absolute;
-  left: 3dvw;
+  left: max(28px, 5dvw);
   bottom: 3dvh;
   display: flex;
   align-items: center;
   gap: 1dvw;
   pointer-events: auto;
   touch-action: none;
+}
+
+.touch-slider-wrap * {
+  touch-action: none;
+}
+
+.slider-track {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: clamp(120px, 20dvw, 220px);
+  height: clamp(42px, 10dvh, 66px);
+  background-color: rgba(20, 20, 20, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 36px;
+}
+
+.touch-btn {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: clamp(48px, 12dvh, 76px);
+  height: clamp(48px, 12dvh, 76px);
+  border-radius: 50%;
+  background-color: rgba(20, 20, 20, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.9);
+  font-family: Arial, sans-serif;
+  font-size: clamp(11px, 2.5dvh, 18px);
+  font-weight: bold;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: pointer;
 }
 
 .slider-arrow {
