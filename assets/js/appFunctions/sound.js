@@ -1,5 +1,6 @@
 let audioCtx = null;
 let audioUnlockBound = false;
+let hasUserInteracted = false;
 
 /**
  * Checks whether global sound output is currently enabled in Settings.
@@ -27,11 +28,12 @@ const resumeAudioContext = () => {
  * @returns {void}
  */
 const unlockAudioContext = () => {
+  hasUserInteracted = true;
   getActiveAudioContext();
 };
 
 /**
- * Registers one-time interaction listeners so browser autoplay locks lift immediately.
+ * Registers one-time capture listeners so Web Audio unlocks cleanly on first gesture.
  * @returns {void}
  */
 const bindAudioUnlockListeners = () => {
@@ -39,20 +41,18 @@ const bindAudioUnlockListeners = () => {
     return;
   }
   audioUnlockBound = true;
-  window.addEventListener("pointerdown", unlockAudioContext, { once: true });
-  window.addEventListener("click", unlockAudioContext, { once: true });
-  window.addEventListener("keydown", unlockAudioContext, { once: true });
-  window.addEventListener("touchstart", unlockAudioContext, { once: true });
+  const opts = { once: true, capture: true };
+  window.addEventListener("pointerdown", unlockAudioContext, opts);
+  window.addEventListener("click", unlockAudioContext, opts);
+  window.addEventListener("keydown", unlockAudioContext, opts);
+  window.addEventListener("touchstart", unlockAudioContext, opts);
 };
 
 /**
- * Returns an active AudioContext if sound is enabled in Settings.
- * @returns {AudioContext|null} Ready AudioContext or null when muted.
+ * Creates the global AudioContext instance if supported and not yet initialized.
+ * @returns {AudioContext|null} AudioContext instance or null if unsupported.
  */
-const getActiveAudioContext = () => {
-  if (!isSoundEnabled()) {
-    return null;
-  }
+const ensureAudioContext = () => {
   const AudioClass = window.AudioContext || window.webkitAudioContext;
   if (!AudioClass) {
     return null;
@@ -60,8 +60,23 @@ const getActiveAudioContext = () => {
   if (!audioCtx) {
     audioCtx = new AudioClass();
   }
-  resumeAudioContext();
   return audioCtx;
+};
+
+/**
+ * Returns an active AudioContext once user interaction has unlocked Web Audio.
+ * @returns {AudioContext|null} Ready AudioContext or null when muted or locked.
+ */
+const getActiveAudioContext = () => {
+  if (!hasUserInteracted || !isSoundEnabled()) {
+    return null;
+  }
+  const ctx = ensureAudioContext();
+  if (!ctx) {
+    return null;
+  }
+  resumeAudioContext();
+  return ctx;
 };
 
 /**

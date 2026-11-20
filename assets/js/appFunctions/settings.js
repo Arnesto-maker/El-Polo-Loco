@@ -41,6 +41,23 @@ const isPortraitViewport = () => {
 };
 
 /**
+ * Returns the currently active fullscreen element across standard and vendor APIs.
+ * @returns {Element|null} Active fullscreen element or null.
+ */
+const getFullscreenElement = () => {
+  return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || null;
+};
+
+/**
+ * Syncs settingsState and Settings UI with the browser's actual fullscreen state.
+ * @returns {void}
+ */
+const syncFullscreenState = () => {
+  settingsState.fullscreenEnabled = Boolean(getFullscreenElement());
+  renderSettingsButtons(settingsState.soundEnabled, settingsState.fullscreenEnabled);
+};
+
+/**
  * Handles orientation transitions between portrait lock and landscape pause workflow.
  * @returns {void}
  */
@@ -94,8 +111,7 @@ const openSettingsOverlay = (origin) => {
   blurActiveElement();
   settingsState.origin = origin;
   settingsState.isOpen = true;
-  settingsState.fullscreenEnabled = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
-  renderSettingsButtons(settingsState.soundEnabled, settingsState.fullscreenEnabled);
+  syncFullscreenState();
   toggleElement("settings-overlay", true);
 };
 
@@ -129,46 +145,93 @@ const toggleSoundSetting = () => {
  */
 const toggleFullscreenSetting = () => {
   blurActiveElement();
-  if (document.fullscreenElement || document.webkitFullscreenElement) {
+  if (getFullscreenElement()) {
     exitFullscreen();
-    settingsState.fullscreenEnabled = false;
   } else {
     enterFullscreen();
-    settingsState.fullscreenEnabled = true;
-  }
-  renderSettingsButtons(settingsState.soundEnabled, settingsState.fullscreenEnabled);
+  } 
 };
 
 /**
- * Requests fullscreen on the game container and locks landscape orientation.
+ * Requests fullscreen on the game container or document root.
  * @returns {void}
  */
 const enterFullscreen = () => {
-  const container = document.getElementById("game-container");
-  if (!container || document.fullscreenElement) {
+  const target = document.getElementById("game-container") || document.documentElement;
+  if (!target || getFullscreenElement()) {
     return;
   }
-  if (container.requestFullscreen) {
-    container.requestFullscreen({ navigationUI: "hide" }).then(lockLandscape).catch(() => {});
+  if (target.requestFullscreen) {
+    requestStandardFullscreen(target);
     return;
   }
-  if (container.webkitRequestFullscreen) {
-    container.webkitRequestFullscreen();
+  requestVendorFullscreen(target);
+};
+
+/**
+ * Invokes standard requestFullscreen and handles promise resolution safely.
+ * @param {Element} target - Element to display in fullscreen.
+ * @returns {void}
+ */
+const requestStandardFullscreen = (target) => {
+  const request = target.requestFullscreen();
+  if (request && request.then) {
+    request.then(onFullscreenEntered).catch(onFullscreenError);
+  } else {
+    onFullscreenEntered();
   }
 };
 
 /**
- * Exits the currently active fullscreen mode.
+ * Invokes vendor-prefixed fullscreen APIs for Safari and legacy browsers.
+ * @param {Element} target - Element to display in fullscreen.
+ * @returns {void}
+ */
+const requestVendorFullscreen = (target) => {
+  if (target.webkitRequestFullscreen) {
+    target.webkitRequestFullscreen();
+  } else if (target.mozRequestFullScreen) {
+    target.mozRequestFullScreen();
+  }
+  syncFullscreenState();
+};
+
+/**
+ * Syncs UI after entering fullscreen and locks landscape only on coarse touch devices.
+ * @returns {void}
+ */
+const onFullscreenEntered = () => {
+  syncFullscreenState();
+  if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
+    lockLandscape();
+  }
+};
+
+/**
+ * Logs fullscreen rejection reasons and keeps the Settings toggle accurate.
+ * @param {Error} err - Rejection error from the Fullscreen API.
+ * @returns {void}
+ */
+const onFullscreenError = (err) => {
+  console.warn("Fullscreen request failed:", err);
+  syncFullscreenState();
+};
+
+/**
+ * Exits the currently active fullscreen mode across standard and vendor APIs.
  * @returns {void}
  */
 const exitFullscreen = () => {
   if (document.exitFullscreen) {
-    document.exitFullscreen().catch(() => {});
+    document.exitFullscreen().then(syncFullscreenState).catch(onFullscreenError);
     return;
   }
   if (document.webkitExitFullscreen) {
     document.webkitExitFullscreen();
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
   }
+  syncFullscreenState();
 };
 
 /**
@@ -180,3 +243,6 @@ const lockLandscape = () => {
     screen.orientation.lock("landscape").catch(() => {});
   }
 };
+
+document.addEventListener("fullscreenchange", syncFullscreenState);
+document.addEventListener("webkitfullscreenchange", syncFullscreenState);

@@ -113,14 +113,25 @@ class Controller {
     slider.addEventListener("pointercancel", (e) => this.endSliderDrag(e));
   }
 
-  /**
+/**
    * Prevents mobile browsers from scrolling or swiping when dragging a touch control.
    * @param {HTMLElement} element - Touch control container.
    * @returns {void}
    */
   blockBrowserTouchScroll(element) {
-    element.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
-    element.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
+    element.addEventListener("touchstart", (e) => this.preventIfCancelable(e), { passive: false });
+    element.addEventListener("touchmove", (e) => this.preventIfCancelable(e), { passive: false });
+  }
+
+  /**
+   * Cancels a touch event only when the browser marks it as cancelable.
+   * @param {TouchEvent} event - Touch event to guard.
+   * @returns {void}
+   */
+  preventIfCancelable(event) {
+    if (event.cancelable) {
+      event.preventDefault();
+    }
   }
 
   /**
