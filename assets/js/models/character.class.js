@@ -115,7 +115,7 @@ class Character extends CharacterHealth {
    * @returns {void}
    */
   update(controller, scale = 1) {
-    const isLocked = this.isDead();
+    const isLocked = this.isDead() || this.isHurtAnimationActive();
     this.isMoving = Boolean(controller.right) !== Boolean(controller.left);
     if (!isLocked && !this.isThrowing && this.isMoving) {
       this.moveHorizontal(controller, scale);
