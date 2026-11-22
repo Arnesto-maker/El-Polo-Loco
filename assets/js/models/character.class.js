@@ -51,7 +51,7 @@ class Character extends CharacterHealth {
     this.IMAGE_0 = "assets/img/2_character_pepe/1_idle/idle/I-1.png";
     this.IMAGES_IDLE = this.loadSpriteRange("1_idle/idle", "I-", 1, 10);
     this.IMAGES_LONG_IDLE = this.loadSpriteRange("1_idle/long_idle", "I-", 11, 20);
-    this.IMAGES_JUMP = this.loadSpriteRange("3_jump", "J-", 33, 39);
+    this.IMAGES_JUMP = this.loadSpriteRange("3_jump", "J-", 31, 39);
     this.IMAGES_MOVING = this.loadSpriteRange("2_walk", "W-", 22, 26);
     this.IMAGES_MOVING.push(w21);
     this.loadImages([this.IMAGE_0, w21]);

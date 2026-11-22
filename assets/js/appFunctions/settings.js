@@ -1,4 +1,4 @@
-const SOUND_STORAGE_KEY = "el_pollo_loco_sound_enabled";
+
 
 const settingsState = {
   soundEnabled: true,
