@@ -31,6 +31,9 @@
   <body onload="initMenu()" onresize="handleOrientationCheck()">
     <main id="game-container">
       <canvas id="gameCanvas" width="2048" height="1280"></canvas>
+      <button id="canvas-sound-btn" class="canvas-sound-btn d-none" type="button" aria-label="Mute sound" aria-pressed="true" onclick="toggleCanvasSoundIcon(event)">
+        <img id="canvas-sound-icon" class="canvas-sound-icon" src="assets/img/sound_icons/sound-on-14606.svg" alt="Sound on" />
+      </button>
       <section id="touch-controls" class="touch-controls d-none" aria-label="Touch Controls">
         <div id="touch-slider" class="touch-slider-wrap">
           <span id="slider-arrow-left" class="slider-arrow">◀</span>
@@ -91,8 +94,8 @@
             <p class="about-item">Arnesto Arnesto, address as stated above.</p>
             <h3 class="legal-heading">Disclaimer &amp; Copyright</h3>
             <p class="about-item">
-              Non-commercial educational and portfolio project ("El Pollo Loco – Tactical Edition"). All sound effects and music are generated locally via the Web Audio API.
-              Image assets are provided by Developer Akademie GmbH; fonts remain the property of their respective copyright holders.
+              Non-commercial educational and portfolio project ("El Pollo Loco – Tactical Edition"). All sound effects and music are generated locally via the Web Audio API. Image
+              assets are provided by Developer Akademie GmbH; fonts remain the property of their respective copyright holders.
             </p>
           </div>
           <button class="menu-btn about-back-btn" onclick="showFrame2()">Back</button>

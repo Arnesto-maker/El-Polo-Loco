@@ -101,6 +101,41 @@ a:focus-visible,
   height: min(100dvh, calc(100dvw * 10 / 16));
 }
 
+.canvas-sound-btn {
+  position: absolute;
+  top: clamp(6px, 1.5dvh, 16px);
+  left: clamp(8px, 1.2dvw, 22px);
+  z-index: 15;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  width: clamp(44px, 6.5dvh, 56px);
+  height: clamp(44px, 6.5dvh, 56px);
+  padding: 4px;
+  background-color: transparent;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  transition: transform 0.12s ease;
+}
+
+.canvas-sound-btn:hover,
+.canvas-sound-btn:active {
+  transform: scale(1.12);
+}
+
+.canvas-sound-icon {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
 .touch-controls {
   position: absolute;
   inset: 0;

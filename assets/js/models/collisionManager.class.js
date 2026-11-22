@@ -1,5 +1,5 @@
 /**
- * Handles all gameplay hit detection, collision reversals, sound triggers, and expired entity cleanup.
+ * Handles all gameplay hit detection, multi-stomp resolution, sound triggers, and expired entity cleanup.
  */
 class CollisionManager {
   /**
@@ -15,7 +15,7 @@ class CollisionManager {
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  checkAllCollisions(char) {
+  checkAllCollisions = (char) => {
     if (char.isDead()) {
       return;
     }
@@ -25,38 +25,38 @@ class CollisionManager {
     this.checkThrownBottleCollisions();
     this.checkBossCollisions(char);
     this.checkBossBottleCollisions(char);
-  }
+  };
 
   /**
    * Removes finished dead enemies, splashed bottles, and transitions on boss defeat.
    * @returns {void}
    */
-  cleanupObjects() {
+  cleanupObjects = () => {
     this.removeExpiredBottles("throwableBottles");
     this.removeExpiredBottles("bossBottles");
     this.removeDeadChickens();
     this.removeDeadBoss();
-  }
+  };
 
   /**
    * Checks all active player-thrown bottles against enemies and the boss.
    * @returns {void}
    */
-  checkThrownBottleCollisions() {
+  checkThrownBottleCollisions = () => {
     const bottles = this.engine.world.throwableBottles;
     for (let i = 0; i < bottles.length; i++) {
       if (!bottles[i].isSplashing) {
         this.checkBottleHitsEnemy(bottles[i]);
       }
     }
-  }
+  };
 
   /**
    * Tests a single thrown bottle against regular enemies and the boss.
    * @param {ThrowableBottle} bottle - Active thrown bottle.
    * @returns {void}
    */
-  checkBottleHitsEnemy(bottle) {
+  checkBottleHitsEnemy = (bottle) => {
     const enemies = this.engine.world.enemies;
     for (let i = 0; i < enemies.length; i++) {
       if (!enemies[i].isDead && bottle.isColliding(enemies[i])) {
@@ -66,14 +66,14 @@ class CollisionManager {
       }
     }
     this.checkBottleHitsBoss(bottle);
-  }
+  };
 
   /**
    * Applies vertical hit-zone damage when a player bottle hits the Endboss.
    * @param {ThrowableBottle} bottle - Active thrown bottle.
    * @returns {void}
    */
-  checkBottleHitsBoss(bottle) {
+  checkBottleHitsBoss = (bottle) => {
     const boss = this.engine.world.boss;
     if (boss && !boss.isDead && bottle.isColliding(boss)) {
       bottle.startSplashSequenz();
@@ -82,14 +82,14 @@ class CollisionManager {
       this.engine.statusBar.bossArmour = boss.armour;
       this.engine.statusBar.updateBossHealthImage();
     }
-  }
+  };
 
   /**
    * Checks horizontal contact collision between Pepe and the active boss.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  checkBossCollisions(char) {
+  checkBossCollisions = (char) => {
     const boss = this.engine.world.boss;
     if (!boss || !boss.isActivated || boss.isDead) {
       return;
@@ -97,7 +97,7 @@ class CollisionManager {
     if (char.isColliding(boss) && !char.isHurt()) {
       this.applyBossContactDamage(char, boss);
     }
-  }
+  };
 
   /**
    * Deducts boss contact damage, triggers Pepe hurt animation, and reverses boss heading.
@@ -105,7 +105,7 @@ class CollisionManager {
    * @param {Boss} boss - Active Endboss instance.
    * @returns {void}
    */
-  applyBossContactDamage(char, boss) {
+  applyBossContactDamage = (char, boss) => {
     if (boss.isAttacking) {
       char.health = Math.max(0, char.health - 10);
     } else {
@@ -116,24 +116,24 @@ class CollisionManager {
     char.triggerHurtAnimation();
     boss.reverseDirection();
     this.syncPlayerHealthHud(char);
-  }
+  };
 
   /**
    * Updates the player health HUD sprite to match current health.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  syncPlayerHealthHud(char) {
+  syncPlayerHealthHud = (char) => {
     this.engine.statusBar.health = char.health;
     this.engine.statusBar.updateHealthImage();
-  }
+  };
 
   /**
    * Checks collisions between Pepe and incoming boss salvo bottles.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  checkBossBottleCollisions(char) {
+  checkBossBottleCollisions = (char) => {
     const bottles = this.engine.world.bossBottles;
     for (let i = 0; i < bottles.length; i++) {
       if (!bottles[i].isSplashing && char.isColliding(bottles[i])) {
@@ -143,67 +143,84 @@ class CollisionManager {
         }
       }
     }
-  }
+  };
 
   /**
-   * Checks collisions and stomps against all regular chickens.
+   * Resolves vertical multi-stomp kills before falling back to horizontal contact hits.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  checkChickenCollision(char) {
-    const enemies = this.engine.world.enemies;
-    for (let i = 0; i < enemies.length; i++) {
-      this.updateChickenCollision(char, enemies[i]);
-    }
-  }
-
-  /**
-   * Resolves a stomp kill or horizontal collision with hurt animation and enemy reversal.
-   * @param {Character} char - Player character instance.
-   * @param {Chicken} enemy - Target chicken enemy.
-   * @returns {void}
-   */
-  updateChickenCollision(char, enemy) {
-    if (enemy.isDead) {
+  checkChickenCollision = (char) => {
+    if (this.hasStompCollision(char)) {
+      this.resolveMultiStomp(char);
       return;
     }
-    if (char.isStomping(enemy)) {
-      this.startCharStompingSequence(char, enemy);
-    } else if (char.isColliding(enemy) && !char.isHurt()) {
-      this.startCharHitSequence(char);
-      enemy.reverseDirection();
-    }
-  }
+    this.checkHorizontalChickenHit(char);
+  };
 
   /**
-   * Bounces Pepe, awards points, plays stomp SFX, and kills the stomped chicken.
+   * Checks whether Pepe is stomping at least one live chicken on the current frame.
    * @param {Character} char - Player character instance.
-   * @param {Chicken} enemy - Stomped chicken enemy.
+   * @returns {boolean} True when any live chicken is being stomped.
+   */
+  hasStompCollision = (char) => {
+    const enemies = this.engine.world.enemies;
+    for (let i = 0; i < enemies.length; i++) {
+      if (!enemies[i].isDead && char.isStomping(enemies[i])) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  /**
+   * Kills all overlapping live chickens on a stomp frame, then bounces Pepe once.
+   * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  startCharStompingSequence(char, enemy) {
+  resolveMultiStomp = (char) => {
+    const enemies = this.engine.world.enemies;
+    for (let i = 0; i < enemies.length; i++) {
+      if (!enemies[i].isDead && char.isColliding(enemies[i])) {
+        enemies[i].die();
+        this.engine.statusBar.score += 500;
+      }
+    }
     char.initGeneralJumpAction();
-    this.engine.statusBar.score += 500;
-    enemy.die();
     playStompSound();
-  }
+  };
+
+  /**
+   * Applies horizontal contact damage and reverses colliding chickens when no stomp occurred.
+   * @param {Character} char - Player character instance.
+   * @returns {void}
+   */
+  checkHorizontalChickenHit = (char) => {
+    const enemies = this.engine.world.enemies;
+    for (let i = 0; i < enemies.length; i++) {
+      if (!enemies[i].isDead && char.isColliding(enemies[i]) && !char.isHurt()) {
+        this.startCharHitSequence(char);
+        enemies[i].reverseDirection();
+      }
+    }
+  };
 
   /**
    * Damages Pepe, triggers hurt animation, and refreshes the HUD health bar.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  startCharHitSequence(char) {
+  startCharHitSequence = (char) => {
     char.hit();
     this.syncPlayerHealthHud(char);
-  }
+  };
 
   /**
    * Collects coins overlapping Pepe's hitbox and plays coin SFX.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  checkCoinCollisions(char) {
+  checkCoinCollisions = (char) => {
     const coins = this.engine.world.coins;
     for (let i = coins.length - 1; i >= 0; i--) {
       if (char.isColliding(coins[i])) {
@@ -214,14 +231,14 @@ class CollisionManager {
         this.engine.refreshFrameObjects();
       }
     }
-  }
+  };
 
   /**
    * Collects ground salsa bottles overlapping Pepe's hitbox and plays pickup SFX.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  checkBottleCollisions(char) {
+  checkBottleCollisions = (char) => {
     const bottles = this.engine.world.bottles;
     for (let i = bottles.length - 1; i >= 0; i--) {
       if (char.isColliding(bottles[i])) {
@@ -231,14 +248,14 @@ class CollisionManager {
         this.engine.refreshFrameObjects();
       }
     }
-  }
+  };
 
   /**
    * Removes splashed bottles older than 400ms from a world collection.
    * @param {string} listKey - World property key for the bottle array.
    * @returns {void}
    */
-  removeExpiredBottles(listKey) {
+  removeExpiredBottles = (listKey) => {
     const source = this.engine.world[listKey];
     const active = [];
     for (let i = 0; i < source.length; i++) {
@@ -250,13 +267,13 @@ class CollisionManager {
       this.engine.world[listKey] = active;
       this.engine.refreshFrameObjects();
     }
-  }
+  };
 
   /**
    * Removes defeated chickens older than 500ms from the world.
    * @returns {void}
    */
-  removeDeadChickens() {
+  removeDeadChickens = () => {
     const enemies = this.engine.world.enemies;
     const active = [];
     for (let i = 0; i < enemies.length; i++) {
@@ -268,18 +285,18 @@ class CollisionManager {
       this.engine.world.enemies = active;
       this.engine.refreshFrameObjects();
     }
-  }
+  };
 
   /**
    * Triggers the victory sequence 1 second after the boss is defeated.
    * @returns {void}
    */
-  removeDeadBoss() {
+  removeDeadBoss = () => {
     const boss = this.engine.world.boss;
     if (boss && boss.isDead && performance.now() - boss.deadTime >= 1000) {
       const winStats = this.engine.combatManager.collectWinStats();
       this.engine.world.boss = null;
       startYouWonFlow(winStats);
     }
-  }
+  };
 }

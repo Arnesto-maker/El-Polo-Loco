@@ -21,6 +21,7 @@ const initMenu = () => {
   bindAudioUnlockListeners();
   currentMenuFrame = 1;
   toggleElement("touch-controls", false);
+  toggleElement("canvas-sound-btn", false);
   toggleElement("start-overlay", true);
   setMenuVisibility(true, false, false, false);
   initPendingSyncOnLoad();
@@ -29,7 +30,7 @@ const initMenu = () => {
 };
 
 /**
- * Starts a fresh game session, displays responsive touch HUD, and starts level music.
+ * Starts a fresh game session, displays touch HUD and sound icon, and starts level music.
  * @returns {void}
  */
 const startNewGame = () => {
@@ -39,6 +40,8 @@ const startNewGame = () => {
   toggleElement("start-overlay", false);
   setMenuVisibility(false, true, false, false);
   toggleElement("touch-controls", true);
+  toggleElement("canvas-sound-btn", true);
+  syncAllSoundControls();
   initGameEngine();
   startBackgroundMusic("level");
   handleOrientationCheck();
@@ -65,6 +68,7 @@ const resetAllGamePopups = () => {
   toggleElement("pause-overlay", false);
   toggleElement("frame-help", false);
   toggleElement("boss-dossier-overlay", false);
+  toggleElement("canvas-sound-btn", false);
   if (appController) {
     appController.resetStates();
   }

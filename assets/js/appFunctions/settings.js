@@ -1,4 +1,5 @@
-
+const SOUND_ICON_ON = "assets/img/sound_icons/sound-on-14606.svg";
+const SOUND_ICON_OFF = "assets/img/sound_icons/sound-off-14613.svg";
 
 const settingsState = {
   soundEnabled: true,
@@ -9,19 +10,27 @@ const settingsState = {
 };
 
 /**
- * Loads the persisted sound preference from localStorage and syncs the Settings UI.
- * @returns {void}
+ * Reads the persisted sound state from localStorage as the single source of truth.
+ * @returns {boolean} True when sound is enabled, false when muted.
  */
-const loadSoundSetting = () => {
+const getStoredSoundSetting = () => {
   try {
     const saved = localStorage.getItem(SOUND_STORAGE_KEY);
     if (saved === "false") {
-      settingsState.soundEnabled = false;
-    } else if (saved === "true") {
-      settingsState.soundEnabled = true;
+      return false;
     }
   } catch (err) {}
-  renderSettingsButtons(settingsState.soundEnabled, settingsState.fullscreenEnabled);
+  return true;
+};
+
+/**
+ * Loads the persisted sound preference from localStorage and syncs all sound controls.
+ * @returns {void}
+ */
+const loadSoundSetting = () => {
+  settingsState.soundEnabled = getStoredSoundSetting();
+  saveSoundSetting(settingsState.soundEnabled);
+  syncAllSoundControls();
 };
 
 /**
@@ -33,6 +42,66 @@ const saveSoundSetting = (isEnabled) => {
   try {
     localStorage.setItem(SOUND_STORAGE_KEY, String(isEnabled));
   } catch (err) {}
+};
+
+/**
+ * Synchronizes both the Settings button and the canvas sound icon with localStorage.
+ * @returns {void}
+ */
+const syncAllSoundControls = () => {
+  const isEnabled = getStoredSoundSetting();
+  settingsState.soundEnabled = isEnabled;
+  renderSettingsButtons(isEnabled, settingsState.fullscreenEnabled);
+  renderCanvasSoundIcon(isEnabled);
+};
+
+/**
+ * Updates the canvas sound overlay button if its DOM elements exist.
+ * @param {boolean} isEnabled - Current persisted sound state.
+ * @returns {void}
+ */
+const renderCanvasSoundIcon = (isEnabled) => {
+  const btn = document.getElementById("canvas-sound-btn");
+  const icon = document.getElementById("canvas-sound-icon");
+  if (!btn || !icon) {
+    return;
+  }
+  applyCanvasSoundAttributes(btn, icon, isEnabled);
+};
+
+/**
+ * Applies SVG source, alt text, and ARIA attributes for the canvas sound toggle.
+ * @param {HTMLElement} btn - Canvas sound toggle button element.
+ * @param {HTMLImageElement} icon - Sound icon image element.
+ * @param {boolean} isEnabled - Current persisted sound state.
+ * @returns {void}
+ */
+const applyCanvasSoundAttributes = (btn, icon, isEnabled) => {
+  if (isEnabled) {
+    icon.setAttribute("src", SOUND_ICON_ON);
+    icon.setAttribute("alt", "Sound on");
+    btn.setAttribute("aria-label", "Mute sound");
+    btn.setAttribute("aria-pressed", "true");
+    return;
+  }
+  icon.setAttribute("src", SOUND_ICON_OFF);
+  icon.setAttribute("alt", "Sound off");
+  btn.setAttribute("aria-label", "Unmute sound");
+  btn.setAttribute("aria-pressed", "false");
+};
+
+/**
+ * Resumes a suspended Web Audio context after a direct user toggle gesture.
+ * @returns {void}
+ */
+const resumeAudioIfSuspended = () => {
+  if (typeof getActiveAudioContext !== "function") {
+    return;
+  }
+  const ctx = getActiveAudioContext();
+  if (ctx && ctx.state === "suspended") {
+    ctx.resume();
+  }
 };
 
 /**
@@ -141,6 +210,7 @@ const openSettingsOverlay = (origin) => {
   settingsState.origin = origin;
   settingsState.isOpen = true;
   syncFullscreenState();
+  syncAllSoundControls();
   toggleElement("settings-overlay", true);
 };
 
@@ -158,15 +228,29 @@ const closeSettingsOverlay = () => {
 };
 
 /**
- * Toggles global sound setting between on and off and persists it locally.
+ * Toggles global sound in localStorage, updates both UI controls, and syncs engine audio.
  * @returns {void}
  */
 const toggleSoundSetting = () => {
   blurActiveElement();
-  settingsState.soundEnabled = !settingsState.soundEnabled;
-  saveSoundSetting(settingsState.soundEnabled);
-  renderSettingsButtons(settingsState.soundEnabled, settingsState.fullscreenEnabled);
+  const nextState = !getStoredSoundSetting();
+  saveSoundSetting(nextState);
+  settingsState.soundEnabled = nextState;
+  resumeAudioIfSuspended();
+  syncAllSoundControls();
   syncMusicWithSoundSetting();
+};
+
+/**
+ * Handles clicks on the canvas sound overlay icon without triggering parent handlers.
+ * @param {Event} event - Click event from the canvas sound button.
+ * @returns {void}
+ */
+const toggleCanvasSoundIcon = (event) => {
+  if (event) {
+    event.stopPropagation();
+  }
+  toggleSoundSetting();
 };
 
 /**
@@ -274,5 +358,5 @@ const lockLandscape = () => {
   }
 };
 
-document.addEventListener("fullscreenchange", syncFullscreenState);
-document.addEventListener("webkitfullscreenchange", syncFullscreenState);
+document.onfullscreenchange = syncFullscreenState;
+document.onwebkitfullscreenchange = syncFullscreenState;
