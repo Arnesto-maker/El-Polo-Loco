@@ -1,4 +1,5 @@
 let appController = null;
+let lastExoticHudKey = "";
 
 /**
  * Ensures the single unified Controller instance exists.
@@ -9,6 +10,177 @@ const ensureAppController = () => {
     appController = new Controller();
   }
   return appController;
+};
+
+/**
+ * Evaluates whether the current viewport matches exotic ultra-flat landscape screens such as 640x320.
+ * @returns {boolean} True only when width <= 740, height <= 350, and orientation is landscape.
+ */
+const isExoticViewport = () => {
+  const isFlatLandscape = window.innerWidth <= 740 && window.innerHeight <= 350;
+  return isFlatLandscape && window.innerWidth > window.innerHeight;
+};
+
+/**
+ * Evaluates whether the active viewport is a standard touch device outside the exotic 640x320 tier.
+ * @returns {boolean} True for normal touch viewports (<= 1366px or coarse pointer) excluding exotic mode.
+ */
+const isNormalTouchViewport = () => {
+  if (isExoticViewport()) {
+    return false;
+  }
+  const isCoarse = Boolean(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  return window.innerWidth <= 1366 || isCoarse;
+};
+
+/**
+ * Resets exotic gameplay layout classes and hides the exotic CSS HUD overlay.
+ * @returns {void}
+ */
+const resetExoticGameHud = () => {
+  lastExoticHudKey = "";
+  toggleElement("exotic-hud", false);
+  const container = document.getElementById("game-container");
+  if (container) {
+    container.classList.remove("exotic-gameplay");
+    container.classList.remove("exotic-boss-mode");
+  }
+};
+
+/**
+ * Clears exotic HUD classes only when leaving the exotic viewport tier.
+ * @returns {void}
+ */
+const resetExoticIfNeeded = () => {
+  if (lastExoticHudKey !== "") {
+    resetExoticGameHud();
+  }
+};
+
+/**
+ * Synchronizes the exotic CSS HUD and Frame 1 / Frame 2 container modes with live StatusBar state.
+ * @param {StatusBar} bar - Active gameplay StatusBar instance.
+ * @returns {void}
+ */
+const syncExoticGameHud = (bar) => {
+  if (!isExoticViewport()) {
+    resetExoticIfNeeded();
+    return;
+  }
+  const key = buildExoticHudKey(bar);
+  if (key === lastExoticHudKey) {
+    return;
+  }
+  lastExoticHudKey = key;
+  applyExoticHudState(bar);
+};
+
+/**
+ * Applies container mode classes and renders both standard and boss exotic HUD readouts.
+ * @param {StatusBar} bar - Active gameplay StatusBar instance.
+ * @returns {void}
+ */
+const applyExoticHudState = (bar) => {
+  syncExoticContainerClasses(bar.showBossHud);
+  renderExoticStandardHud(bar);
+  renderExoticBossHud(bar);
+};
+
+/**
+ * Builds a deterministic state signature to prevent redundant DOM writes on unchanged frames.
+ * @param {StatusBar} bar - Active gameplay StatusBar instance.
+ * @returns {string} Serialized HUD state key.
+ */
+const buildExoticHudKey = (bar) => {
+  const timeStr = bar.bossHud.formatBossTime();
+  return [
+    bar.health, bar.bottleCount, bar.coinCount, bar.score,
+    bar.showBossHud, bar.bossHealth, bar.bossArmour, bar.bossBonus, timeStr,
+  ].join("|");
+};
+
+/**
+ * Applies Frame 1 (earth-dock) or Frame 2 (full-canvas boss) layout classes on the game container.
+ * @param {boolean} isBoss - True when Endboss fight is active.
+ * @returns {void}
+ */
+const syncExoticContainerClasses = (isBoss) => {
+  toggleElement("exotic-hud", true);
+  const container = document.getElementById("game-container");
+  if (!container) {
+    return;
+  }
+  container.classList.add("exotic-gameplay");
+  container.classList.toggle("exotic-boss-mode", Boolean(isBoss));
+};
+
+/**
+ * Updates player health sprite, inventory counts, score, and coin-buy badge in the exotic HUD.
+ * @param {StatusBar} bar - Active gameplay StatusBar instance.
+ * @returns {void}
+ */
+const renderExoticStandardHud = (bar) => {
+  const healthSrc = bar.IMAGES_HEALTH[bar.setHealthIndex(bar.health)];
+  setExoticImageSrc("exotic-health-img", healthSrc);
+  setExoticText("exotic-bottle-count", bar.formatCount(bar.bottleCount));
+  setExoticText("exotic-coin-count", bar.formatCount(bar.coinCount));
+  setExoticText("exotic-score", "Score: " + bar.score);
+  toggleElement("exotic-buy-hint", bar.coinCount >= 2);
+};
+
+/**
+ * Toggles boss-specific exotic HUD groups and refreshes boss values during boss fights.
+ * @param {StatusBar} bar - Active gameplay StatusBar instance.
+ * @returns {void}
+ */
+const renderExoticBossHud = (bar) => {
+  toggleElement("exotic-boss-top", bar.showBossHud);
+  toggleElement("exotic-boss-sub", bar.showBossHud);
+  if (bar.showBossHud) {
+    updateExoticBossDetails(bar);
+  }
+};
+
+/**
+ * Updates boss health sprite, timer, decaying bonus, armor count, and warning text in the exotic HUD.
+ * @param {StatusBar} bar - Active gameplay StatusBar instance.
+ * @returns {void}
+ */
+const updateExoticBossDetails = (bar) => {
+  const bossSrc = bar.IMAGES_BOSS_HEALTH[bar.setHealthIndex(bar.bossHealth)];
+  const hasArmour = bar.bossArmour > 0;
+  setExoticImageSrc("exotic-boss-health-img", bossSrc);
+  setExoticText("exotic-boss-time", bar.bossHud.formatBossTime());
+  setExoticText("exotic-boss-bonus", "+ " + bar.bossBonus);
+  setExoticText("exotic-boss-armour", "+" + bar.bossArmour + " Armour");
+  toggleElement("exotic-boss-armour", hasArmour);
+  toggleElement("exotic-boss-armour-warn", hasArmour);
+};
+
+/**
+ * Safely writes plain text to an exotic HUD DOM element by id.
+ * @param {string} id - Target element id.
+ * @param {string} text - Plain text value.
+ * @returns {void}
+ */
+const setExoticText = (id, text) => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.innerText = text;
+  }
+};
+
+/**
+ * Safely updates the image source attribute of an exotic HUD sprite element.
+ * @param {string} id - Target image element id.
+ * @param {string} src - Asset path string.
+ * @returns {void}
+ */
+const setExoticImageSrc = (id, src) => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.setAttribute("src", src);
+  }
 };
 
 /**
@@ -65,6 +237,7 @@ const initGameEngine = () => {
 const resetAllGamePopups = () => {
   stopBackgroundMusic();
   resetSettingsOverlay();
+  resetExoticGameHud();
   toggleElement("pause-overlay", false);
   toggleElement("frame-help", false);
   toggleElement("boss-dossier-overlay", false);

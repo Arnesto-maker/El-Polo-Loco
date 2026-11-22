@@ -26,7 +26,7 @@ class GameEngine {
    * Initializes loop flags and seconds-based delta timing state.
    * @returns {void}
    */
-  initLoopState() {
+  initLoopState = () => {
     this.lastBossTick = 0;
     this.isPaused = false;
     this.isRunning = true;
@@ -34,55 +34,55 @@ class GameEngine {
     this.lastFrameTime = 0;
     this.dtSec = 1 / 60;
     this.frameScale = 1;
-  }
+  };
 
   /**
    * Instantiates all in-game popup controllers.
    * @returns {void}
    */
-  initPopups() {
+  initPopups = () => {
     this.startHelp = new StartHelpPopup(this);
     this.bossDossier = new BossDossierPopup(this);
     this.coinConverter = new CoinConverter(this.statusBar, this);
     this.pausePopup = new PausePopup(this);
-  }
+  };
 
   /**
    * Rebuilds the cached render list from the World instance.
    * @returns {void}
    */
-  refreshFrameObjects() {
+  refreshFrameObjects = () => {
     this.frameObjects = this.world.getFramePackages();
-  }
+  };
 
   /**
    * Pauses simulation and clears held input flags when portrait Sperrframe activates.
    * @returns {void}
    */
-  pauseForLandscapeLock() {
+  pauseForLandscapeLock = () => {
     this.isPaused = true;
     this.lastFrameTime = 0;
     this.controller.resetStates();
-  }
+  };
 
   /**
    * Keeps simulation paused and triggers the Pause Popup when returning to landscape.
    * @returns {void}
    */
-  resumeAfterLandscapeLock() {
+  resumeAfterLandscapeLock = () => {
     this.isPaused = true;
     this.lastFrameTime = 0;
     if (this.pausePopup) {
       this.pausePopup.openPauseFromLandscapeLock();
     }
-  }
+  };
 
   /**
    * Routes discrete control keys from Controller to the highest-priority open popup.
    * @param {string} key - Logical key name (Tab, Enter, b, ArrowLeft, ArrowRight).
    * @returns {void}
    */
-  routePopupKeyDown(key) {
+  routePopupKeyDown = (key) => {
     if (!this.isRunning) {
       return;
     }
@@ -95,36 +95,34 @@ class GameEngine {
     } else {
       this.coinConverter.handleKeyDown(key);
     }
-  }
+  };
 
   /**
    * Executes one display frame with clamped seconds-based dt scaling.
    * @param {number} timestamp - High-resolution timestamp from requestAnimationFrame.
    * @returns {void}
    */
-  renderLoop(timestamp) {
+  renderLoop = (timestamp) => {
     if (!this.isRunning || !this.world) {
       return;
     }
     this.updateDeltaSeconds(timestamp || performance.now());
-    const char = this.world.character;
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     if (!this.isPaused && !isLandscapeLocked()) {
-      this.stepSimulation(char);
-      if (!this.isRunning) {
-        return;
-      }
+      this.stepSimulation(this.world.character);
     }
-    this.drawScene(char);
-    this.animationFrameId = requestAnimationFrame((ts) => this.renderLoop(ts));
-  }
+    if (this.isRunning) {
+      this.drawScene(this.world.character);
+      this.animationFrameId = requestAnimationFrame((ts) => this.renderLoop(ts));
+    }
+  };
 
   /**
    * Calculates frame delta in seconds (clamped to 0.05s) and normalizes to a 60-FPS scale.
    * @param {number} now - Current timestamp in milliseconds.
    * @returns {void}
    */
-  updateDeltaSeconds(now) {
+  updateDeltaSeconds = (now) => {
     if (this.lastFrameTime === 0) {
       this.lastFrameTime = now;
     }
@@ -132,49 +130,60 @@ class GameEngine {
     this.lastFrameTime = now;
     this.dtSec = Math.max(0, Math.min(rawSec, 0.05));
     this.frameScale = this.dtSec * 60;
-  }
+  };
 
   /**
    * Advances one normalized simulation frame for logic, entities, and collisions.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  stepSimulation(char) {
+  stepSimulation = (char) => {
     this.updateLogic(char);
     if (this.isRunning) {
       this.collisionManager.checkAllCollisions(char);
     }
-  }
+  };
 
   /**
-   * Renders world sprites, HUD overlay, and canvas popups.
+   * Renders world sprites, HUD overlay, coin converter, and notifies exotic HUD bridge.
    * @param {Character} char - Player character for camera translation.
    * @returns {void}
    */
-  drawScene(char) {
+  drawScene = (char) => {
     this.drawWorldWithCamera(char);
     this.statusBar.draw(this.ctx);
     this.coinConverter.draw(this.ctx);
-  }
+    this.notifyExoticHud();
+  };
 
-/**
+  /**
+   * Delegates exotic ultra-compact viewport HUD sync to the UI layer without DOM access.
+   * @returns {void}
+   */
+  notifyExoticHud = () => {
+    if (typeof syncExoticGameHud === "function") {
+      syncExoticGameHud(this.statusBar);
+    }
+  };
+
+  /**
    * Translates canvas context by integer-rounded camera offset, draws all entities, and restores offset.
    * @param {Character} char - Player character holding cameraX.
    * @returns {void}
    */
-  drawWorldWithCamera(char) {
+  drawWorldWithCamera = (char) => {
     const camX = Math.round(char.cameraX);
     this.ctx.translate(camX, 0);
     this.drawFrame();
     this.ctx.translate(-camX, 0);
-  }
+  };
 
   /**
    * Advances combat, entity updates, object cleanup, and checks game-over condition.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  updateLogic(char) {
+  updateLogic = (char) => {
     if (!char.isDead() && !char.isHurtAnimationActive()) {
       this.combatManager.updateThrowWorkflow(char);
     }
@@ -186,37 +195,37 @@ class GameEngine {
     if (char.isReadyForGameOver) {
       this.triggerGameOverFlow();
     }
-  }
+  };
 
   /**
    * Invokes the dt-scaled update method on every active frame object.
    * @returns {void}
    */
-  updateAllFrameObjects() {
+  updateAllFrameObjects = () => {
     for (let i = 0; i < this.frameObjects.length; i++) {
       if (this.frameObjects[i].update) {
         this.frameObjects[i].update(this.controller, this.frameScale);
       }
     }
-  }
+  };
 
   /**
    * Draws every entity in the current Z-ordered frame array.
    * @returns {void}
    */
-  drawFrame() {
+  drawFrame = () => {
     for (let i = 0; i < this.frameObjects.length; i++) {
       if (this.frameObjects[i].draw) {
         this.frameObjects[i].draw(this.ctx);
       }
     }
-  }
+  };
 
   /**
    * Transitions the application into the Game Over screen.
    * @returns {void}
    */
-  triggerGameOverFlow() {
+  triggerGameOverFlow = () => {
     showGameOverFrame();
-  }
+  };
 }
