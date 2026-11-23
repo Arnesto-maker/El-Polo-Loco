@@ -1,5 +1,5 @@
 /**
- * Playable hero Pepe handling dt-scaled movement, jumping, throwing, dynamic camera follow, and idle sprites.
+ * Playable hero Pepe handling dt-scaled movement, edge-triggered jumping, throwing, dynamic camera follow, and idle sprites.
  */
 class Character extends CharacterHealth {
   vXChar = 7;
@@ -7,6 +7,7 @@ class Character extends CharacterHealth {
   isMoving = false;
   isThrowing = false;
   readyToSpawnBottle = false;
+  spaceWasHeld = false;
   idleTimer = 0;
   idleStage = 0;
   cameraX = 0;
@@ -216,17 +217,19 @@ class Character extends CharacterHealth {
   };
 
   /**
-   * Initiates a jump on Space when unlocked and applies airborne gravity.
+   * Initiates a single edge-triggered jump on fresh Space press and applies airborne gravity.
    * @param {Controller} controller - Active input controller.
    * @param {boolean} isLocked - Whether controls are temporarily locked.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
   jump = (controller, isLocked, scale = 1) => {
-    if (!isLocked && controller.space && !this.isJumping) {
+    const isFreshSpace = controller.space && !this.spaceWasHeld;
+    if (!isLocked && isFreshSpace && !this.isJumping) {
       this.initGeneralJumpAction(-25);
       playJumpSound();
     }
+    this.spaceWasHeld = Boolean(controller.space);
     if (this.isJumping || (isLocked && this.isAboveGround())) {
       this.setJumpingSequence(scale);
     }

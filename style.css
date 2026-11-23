@@ -11,6 +11,8 @@
   padding: 0;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -39,6 +41,7 @@ body {
 input {
   user-select: text;
   -webkit-user-select: text;
+  -webkit-touch-callout: default;
 }
 
 .skip-link {
@@ -123,7 +126,6 @@ a:focus-visible,
   transition: transform 0.12s ease;
 }
 
-.canvas-sound-btn:hover,
 .canvas-sound-btn:active {
   transform: scale(1.12);
 }
@@ -488,6 +490,7 @@ a:focus-visible,
   font-weight: bold;
   color: #000000;
   cursor: pointer;
+  touch-action: manipulation;
   font-family: "PolloFont", Arial, sans-serif;
 }
 
@@ -498,10 +501,20 @@ a:focus-visible,
   font-size: clamp(16px, min(2dvw, 3.8dvh), 26px);
 }
 
-.menu-btn:hover,
 .menu-btn:active {
   background-color: #d32f2f;
   color: #ffffff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .canvas-sound-btn:hover {
+    transform: scale(1.12);
+  }
+
+  .menu-btn:hover {
+    background-color: #d32f2f;
+    color: #ffffff;
+  }
 }
 
 .settings-box {
@@ -561,6 +574,7 @@ a:focus-visible,
   font-size: clamp(16px, 2.6dvh, 24px);
   font-weight: bold;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .settings-toggle-btn.is-off {

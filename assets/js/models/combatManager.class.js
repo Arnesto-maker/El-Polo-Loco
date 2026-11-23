@@ -1,5 +1,5 @@
 /**
- * Coordinates player bottle throws, boss fight activation, economy soft-lock checks, music, and boss salvos.
+ * Coordinates edge-triggered bottle throws, boss fight activation, economy soft-lock checks, music, and boss salvos.
  */
 class CombatManager {
   /**
@@ -8,17 +8,20 @@ class CombatManager {
    */
   constructor(engine) {
     this.engine = engine;
+    this.enterWasHeld = false;
   }
 
   /**
-   * Starts throw animation on Enter press and spawns the bottle projectile when ready.
+   * Starts a single edge-triggered throw on fresh Enter press and spawns the bottle when ready.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
   updateThrowWorkflow = (char) => {
-    if (this.engine.controller.enter && this.engine.statusBar.bottleCount > 0) {
+    const isFreshEnter = this.engine.controller.enter && !this.enterWasHeld;
+    if (isFreshEnter && this.engine.statusBar.bottleCount > 0) {
       char.startThrowSequence();
     }
+    this.enterWasHeld = Boolean(this.engine.controller.enter);
     if (char.readyToSpawnBottle) {
       this.initBottleThrow(char);
     }
