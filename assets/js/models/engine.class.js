@@ -3,7 +3,7 @@
  */
 class GameEngine {
   /**
-   * Initializes canvas context, managers, HUD, popups, and starts the dt loop.
+   * Initializes canvas context, design reference, managers, HUD, popups, and starts the dt loop.
    * @param {HTMLCanvasElement} canvasElement - The game canvas.
    * @param {Controller} inputController - Unified input controller instance.
    * @param {Array<Object>} gameFrames - Initial Z-ordered render objects.
@@ -12,9 +12,10 @@ class GameEngine {
   constructor(canvasElement, inputController, gameFrames, world) {
     this.world = world;
     this.ctx = canvasElement.getContext("2d");
+    this.designCanvas = { width: 2048, height: 1280 };
     this.controller = inputController;
     this.frameObjects = gameFrames;
-    this.statusBar = new StatusBar(canvasElement);
+    this.statusBar = new StatusBar(this.designCanvas);
     this.combatManager = new CombatManager(this);
     this.collisionManager = new CollisionManager(this);
     this.initLoopState();
@@ -78,14 +79,11 @@ class GameEngine {
   };
 
   /**
-   * Routes discrete control keys from Controller to the highest-priority open popup.
+   * Dispatches a discrete key to whichever popup currently owns input focus.
    * @param {string} key - Logical key name (Tab, Enter, b, ArrowLeft, ArrowRight).
    * @returns {void}
    */
-  routePopupKeyDown = (key) => {
-    if (!this.isRunning) {
-      return;
-    }
+  dispatchPopupKey = (key) => {
     if (this.startHelp.isOpen) {
       this.startHelp.handleKeyDown(key);
     } else if (this.bossDossier.isOpen) {
@@ -98,6 +96,18 @@ class GameEngine {
   };
 
   /**
+   * Routes discrete control keys from Controller to the highest-priority open popup.
+   * @param {string} key - Logical key name (Tab, Enter, b, ArrowLeft, ArrowRight).
+   * @returns {void}
+   */
+  routePopupKeyDown = (key) => {
+    if (!this.isRunning) {
+      return;
+    }
+    this.dispatchPopupKey(key);
+  };
+
+  /**
    * Executes one display frame with clamped seconds-based dt scaling.
    * @param {number} timestamp - High-resolution timestamp from requestAnimationFrame.
    * @returns {void}
@@ -107,14 +117,22 @@ class GameEngine {
       return;
     }
     this.updateDeltaSeconds(timestamp || performance.now());
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     if (!this.isPaused && !isLandscapeLocked()) {
       this.stepSimulation(this.world.character);
     }
-    if (this.isRunning) {
-      this.drawScene(this.world.character);
-      this.animationFrameId = requestAnimationFrame((ts) => this.renderLoop(ts));
+    this.finishRenderFrame();
+  };
+
+  /**
+   * Draws the active frame and schedules the next animation frame when running.
+   * @returns {void}
+   */
+  finishRenderFrame = () => {
+    if (!this.isRunning) {
+      return;
     }
+    this.drawScene(this.world.character);
+    this.animationFrameId = requestAnimationFrame((ts) => this.renderLoop(ts));
   };
 
   /**
@@ -145,15 +163,17 @@ class GameEngine {
   };
 
   /**
-   * Renders world sprites, HUD overlay, coin converter, and notifies exotic HUD bridge.
+   * Syncs HUD bridge and viewport aspect ratio, clears buffer, and renders world, HUD, and popups.
    * @param {Character} char - Player character for camera translation.
    * @returns {void}
    */
   drawScene = (char) => {
+    this.notifyExoticHud();
+    this.syncViewportCanvas();
+    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.drawWorldWithCamera(char);
     this.statusBar.draw(this.ctx);
     this.coinConverter.draw(this.ctx);
-    this.notifyExoticHud();
   };
 
   /**
@@ -167,11 +187,22 @@ class GameEngine {
   };
 
   /**
-   * Translates canvas context by integer-rounded camera offset, draws all entities, and restores offset.
+   * Delegates dynamic canvas aspect-ratio width sync to the UI layer without DOM access.
+   * @returns {void}
+   */
+  syncViewportCanvas = () => {
+    if (typeof syncGameCanvasResolution === "function") {
+      syncGameCanvasResolution();
+    }
+  };
+
+  /**
+   * Syncs dynamic camera width, translates context by rounded offset, draws entities, and restores offset.
    * @param {Character} char - Player character holding cameraX.
    * @returns {void}
    */
   drawWorldWithCamera = (char) => {
+    char.updateCameraControl(this.ctx.canvas.width);
     const camX = Math.round(char.cameraX);
     this.ctx.translate(camX, 0);
     this.drawFrame();

@@ -13,6 +13,45 @@ const ensureAppController = () => {
 };
 
 /**
+ * Returns the fixed 16:10 design reference dimensions used by all gameplay entities.
+ * @returns {{width: number, height: number}} Fixed logical design reference.
+ */
+const createDesignCanvasRef = () => {
+  return { width: 2048, height: 1280 };
+};
+
+/**
+ * Computes the distortion-free logical canvas width for the current CSS aspect ratio.
+ * @param {HTMLCanvasElement} canvas - The game canvas element.
+ * @returns {number} Target logical width at fixed 1280px height, or 0 if hidden.
+ */
+const getTargetCanvasWidth = (canvas) => {
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) {
+    return 0;
+  }
+  return Math.round(1280 * (rect.width / rect.height));
+};
+
+/**
+ * Synchronizes the canvas logical width to its rendered CSS aspect ratio at fixed 1280px height.
+ * @returns {void}
+ */
+const syncGameCanvasResolution = () => {
+  const canvas = document.getElementById("gameCanvas");
+  if (!canvas) {
+    return;
+  }
+  const targetWidth = getTargetCanvasWidth(canvas);
+  if (targetWidth > 0 && canvas.width !== targetWidth) {
+    canvas.width = targetWidth;
+  }
+  if (canvas.height !== 1280) {
+    canvas.height = 1280;
+  }
+};
+
+/**
  * Evaluates whether the current viewport matches exotic ultra-flat landscape screens such as 640x320.
  * @returns {boolean} True only when width <= 740, height <= 350, and orientation is landscape.
  */
@@ -220,12 +259,13 @@ const startNewGame = () => {
 };
 
 /**
- * Creates World and GameEngine using the single unified Controller instance.
+ * Creates World with fixed design dimensions and starts GameEngine synced to the live viewport aspect ratio.
  * @returns {void}
  */
 const initGameEngine = () => {
   const canvas = document.getElementById("gameCanvas");
-  const world = new World(canvas);
+  syncGameCanvasResolution();
+  const world = new World(createDesignCanvasRef());
   const controller = ensureAppController();
   window.gameEngine = new GameEngine(canvas, controller, world.getFramePackages(), world);
 };

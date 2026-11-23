@@ -52,7 +52,7 @@ class CombatManager {
   };
 
   /**
-   * Adds a new ThrowableBottle projectile to the world and updates render frames.
+   * Adds a new ThrowableBottle projectile using fixed design dimensions and refreshes render frames.
    * @param {number} startX - Launch X coordinate.
    * @param {number} startY - Launch Y coordinate.
    * @param {boolean} otherDirection - True if thrown left.
@@ -60,7 +60,7 @@ class CombatManager {
    * @returns {void}
    */
   spawnThrownBottle = (startX, startY, otherDirection, yMax) => {
-    const bottle = new ThrowableBottle(this.engine.ctx.canvas, startX, startY, otherDirection, yMax);
+    const bottle = new ThrowableBottle(this.engine.designCanvas, startX, startY, otherDirection, yMax);
     this.engine.world.throwableBottles.push(bottle);
     this.engine.refreshFrameObjects();
   };
@@ -175,7 +175,7 @@ class CombatManager {
   };
 
   /**
-   * Spawns a 6-bottle radial volley from the Endboss.
+   * Spawns a 6-bottle radial volley from the Endboss using fixed design dimensions.
    * @param {Boss} boss - Endboss instance.
    * @returns {void}
    */
@@ -184,7 +184,7 @@ class CombatManager {
     const startX = boss.x + boss.width * 0.4;
     const startY = boss.y + boss.height * 0.1;
     for (let i = 0; i < velocitiesX.length; i++) {
-      const bottle = new BossBottle(this.engine.ctx.canvas, startX, startY, velocitiesX[i], -21);
+      const bottle = new BossBottle(this.engine.designCanvas, startX, startY, velocitiesX[i], -21);
       this.engine.world.bossBottles.push(bottle);
     }
     this.engine.refreshFrameObjects();

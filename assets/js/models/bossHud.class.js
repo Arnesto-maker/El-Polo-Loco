@@ -27,12 +27,21 @@ class BossHud {
   };
 
   /**
+   * Computes the right-anchored X coordinate of the boss health bar for any dynamic canvas width.
+   * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
+   * @returns {number} Logical X coordinate for the boss health bar.
+   */
+  getBossBarX = (ctx) => {
+    return ctx.canvas.width - this.bar.width - this.bar.x * 2;
+  };
+
+  /**
    * Draws the boss health bar graphic in the upper-right area.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @returns {void}
    */
   drawBossHealthBar = (ctx) => {
-    const bossBarX = this.bar.canvasWidth * 0.78;
+    const bossBarX = this.getBossBarX(ctx);
     ctx.drawImage(this.bar.bossImg, bossBarX, this.bar.y + 20, this.bar.width, this.bar.height);
   };
 
@@ -46,7 +55,7 @@ class BossHud {
       return;
     }
     const armourText = "+" + this.bar.bossArmour + " Armour";
-    const armourX = this.bar.canvasWidth * 0.78;
+    const armourX = this.getBossBarX(ctx);
     const armourY = this.bar.y + this.bar.height + this.bar.canvasHeight * 0.035;
     ctx.strokeText(armourText, armourX, armourY);
     ctx.fillText(armourText, armourX, armourY);
@@ -60,7 +69,7 @@ class BossHud {
   drawBossJumpThrowHint = (ctx) => {
     const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.07;
     const fontSize = this.bar.getScaledFontSize(0.019, pulse);
-    const hintX = this.bar.canvasWidth * 0.98;
+    const hintX = ctx.canvas.width - this.bar.x * 2;
     const hintY = this.bar.y + this.bar.height + this.bar.canvasHeight * 0.068;
     const text = "Use Jump Throw to deal more damage";
     ctx.save();
@@ -94,7 +103,7 @@ class BossHud {
       return;
     }
     const fontSize = this.bar.getScaledFontSize(0.018);
-    const hintX = this.bar.canvasWidth * 0.98;
+    const hintX = ctx.canvas.width - this.bar.x * 2;
     const hintY = this.bar.y + this.bar.height + this.bar.canvasHeight * 0.1;
     const text = "Armour activated! Break armour to reduce health";
     ctx.save();
@@ -115,16 +124,19 @@ class BossHud {
   };
 
   /**
-   * Draws the elapsed boss fight timer centered near the top.
+   * Draws the elapsed boss fight timer centered near the top of the live viewport.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @returns {void}
    */
   drawBossTimerGroup = (ctx) => {
     const timeText = this.formatBossTime();
-    const timeX = this.bar.canvasWidth * 0.45;
+    const timeX = ctx.canvas.width / 2;
     const timeY = this.bar.y + this.bar.height * 0.55;
+    ctx.save();
+    ctx.textAlign = "center";
     ctx.strokeText(timeText, timeX, timeY);
     ctx.fillText(timeText, timeX, timeY);
+    ctx.restore();
   };
 
   /**
