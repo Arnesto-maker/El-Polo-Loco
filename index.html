@@ -25,10 +25,16 @@
     <meta name="twitter:title" content="El Pollo Loco – Tactical Edition" />
     <meta name="twitter:description" content="Tactical 2D action game engineered with Pure JS and the strict Arnesto Classic Architecture." />
     <meta name="twitter:image" content="assets/img/9_intro_outro_screens/start/startscreen_1.png" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style/main-css-style.css">
+    <link rel="stylesheet" href="style/menu-start-style.css" />
+    <link rel="stylesheet" href="style/modals-overlays-style.css" />
+    <link rel="stylesheet" href="style/help-controls-style.css" />
+    <link rel="stylesheet" href="style/endscreen-win-style.css" />
+    <link rel="stylesheet" href="style/highscore-form-style.css" />
+    <link rel="stylesheet" href="style/exotic-responsive-style.css" />
     <link rel="icon" type="image/png" href="assets/img/7_statusbars/3_icons/icon_salsa_bottle.png" />
   </head>
-  <body onload="initMenu()" onresize="handleOrientationCheck()">
+  <body onload="initMenu()">
     <a href="#game-container" class="skip-link">Skip to game</a>
     <main id="game-container">
       <canvas id="gameCanvas" width="2048" height="1280"></canvas>

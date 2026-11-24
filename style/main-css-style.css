@@ -1,0 +1,268 @@
+@font-face {
+  font-family: "PolloFont";
+  src: url("../assets/fonts/Sancreek/Sancreek-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px;
+}
+
+html,
+body {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100dvw;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  background-color: #000000;
+  font-family: "PolloFont", Arial, sans-serif;
+  font-size: 1rem;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+input {
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: default;
+}
+
+.skip-link {
+  position: fixed;
+  top: -120px;
+  left: 16px;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 18px;
+  background-color: #000000;
+  color: #ffffff;
+  border: 3px solid #ffeb3b;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 16px;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible,
+[onclick]:focus-visible {
+  outline: 3px solid #000000;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px #ffeb3b;
+}
+
+#game-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100dvw;
+  height: 100dvh;
+  background-color: #000000;
+  overflow: hidden;
+  touch-action: none;
+}
+
+#game-container:fullscreen,
+#game-container:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+}
+
+#gameCanvas {
+  display: flex;
+  width: 100dvw;
+  height: 100dvh;
+}
+
+.canvas-sound-btn {
+  position: absolute;
+  top: clamp(6px, 1.5dvh, 16px);
+  left: clamp(8px, 1.2dvw, 22px);
+  z-index: 15;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  width: clamp(44px, 6.5dvh, 56px);
+  height: clamp(44px, 6.5dvh, 56px);
+  padding: 4px;
+  background-color: transparent;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  transition: transform 0.12s ease;
+}
+
+.canvas-sound-btn:active {
+  transform: scale(1.12);
+}
+
+.canvas-sound-icon {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.exotic-hud {
+  display: none;
+}
+
+.touch-controls {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  display: none;
+  pointer-events: none;
+}
+
+.touch-btn-group {
+  display: flex;
+  pointer-events: none;
+}
+
+@media (max-width: 1366px), (pointer: coarse) {
+  .touch-controls:not(.d-none) {
+    display: flex;
+  }
+}
+
+.touch-slider-wrap {
+  position: absolute;
+  left: clamp(16px, 5dvw, 48px);
+  bottom: clamp(10px, 3dvh, 28px);
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 1dvw, 14px);
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.touch-slider-wrap * {
+  touch-action: none;
+}
+
+.slider-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(18px, 4.5dvh, 34px);
+  color: rgba(255, 82, 82, 0.75);
+  transition: transform 0.08s ease, color 0.08s ease, text-shadow 0.08s ease;
+}
+
+.slider-arrow.is-active {
+  color: #ff1744;
+  text-shadow: 0 0 14px #ff1744, 0 0 26px rgba(255, 23, 68, 0.9);
+  transform: scale(1.22);
+}
+
+.slider-track {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: clamp(120px, 20dvw, 220px);
+  height: clamp(44px, 10dvh, 66px);
+  background-color: rgba(20, 20, 20, 0.55);
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 36px;
+}
+
+.slider-knob {
+  width: clamp(34px, 8dvh, 54px);
+  height: clamp(34px, 8dvh, 54px);
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.38);
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  transition: background-color 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease;
+}
+
+.slider-knob.is-active {
+  background-color: rgba(255, 23, 68, 0.7);
+  border-color: #ff1744;
+  box-shadow: 0 0 18px 4px rgba(255, 23, 68, 0.85);
+}
+
+.touch-btn {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: clamp(58px, 12dvh, 78px);
+  height: clamp(58px, 12dvh, 78px);
+  border-radius: 50%;
+  background-color: rgba(20, 20, 20, 0.58);
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  font-size: clamp(16px, 2.5dvh, 18px);
+  font-weight: bold;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.touch-btn.is-active {
+  background-color: rgba(255, 23, 68, 0.72);
+  border-color: #ff1744;
+  box-shadow: 0 0 18px 4px rgba(255, 23, 68, 0.85);
+  color: #ffffff;
+}
+
+.touch-btn-tab {
+  left: 44dvw;
+  bottom: clamp(10px, 3dvh, 28px);
+}
+
+.touch-btn-b {
+  right: 28dvw;
+  bottom: clamp(10px, 3dvh, 28px);
+  color: #ffeb3b;
+}
+
+.touch-btn-space {
+  right: 16dvw;
+  bottom: clamp(10px, 3dvh, 28px);
+  color: #69f0ae;
+}
+
+.touch-btn-enter {
+  right: 4dvw;
+  bottom: clamp(56px, 14dvh, 120px);
+  color: #90caf9;
+}

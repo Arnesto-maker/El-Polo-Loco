@@ -223,6 +223,15 @@ const setExoticImageSrc = (id, src) => {
 };
 
 /**
+ * Binds the global window resize handler once scripts are loaded and runs an initial orientation check.
+ * @returns {void}
+ */
+const bindOrientationResize = () => {
+  window.onresize = handleOrientationCheck;
+  handleOrientationCheck();
+};
+
+/**
  * Initializes the application on body load, restoring sound settings, menu, music, and orientation lock.
  * @returns {void}
  */
@@ -237,7 +246,7 @@ const initMenu = () => {
   setMenuVisibility(true, false, false, false);
   initPendingSyncOnLoad();
   startBackgroundMusic("menu");
-  handleOrientationCheck();
+  bindOrientationResize();
 };
 
 /**

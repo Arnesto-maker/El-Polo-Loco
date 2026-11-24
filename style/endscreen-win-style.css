@@ -1,0 +1,201 @@
+.game-over-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(10px, 2dvh, 24px);
+  width: 100%;
+  height: 100%;
+  padding: clamp(12px, 2dvh, 24px) clamp(12px, 4dvw, 40px);
+  background-image: url("../assets/img/5_background/first_half_background.png");
+  background-size: cover;
+  background-position: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  cursor: pointer;
+}
+
+.game-over-bild-02 {
+  display: flex;
+  max-width: 75%;
+  max-height: 55dvh;
+  object-fit: contain;
+}
+
+.game-over-hint {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(4px, 0.6dvh, 10px);
+  max-width: 90dvw;
+  padding: clamp(10px, 1.4dvh, 18px) clamp(14px, 2.8dvw, 32px);
+  background-color: rgba(238, 138, 69, 0.92);
+  border: 3px solid #000000;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.game-over-hint-line {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: clamp(16px, 2.4dvh, 24px);
+  font-weight: bold;
+  line-height: 1.3;
+  color: #111111;
+  text-align: center;
+}
+
+.game-over-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(16px, 2.5dvw, 32px);
+  font-weight: bold;
+  color: #111111;
+  text-align: center;
+  animation: gameOverBlink 1.2s infinite ease-in-out;
+}
+
+@keyframes gameOverBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.you-won-frame {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 30;
+  padding: clamp(10px, 2dvh, 20px);
+  background-image: url("../assets/img/5_background/first_half_background.png");
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+}
+
+.you-won-bild {
+  display: flex;
+  max-width: 75%;
+  max-height: 70dvh;
+  object-fit: contain;
+}
+
+.win-overlay-frame {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 35;
+  padding: clamp(10px, 2dvh, 20px);
+  background-image: url("../assets/img/5_background/first_half_background.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.win-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(10px, 1.8dvh, 20px);
+  max-width: 94dvw;
+  max-height: 92dvh;
+  padding: clamp(16px, 4dvh, 38px) clamp(16px, 5dvw, 48px);
+  border: 3px solid #1a237e;
+  background-color: #ee9b4b;
+  border-radius: 10px;
+  color: #111111;
+  overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: pan-y;
+}
+
+.win-title {
+  display: flex;
+  font-size: clamp(20px, 4dvh, 42px);
+  margin: 0;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(8px, 2dvw, 20px);
+  width: 100%;
+  font-size: clamp(16px, 2.6dvh, 26px);
+}
+
+.summary-icon {
+  display: flex;
+  height: clamp(28px, 4dvh, 44px);
+  width: auto;
+  object-fit: contain;
+}
+
+.summary-total {
+  font-weight: bold;
+  border-top: 2px solid #111111;
+  padding-top: clamp(6px, 1dvh, 12px);
+}
+
+.summary-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(12px, 4dvw, 36px);
+  width: 100%;
+  margin-top: clamp(10px, 2dvh, 20px);
+  font-size: clamp(16px, 2.4dvh, 24px);
+  font-weight: bold;
+}
+
+.summary-actions span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.win-continue-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  font-size: clamp(16px, 3dvw, 34px);
+  font-weight: bold;
+  color: #111111;
+  text-align: center;
+  animation: gameOverBlink 1.2s infinite ease-in-out;
+}
+
+.win-continue-bottom {
+  margin-top: clamp(10px, 2dvh, 24px);
+  margin-bottom: clamp(14px, 5dvh, 44px);
+  font-size: clamp(16px, 3dvw, 34px);
+  color: #111111;
+}
