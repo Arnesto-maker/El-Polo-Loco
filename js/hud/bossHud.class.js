@@ -1,13 +1,14 @@
 /**
- * Renders the Endboss health bar, armor readout, tactical hints, timer, and decaying bonus score.
+ * Renders the Endboss health bar, graphical armor bar, tactical hints, timer, and decaying bonus score.
  */
 class BossHud {
   /**
-   * Creates the boss HUD renderer attached to a parent StatusBar.
+   * Creates the boss HUD renderer and its graphical armor bar attached to a parent StatusBar.
    * @param {StatusBar} statusBar - Parent HUD status bar instance.
    */
   constructor(statusBar) {
     this.bar = statusBar;
+    this.armourBar = new BossArmourBar(this);
   }
 
   /**
@@ -20,7 +21,7 @@ class BossHud {
       return;
     }
     this.drawBossHealthBar(ctx);
-    this.drawBossArmourText(ctx);
+    this.armourBar.draw(ctx);
     this.drawBossJumpThrowHint(ctx);
     this.drawBossArmourHint(ctx);
     this.drawBossTimerGroup(ctx);
@@ -46,23 +47,7 @@ class BossHud {
   };
 
   /**
-   * Draws remaining boss armor points beneath the boss health bar.
-   * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
-   * @returns {void}
-   */
-  drawBossArmourText = (ctx) => {
-    if (this.bar.bossArmour <= 0) {
-      return;
-    }
-    const armourText = "+" + this.bar.bossArmour + " Armour";
-    const armourX = this.getBossBarX(ctx);
-    const armourY = this.bar.y + this.bar.height + this.bar.canvasHeight * 0.035;
-    ctx.strokeText(armourText, armourX, armourY);
-    ctx.fillText(armourText, armourX, armourY);
-  };
-
-  /**
-   * Draws pulsing Hint A advising Jump-Throw attacks beneath the boss armor readout.
+   * Draws pulsing Hint A advising Jump-Throw attacks beneath the boss armor bar.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @returns {void}
    */
@@ -70,7 +55,7 @@ class BossHud {
     const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.07;
     const fontSize = this.bar.getScaledFontSize(0.019, pulse);
     const hintX = ctx.canvas.width - this.bar.x * 2;
-    const hintY = this.bar.y + this.bar.height + this.bar.canvasHeight * 0.068;
+    const hintY = this.bar.y + this.bar.height * 2 + this.bar.canvasHeight * 0.032;
     const text = "Use Jump Throw to deal more damage";
     ctx.save();
     ctx.font = `${fontSize}px PolloFont`;
@@ -104,7 +89,7 @@ class BossHud {
     }
     const fontSize = this.bar.getScaledFontSize(0.018);
     const hintX = ctx.canvas.width - this.bar.x * 2;
-    const hintY = this.bar.y + this.bar.height + this.bar.canvasHeight * 0.1;
+    const hintY = this.bar.y + this.bar.height * 2 + this.bar.canvasHeight * 0.065;
     const text = "Armour activated! Break armour to reduce health";
     ctx.save();
     this.applyWarningHintStyle(ctx, fontSize);
