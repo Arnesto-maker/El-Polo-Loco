@@ -25,7 +25,7 @@
     <meta name="twitter:title" content="El Pollo Loco – Tactical Edition" />
     <meta name="twitter:description" content="Tactical 2D action game engineered with Pure JS and the strict Arnesto Classic Architecture." />
     <meta name="twitter:image" content="assets/img/9_intro_outro_screens/start/startscreen_1.png" />
-    <link rel="stylesheet" href="style/main-css-style.css">
+    <link rel="stylesheet" href="style/main-css-style.css" />
     <link rel="stylesheet" href="style/menu-start-style.css" />
     <link rel="stylesheet" href="style/modals-overlays-style.css" />
     <link rel="stylesheet" href="style/help-controls-style.css" />
@@ -38,30 +38,13 @@
     <a href="#game-container" class="skip-link">Skip to game</a>
     <main id="game-container">
       <canvas id="gameCanvas" width="2048" height="1280"></canvas>
-      <button
-        id="canvas-sound-btn"
-        class="canvas-sound-btn d-none"
-        type="button"
-        aria-label="Mute sound"
-        aria-pressed="true"
-        onclick="toggleCanvasSoundIcon(event)"
-      >
-        <img
-          id="canvas-sound-icon"
-          class="canvas-sound-icon"
-          src="assets/img/sound_icons/sound-on-14606.svg"
-          alt="Sound on"
-        />
+      <button id="canvas-sound-btn" class="canvas-sound-btn d-none" type="button" aria-label="Mute sound" aria-pressed="true" onclick="toggleCanvasSoundIcon(event)">
+        <img id="canvas-sound-icon" class="canvas-sound-icon" src="assets/img/sound_icons/sound-on-14606.svg" alt="Sound on" />
       </button>
       <section id="exotic-hud" class="exotic-hud d-none" aria-label="Game Status" aria-live="polite">
         <div class="exotic-hud-row-top">
           <div class="exotic-hud-group">
-            <img
-              id="exotic-health-img"
-              class="exotic-health-img"
-              src="assets/img/7_statusbars/1_statusbar/2_statusbar_health/green/100.png"
-              alt="Player health"
-            />
+            <img id="exotic-health-img" class="exotic-health-img" src="assets/img/7_statusbars/1_statusbar/2_statusbar_health/green/100.png" alt="Player health" />
             <span class="exotic-stat">
               <img class="exotic-stat-icon" src="assets/img/7_statusbars/3_icons/icon_salsa_bottle.png" alt="Bottles" />
               <span id="exotic-bottle-count">00</span>
@@ -78,12 +61,7 @@
           </div>
           <div id="exotic-boss-top" class="exotic-hud-group d-none">
             <span id="exotic-boss-time" class="exotic-stat">Time: 00:00</span>
-            <img
-              id="exotic-boss-health-img"
-              class="exotic-health-img"
-              src="assets/img/7_statusbars/2_statusbar_endboss/green/green100.png"
-              alt="Boss health"
-            />
+            <img id="exotic-boss-health-img" class="exotic-health-img" src="assets/img/7_statusbars/2_statusbar_endboss/green/green100.png" alt="Boss health" />
           </div>
         </div>
         <div id="exotic-boss-sub" class="exotic-boss-sub d-none">
@@ -159,8 +137,8 @@
             <p class="about-item">Arnesto Arnesto, address as stated above.</p>
             <h3 class="legal-heading">Disclaimer &amp; Copyright</h3>
             <p class="about-item">
-              Non-commercial educational and portfolio project ("El Pollo Loco – Tactical Edition"). All sound effects and music are generated locally via the Web Audio API.
-              Image assets are provided by Developer Akademie GmbH; fonts remain the property of their respective copyright holders.
+              Non-commercial educational and portfolio project ("El Pollo Loco – Tactical Edition"). All sound effects and music are generated locally via the Web Audio API. Image
+              assets are provided by Developer Akademie GmbH; fonts remain the property of their respective copyright holders.
             </p>
           </div>
           <button class="menu-btn about-back-btn" onclick="showFrame2()">Back</button>
@@ -308,42 +286,42 @@
       <section id="local-save-error-frame" class="win-overlay-frame d-none"></section>
       <section id="highscore-frame" class="win-overlay-frame d-none"></section>
     </main>
-    <script src="assets/js/appFunctions/firebaseConfig.js"></script>
-    <script src="assets/js/models/movableObject.class.js"></script>
-    <script src="assets/js/models/drawableObject.class.js"></script>
-    <script src="assets/js/models/cloud.class.js"></script>
-    <script src="assets/js/models/background.class.js"></script>
-    <script src="assets/js/models/backgroundPackage.class.js"></script>
-    <script src="assets/js/models/bossHud.class.js"></script>
-    <script src="assets/js/models/statusbar.class.js"></script>
-    <script src="assets/js/models/starthelpPopUp.class.js"></script>
-    <script src="assets/js/models/pausePopUp.class.js"></script>
-    <script src="assets/js/models/coinConverter.class.js"></script>
-    <script src="assets/js/models/coin.class.js"></script>
-    <script src="assets/js/models/bottle.class.js"></script>
-    <script src="assets/js/models/characterHealth.class.js"></script>
-    <script src="assets/js/models/character.class.js"></script>
-    <script src="assets/js/models/throwableBottle.class.js"></script>
-    <script src="assets/js/models/chicken.class.js"></script>
-    <script src="assets/js/models/bossDossierPopUp.class.js"></script>
-    <script src="assets/js/models/bossCombat.class.js"></script>
-    <script src="assets/js/models/bossChicken.class.js"></script>
-    <script src="assets/js/models/bossBottle.class.js"></script>
-    <script src="assets/js/models/touchInput.class.js"></script>
-    <script src="assets/js/models/controller.class.js"></script>
-    <script src="assets/js/models/worldSpawner.class.js"></script>
-    <script src="assets/js/models/world.class.js"></script>
-    <script src="assets/js/models/collisionManager.class.js"></script>
-    <script src="assets/js/models/combatManager.class.js"></script>
-    <script src="assets/js/models/engine.class.js"></script>
-    <script src="assets/js/appFunctions/template.js"></script>
-    <script src="assets/js/appFunctions/data.js"></script>
-    <script src="assets/js/appFunctions/render.js"></script>
-    <script src="assets/js/appFunctions/ui.js"></script>
-    <script src="assets/js/appFunctions/settings.js"></script>
-    <script src="assets/js/appFunctions/sound.js"></script>
-    <script src="assets/js/appFunctions/music.js"></script>
-    <script src="assets/js/appFunctions/menuNavigation.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script src="js/appFunctions/firebaseConfig.js"></script>
+    <script src="js/core/movableObject.class.js"></script>
+    <script src="js/core/drawableObject.class.js"></script>
+    <script src="js/environment/cloud.class.js"></script>
+    <script src="js/environment/background.class.js"></script>
+    <script src="js/environment/backgroundPackage.class.js"></script>
+    <script src="js/hud/bossHud.class.js"></script>
+    <script src="js/hud/statusbar.class.js"></script>
+    <script src="js/hud/starthelpPopUp.class.js"></script>
+    <script src="js/hud/pausePopUp.class.js"></script>
+    <script src="js/hud/bossDossierPopUp.class.js"></script>
+    <script src="js/hud/coinConverter.class.js"></script>
+    <script src="js/items/coin.class.js"></script>
+    <script src="js/items/bottle.class.js"></script>
+    <script src="js/player/characterHealth.class.js"></script>
+    <script src="js/player/character.class.js"></script>
+    <script src="js/projectiles/throwableBottle.class.js"></script>
+    <script src="js/projectiles/bossBottle.class.js"></script>
+    <script src="js/enemies/chicken.class.js"></script>
+    <script src="js/enemies/bossCombat.class.js"></script>
+    <script src="js/enemies/bossChicken.class.js"></script>
+    <script src="js/input/touchInput.class.js"></script>
+    <script src="js/input/controller.class.js"></script>
+    <script src="js/engine/worldSpawner.class.js"></script>
+    <script src="js/engine/world.class.js"></script>
+    <script src="js/engine/collisionManager.class.js"></script>
+    <script src="js/engine/combatManager.class.js"></script>
+    <script src="js/engine/engine.class.js"></script>
+    <script src="js/appFunctions/template.js"></script>
+    <script src="js/appFunctions/data.js"></script>
+    <script src="js/appFunctions/render.js"></script>
+    <script src="js/appFunctions/ui.js"></script>
+    <script src="js/appFunctions/settings.js"></script>
+    <script src="js/appFunctions/sound.js"></script>
+    <script src="js/appFunctions/music.js"></script>
+    <script src="js/appFunctions/menuNavigation.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>

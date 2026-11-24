@@ -147,7 +147,7 @@ flowchart LR
 3. **Play!**
    Open `http://127.0.0.1:5500/index.html` in your browser and hit **New game**.
 
-> 🔧 *Optional: Want your own leaderboard? Simply update the database URL in `assets/js/appFunctions/firebaseConfig.js`.*
+> 🔧 *Optional: Want your own leaderboard? Simply update the database URL in `js/appFunctions/firebaseConfig.js`.*
 
 ---
 
@@ -157,7 +157,11 @@ flowchart LR
 ```text
 el-pollo-loco/
 ├── index.html
-├── css/
+├── readme.md
+├── assets/
+│   ├── fonts/
+│   └── img/
+├── style/
 │   ├── main-css-style.css
 │   ├── menu-start-style.css
 │   ├── modals-overlays-style.css
@@ -165,13 +169,18 @@ el-pollo-loco/
 │   ├── endscreen-win-style.css
 │   ├── highscore-form-style.css
 │   └── exotic-responsive-style.css
-└── assets/
-    ├── fonts/
-    ├── img/
-    └── js/
-        ├── main.js
-        ├── appFunctions/
-        └── models/
+└── js/
+    ├── main.js
+    ├── appFunctions/
+    ├── core/
+    ├── enemies/
+    ├── engine/
+    ├── environment/
+    ├── hud/
+    ├── input/
+    ├── items/
+    ├── player/
+    └── projectiles/
 ```
 
 </details>
