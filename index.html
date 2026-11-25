@@ -5,10 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>El Pollo Loco – Tactical Edition</title>
-    <meta
-      name="description"
-      content="Tactical 2D action jump-and-run game featuring multi-phase boss combat, vertical hit-zones, and a live coin-to-ammo economy. Built with Arnesto Classic Architecture."
-    />
+    <meta name="description" content="Tactical 2D action jump-and-run game featuring multi-phase boss combat, vertical hit-zones, and a live coin-to-ammo economy. Built with Arnesto Classic Architecture." />
     <meta name="keywords" content="El Pollo Loco, Indie Game, HTML5 Canvas, JavaScript Game, Tactical Platformer" />
     <meta name="author" content="Arnesto" />
     <meta name="robots" content="index, follow" />
@@ -107,12 +104,8 @@
           <h2 class="about-title">EL POLLO LOCO – TACTICAL EDITION</h2>
           <p class="about-text">Forget everything you know about standard jump-and-run games. In the scorching Mexican desert, Pepe faces the ultimate feathered nightmare!</p>
           <div class="about-list">
-            <p class="about-item">
-              <strong>Tactical Boss Combat:</strong> Break through a 100-point armor shield, aim for critical vertical hit-zones, and survive escalating bullet-hell salvo phases.
-            </p>
-            <p class="about-item">
-              <strong>Smart Resource Economy:</strong> Collect coins and use the live in-game Coin Converter (Press B) to restock salsa bottles in the heat of battle.
-            </p>
+            <p class="about-item"><strong>Tactical Boss Combat:</strong> Break through a 100-point armor shield, aim for critical vertical hit-zones, and survive escalating bullet-hell salvo phases.</p>
+            <p class="about-item"><strong>Smart Resource Economy:</strong> Collect coins and use the live in-game Coin Converter (Press B) to restock salsa bottles in the heat of battle.</p>
             <p class="about-item"><strong>Adaptive AI:</strong> Watch your step—three sneaky back-hits will trigger an instant turnaround combo!</p>
           </div>
           <p class="about-text">
@@ -137,8 +130,8 @@
             <p class="about-item">Arnesto Arnesto, address as stated above.</p>
             <h3 class="legal-heading">Disclaimer &amp; Copyright</h3>
             <p class="about-item">
-              Non-commercial educational and portfolio project ("El Pollo Loco – Tactical Edition"). All sound effects and music are generated locally via the Web Audio API. Image
-              assets are provided by Developer Akademie GmbH; fonts remain the property of their respective copyright holders.
+              Non-commercial educational and portfolio project ("El Pollo Loco – Tactical Edition"). All sound effects and music are generated locally via the Web Audio API. Image assets are provided by Developer Akademie GmbH; fonts remain
+              the property of their respective copyright holders.
             </p>
           </div>
           <button class="menu-btn about-back-btn" type="button" onclick="showFrame2()">Back</button>
@@ -270,19 +263,47 @@
           <p class="lock-message">El-Pollo Loco supports only landscape screen, please turn your phone to Landscape Mode</p>
         </div>
       </section>
-      <section id="game-over-frame" class="game-over-frame d-none" role="button" tabindex="0" aria-label="Game Over - Continue to main menu" onclick="handleGameOverTouchOrClick(event)" ontouchstart="handleGameOverTouchOrClick(event)" onkeydown="handleOverlaySpaceKey(event, handleGameOverTouchOrClick)">
+      <section
+        id="game-over-frame"
+        class="game-over-frame d-none"
+        role="button"
+        tabindex="0"
+        aria-label="Game Over - Continue to main menu"
+        onclick="handleGameOverTouchOrClick(event)"
+        ontouchstart="handleGameOverTouchOrClick(event)"
+        onkeydown="handleOverlaySpaceKey(event, handleGameOverTouchOrClick)"
+      >
         <img src="assets/img/You won, you lost/Game Over.png" alt="Game Over" class="game-over-bild-02" />
         <div id="game-over-hint" class="game-over-hint d-none" aria-live="polite"></div>
         <p class="game-over-text">Press Enter, touch, click to continue</p>
       </section>
-      <section id="you-won-frame" class="you-won-frame d-none" role="button" tabindex="0" aria-label="You Won - Continue to summary" onclick="handleYouWonContinue(event)" ontouchstart="handleYouWonContinue(event)" onkeydown="handleOverlaySpaceKey(event, handleYouWonContinue)">
+      <section
+        id="you-won-frame"
+        class="you-won-frame d-none"
+        role="button"
+        tabindex="0"
+        aria-label="You Won - Continue to summary"
+        onclick="handleYouWonContinue(event)"
+        ontouchstart="handleYouWonContinue(event)"
+        onkeydown="handleOverlaySpaceKey(event, handleYouWonContinue)"
+      >
         <img src="assets/img/You won, you lost/You won A.png" alt="You Won" class="you-won-bild" />
         <p class="win-continue-text win-continue-bottom">Press Enter, touch, click to continue</p>
       </section>
       <section id="summary-frame" class="win-overlay-frame d-none"></section>
       <section id="save-score-frame" class="win-overlay-frame d-none"></section>
       <section id="spinner-frame" class="win-overlay-frame d-none"></section>
-      <section id="save-status-frame" class="win-overlay-frame d-none" role="button" tabindex="0" aria-live="polite" aria-label="Save status - Continue to main menu" onclick="handleSaveStatusContinue(event)" ontouchstart="handleSaveStatusContinue(event)" onkeydown="handleOverlaySpaceKey(event, handleSaveStatusContinue)"></section>
+      <section
+        id="save-status-frame"
+        class="win-overlay-frame d-none"
+        role="button"
+        tabindex="0"
+        aria-live="polite"
+        aria-label="Save status - Continue to main menu"
+        onclick="handleSaveStatusContinue(event)"
+        ontouchstart="handleSaveStatusContinue(event)"
+        onkeydown="handleOverlaySpaceKey(event, handleSaveStatusContinue)"
+      ></section>
       <section id="local-save-error-frame" class="win-overlay-frame d-none"></section>
       <section id="highscore-frame" class="win-overlay-frame d-none"></section>
     </main>
@@ -326,5 +347,5 @@
     <script src="js/appFunctions/music.js"></script>
     <script src="js/appFunctions/menuNavigation.js"></script>
     <script src="js/main.js"></script>
-</body>
+  </body>
 </html>
