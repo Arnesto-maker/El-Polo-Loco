@@ -29,7 +29,7 @@ class BossCombat extends MovableObject {
   }
 
   /**
-   * Applies vertical hit-zone damage, plays impact SFX, and tracks back-hits.
+   * Applies vertical hit-zone damage, plays impact or shatter SFX, and tracks back-hits.
    * @param {ThrowableBottle} bottle - Impacting salsa bottle.
    * @returns {void}
    */
@@ -37,10 +37,24 @@ class BossCombat extends MovableObject {
     if (!this.isActivated || this.isDead) {
       return;
     }
+    const hadArmour = this.armour > 0;
     const damage = this.calculateZoneDamage(bottle);
     this.takeDamage(damage);
-    playBossHitSound();
+    this.playHitImpactAudio(hadArmour);
     this.checkBackHitReaction(bottle);
+  }
+
+  /**
+   * Plays the armor shatter SFX on shield break or the regular boss hit SFX otherwise.
+   * @param {boolean} hadArmour - True if the boss still had armor before this hit.
+   * @returns {void}
+   */
+  playHitImpactAudio(hadArmour) {
+    if (hadArmour && this.armour <= 0) {
+      playArmourBreakSound();
+    } else {
+      playBossHitSound();
+    }
   }
 
   /**

@@ -267,6 +267,87 @@ const playWinSound = () => {
 };
 
 /**
+ * Plays a low metallic impact thud when the boss armor shield shatters.
+ * @param {AudioContext} ctx - Active Web Audio context.
+ * @param {number} now - Current audio context time in seconds.
+ * @returns {void}
+ */
+const playArmourImpactTone = (ctx, now) => {
+  const osc = ctx.createOscillator();
+  const gain = createGainEnvelope(ctx, 0.32, now, 0.26);
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(190, now);
+  osc.frequency.exponentialRampToValueAtTime(48, now + 0.24);
+  osc.connect(gain);
+  connectGainAndRun(osc, gain, ctx, now, 0.27);
+};
+
+/**
+ * Plays a high metallic shatter chime for breaking shield plates.
+ * @param {AudioContext} ctx - Active Web Audio context.
+ * @param {number} now - Current audio context time in seconds.
+ * @returns {void}
+ */
+const playArmourShardRing = (ctx, now) => {
+  const osc = ctx.createOscillator();
+  const gain = createGainEnvelope(ctx, 0.16, now, 0.19);
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(920, now);
+  osc.frequency.exponentialRampToValueAtTime(310, now + 0.18);
+  osc.connect(gain);
+  connectGainAndRun(osc, gain, ctx, now, 0.2);
+};
+
+/**
+ * Creates a deterministic noise buffer for armor shatter debris without Math.random.
+ * @param {AudioContext} ctx - Active Web Audio context.
+ * @returns {AudioBuffer} Synthesized debris audio buffer.
+ */
+const createArmourDebrisBuffer = (ctx) => {
+  const sampleCount = Math.floor(ctx.sampleRate * 0.28);
+  const buffer = ctx.createBuffer(1, sampleCount, ctx.sampleRate);
+  const channel = buffer.getChannelData(0);
+  let phase = 0;
+  for (let i = 0; i < sampleCount; i++) {
+    phase += 1.61803398875;
+    channel[i] = Math.sin(phase * 19.73) * Math.cos(i * 0.37);
+  }
+  return buffer;
+};
+
+/**
+ * Plays a filtered noise burst simulating flying metal shards and dust.
+ * @param {AudioContext} ctx - Active Web Audio context.
+ * @param {number} now - Current audio context time in seconds.
+ * @returns {void}
+ */
+const playArmourDebrisNoise = (ctx, now) => {
+  const source = ctx.createBufferSource();
+  const filter = createBandpassFilter(ctx, 1450, now);
+  const gain = createGainEnvelope(ctx, 0.24, now, 0.28);
+  filter.Q.value = 1.4;
+  source.buffer = createArmourDebrisBuffer(ctx);
+  source.connect(filter);
+  filter.connect(gain);
+  connectGainAndRun(source, gain, ctx, now, 0.29);
+};
+
+/**
+ * Synthesizes and plays the armor break sound effect when the boss shield shatters.
+ * @returns {void}
+ */
+const playArmourBreakSound = () => {
+  const ctx = getActiveAudioContext();
+  if (!ctx) {
+    return;
+  }
+  const now = ctx.currentTime;
+  playArmourImpactTone(ctx, now);
+  playArmourShardRing(ctx, now + 0.02);
+  playArmourDebrisNoise(ctx, now);
+};
+
+/**
  * Plays a descending game-over melody.
  * @returns {void}
  */
