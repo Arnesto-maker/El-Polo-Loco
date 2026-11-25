@@ -27,7 +27,7 @@ class CharacterHealth extends MovableObject {
 
   /**
    * Creates the character health base layer on the given canvas.
-   * @param {HTMLCanvasElement} canvas - The game canvas.
+   * @param {HTMLCanvasElement|Object} canvas - The game canvas or design dimension object.
    */
   constructor(canvas) {
     super(canvas);
@@ -40,15 +40,6 @@ class CharacterHealth extends MovableObject {
   loadHealthImages() {
     this.loadImages(this.IMAGES_HURT);
     this.loadImages(this.IMAGES_DEATH);
-  }
-
-  /**
-   * Resets animation frame counters to the first sprite.
-   * @returns {void}
-   */
-  resetAnimationFrame() {
-    this.imageCounter = 0;
-    this.frameTick = 0;
   }
 
   /**
@@ -65,7 +56,7 @@ class CharacterHealth extends MovableObject {
   }
 
   /**
-   * Routes health-priority animations between death, active hurt, and standard states.
+   * Routes health-priority animations between death and active hurt states.
    * @param {Controller} controller - Active input controller.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
@@ -75,13 +66,11 @@ class CharacterHealth extends MovableObject {
       this.startDeathAnimation(scale);
     } else if (this.isHurtAnimationActive()) {
       this.applyHurtPriorityAnimation(scale);
-    } else {
-      this.updateStandardAnimation(controller, scale);
     }
   }
 
   /**
-   * Interrupts throw/idle state and plays the hurt sprite sequence.
+   * Interrupts throw and idle state and plays the hurt sprite sequence.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */

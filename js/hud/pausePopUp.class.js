@@ -1,36 +1,14 @@
 /**
  * Manages the in-game pause menu overlay, Sperrframe resume flow, and transitions to Settings, Help, or Menu.
  */
-class PausePopup {
+class PausePopup extends BaseOverlayPopup {
   /**
    * Initializes pause state and registers the active pause popup reference.
    * @param {GameEngine} engine - Active GameEngine instance.
    */
   constructor(engine) {
-    this.engine = engine;
-    this.isOpen = false;
-    this.overlayElement = document.getElementById("pause-overlay");
+    super(engine, "pause-overlay");
     window.pausePopup = this;
-  }
-
-  /**
-   * Makes the pause overlay visible.
-   * @returns {void}
-   */
-  showOverlay() {
-    if (this.overlayElement) {
-      this.overlayElement.classList.remove("d-none");
-    }
-  }
-
-  /**
-   * Hides the pause overlay.
-   * @returns {void}
-   */
-  hideOverlay() {
-    if (this.overlayElement) {
-      this.overlayElement.classList.add("d-none");
-    }
   }
 
   /**
@@ -86,9 +64,7 @@ class PausePopup {
    * @returns {void}
    */
   openPause() {
-    this.isOpen = true;
-    this.engine.isPaused = true;
-    this.showOverlay();
+    this.pauseAndShow();
   }
 
   /**
@@ -96,16 +72,12 @@ class PausePopup {
    * @returns {void}
    */
   resumeGame() {
-    this.isOpen = false;
-    this.engine.isPaused = false;
-    this.engine.lastFrameTime = 0;
-    this.engine.lastBossTick = performance.now();
-    this.hideOverlay();
+    this.resumeAndHide();
     blurActiveElement();
   }
 
   /**
-   * Hides the pause menu temporarily and opens Settings (Konstruktion 2a).
+   * Hides the pause menu temporarily and opens Settings.
    * @returns {void}
    */
   openSettings() {
@@ -141,38 +113,38 @@ class PausePopup {
  * Resumes gameplay from the pause overlay DOM button.
  * @returns {void}
  */
-const resumeGameFromDom = () => {
+function resumeGameFromDom() {
   if (window.pausePopup) {
     window.pausePopup.resumeGame();
   }
-};
+}
 
 /**
  * Opens the settings overlay from the pause menu DOM button.
  * @returns {void}
  */
-const openSettingsFromPauseDom = () => {
+function openSettingsFromPauseDom() {
   if (window.pausePopup) {
     window.pausePopup.openSettings();
   }
-};
+}
 
 /**
  * Opens the help overlay from the pause menu DOM button.
  * @returns {void}
  */
-const openHelpFromPauseDom = () => {
+function openHelpFromPauseDom() {
   if (window.pausePopup) {
     window.pausePopup.openHelp();
   }
-};
+}
 
 /**
  * Exits back to main menu from the pause menu DOM button.
  * @returns {void}
  */
-const exitToMenuFromPauseDom = () => {
+function exitToMenuFromPauseDom() {
   if (window.pausePopup) {
     window.pausePopup.exitToMenu();
   }
-};
+}

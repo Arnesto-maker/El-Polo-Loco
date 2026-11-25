@@ -11,6 +11,7 @@ class DrawableObject {
   imageCache = {};
   imageCounter = 0;
   frameTick = 0;
+  currentAnimation = null;
   offset = {
     top: 0,
     bottom: 0,
@@ -20,7 +21,7 @@ class DrawableObject {
 
   /**
    * Initializes canvas dimensions and ground floor offset.
-   * @param {HTMLCanvasElement} canvas - The game canvas.
+   * @param {HTMLCanvasElement|Object} canvas - The game canvas or design dimension object.
    */
   constructor(canvas) {
     this.canvasWidth = canvas.width;
@@ -52,28 +53,76 @@ class DrawableObject {
   }
 
   /**
-   * Advances sprite animation frames normalized to a 60-FPS delta scale.
+   * Advances sprite animation frames immediately on state switch and normalized to dt scale.
    * @param {Array<string>} pathsArray - Ordered animation image paths.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
+   * @param {number} [frameDelay=8] - Tick threshold between animation frames.
    * @returns {void}
    */
-  playAnimation(pathsArray, scale = 1) {
+  playAnimation(pathsArray, scale = 1, frameDelay = 8) {
+    if (this.currentAnimation !== pathsArray) {
+      this.startNewAnimation(pathsArray);
+      return;
+    }
     this.frameTick += scale;
-    if (this.frameTick >= 8) {
+    if (this.frameTick >= frameDelay) {
       this.frameTick = 0;
-      const index = this.imageCounter % pathsArray.length;
-      const path = pathsArray[index];
-      this.img = this.imageCache[path];
-      this.imageCounter += 1;
+      this.applyAnimationFrame(pathsArray);
     }
   }
 
   /**
-   * Draws the current sprite image onto the canvas context.
+   * Switches immediately to frame 0 of a newly triggered animation sequence.
+   * @param {Array<string>} pathsArray - Ordered animation image paths.
+   * @returns {void}
+   */
+  startNewAnimation(pathsArray) {
+    this.currentAnimation = pathsArray;
+    this.resetAnimationFrame();
+    this.applyAnimationFrame(pathsArray);
+  }
+
+  /**
+   * Assigns the active sprite frame from cache and increments the frame counter.
+   * @param {Array<string>} pathsArray - Ordered animation image paths.
+   * @returns {void}
+   */
+  applyAnimationFrame(pathsArray) {
+    const index = this.imageCounter % pathsArray.length;
+    const path = pathsArray[index];
+    this.img = this.imageCache[path];
+    this.imageCounter += 1;
+  }
+
+  /**
+   * Resets animation frame counters to the start of a sequence.
+   * @returns {void}
+   */
+  resetAnimationFrame() {
+    this.imageCounter = 0;
+    this.frameTick = 0;
+  }
+
+  /**
+   * Verifies that the active sprite image has finished loading with valid dimensions.
+   * @returns {boolean} True when image is ready to draw.
+   */
+  isImageLoaded() {
+    if (this.img && this.img.complete && this.img.naturalWidth > 0) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Draws the current sprite image onto the canvas context when loaded.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @returns {void}
    */
   draw(ctx) {
+    if (!this.isImageLoaded()) {
+      return;
+    }
     ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
   }
 

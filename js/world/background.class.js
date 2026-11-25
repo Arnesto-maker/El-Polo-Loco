@@ -1,10 +1,10 @@
 /**
  * Static desert parallax background layer sprite positioned across level frames.
  */
-class Background extends MovableObject {
+class Background extends DrawableObject {
   /**
    * Creates a background layer sprite at the specified world coordinates.
-   * @param {HTMLCanvasElement} canvas - The game canvas.
+   * @param {HTMLCanvasElement|Object} canvas - The game canvas or design dimension object.
    * @param {string} path - Background image asset path.
    * @param {number} x - Horizontal world position.
    * @param {number} y - Vertical world position.

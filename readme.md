@@ -172,15 +172,15 @@ el-pollo-loco/
 └── js/
     ├── main.js
     ├── appFunctions/
+    ├── boss/
     ├── core/
-    ├── enemies/
+    ├── enemy/
     ├── engine/
-    ├── environment/
     ├── hud/
     ├── input/
     ├── items/
     ├── player/
-    └── projectiles/
+    └── world/
 ```
 
 </details>

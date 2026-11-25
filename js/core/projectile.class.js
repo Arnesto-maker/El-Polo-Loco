@@ -1,10 +1,9 @@
 /**
- * Boss radial salvo bottle projectile with dt-normalized ballistic arc and splash SFX.
+ * Base salsa bottle projectile providing shared rotation sprites, splash sequence, and ground detection.
  */
-class BossBottle extends MovableObject {
+class Projectile extends MovableObject {
   isSplashing = false;
   splashTime = 0;
-  vX = 0;
   IMAGES_ROTATION = [
     "assets/img/6_salsa_bottle/bottle_rotation/1_bottle_rotation.png",
     "assets/img/6_salsa_bottle/bottle_rotation/2_bottle_rotation.png",
@@ -21,21 +20,16 @@ class BossBottle extends MovableObject {
   ];
 
   /**
-   * Creates a boss salvo bottle launched with initial velocity components.
-   * @param {HTMLCanvasElement} canvas - The game canvas.
-   * @param {number} startX - Launch X coordinate.
-   * @param {number} startY - Launch Y coordinate.
-   * @param {number} vX - Horizontal velocity at 60 FPS.
-   * @param {number} vY - Initial vertical velocity at 60 FPS.
+   * Initializes base movable properties and preloads bottle sprite animations.
+   * @param {HTMLCanvasElement|Object} canvas - The game canvas or design dimension object.
    */
-  constructor(canvas, startX, startY, vX, vY) {
+  constructor(canvas) {
     super(canvas);
     this.loadAllImages();
-    this.setMainParameter(startX, startY, vX, vY);
   }
 
   /**
-   * Preloads bottle rotation and splash sprite animations.
+   * Preloads bottle rotation and splash sprite frames into the image cache.
    * @returns {void}
    */
   loadAllImages() {
@@ -44,27 +38,21 @@ class BossBottle extends MovableObject {
   }
 
   /**
-   * Sets dimensions, launch coordinates, velocities, gravity, and ground line.
+   * Sets shared bottle sprite dimensions and initial launch coordinates.
    * @param {number} startX - Launch X coordinate.
    * @param {number} startY - Launch Y coordinate.
-   * @param {number} vX - Horizontal velocity at 60 FPS.
-   * @param {number} vY - Vertical velocity at 60 FPS.
    * @returns {void}
    */
-  setMainParameter(startX, startY, vX, vY) {
+  initBaseBounds(startX, startY) {
     this.img = this.imageCache[this.IMAGES_ROTATION[0]];
     this.width = this.canvasWidth * 0.05;
     this.height = this.canvasHeight * 0.1;
     this.x = startX;
     this.y = startY;
-    this.vX = vX;
-    this.vg = vY;
-    this.gravity = 0.5;
-    this.yMax = this.getGroundLine();
   }
 
   /**
-   * Updates ballistic flight or splash animation scaled to 60-FPS delta time.
+   * Updates projectile flight or splash animation scaled to 60-FPS delta time.
    * @param {Controller} controller - Active input controller.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
@@ -74,26 +62,34 @@ class BossBottle extends MovableObject {
       this.playAnimation(this.IMAGES_SPLASH, scale);
       return;
     }
-    this.advanceFlight(scale);
+    this.updateFlight(scale);
     this.playAnimation(this.IMAGES_ROTATION, scale);
     this.checkGroundHit();
   }
 
   /**
-   * Moves the salvo bottle horizontally and integrates midpoint gravity.
+   * Advances flight trajectory for one normalized frame; overridden by subclasses.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  advanceFlight(scale = 1) {
+  updateFlight(scale = 1) {
+    this.applyMidpointGravity(scale);
+  }
+
+  /**
+   * Integrates vertical velocity and position using midpoint gravity.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
+   * @returns {void}
+   */
+  applyMidpointGravity(scale = 1) {
     const halfGravity = this.gravity * scale * 0.5;
-    this.x += this.vX * scale;
     this.vg += halfGravity;
     this.y += this.vg * scale;
     this.vg += halfGravity;
   }
 
   /**
-   * Triggers splash animation upon hitting the ground floor.
+   * Triggers splash animation upon hitting the desert floor line.
    * @returns {void}
    */
   checkGroundHit() {
@@ -104,7 +100,16 @@ class BossBottle extends MovableObject {
   }
 
   /**
-   * Stops projectile velocity, plays splash SFX, and starts splash animation.
+   * Zeroes projectile velocities upon impact; extended by subclasses with custom velocity fields.
+   * @returns {void}
+   */
+  stopMotion() {
+    this.speed = 0;
+    this.vg = 0;
+  }
+
+  /**
+   * Halts motion, plays splash SFX, and starts the splash animation once.
    * @returns {void}
    */
   startSplashSequenz() {
@@ -112,19 +117,10 @@ class BossBottle extends MovableObject {
       return;
     }
     this.isSplashing = true;
-    this.vX = 0;
-    this.vg = 0;
+    this.stopMotion();
+    this.currentAnimation = null;
     this.resetAnimationFrame();
     this.splashTime = performance.now();
     playBottleSplashSound();
-  }
-
-  /**
-   * Resets animation frame counters before splashing.
-   * @returns {void}
-   */
-  resetAnimationFrame() {
-    this.imageCounter = 0;
-    this.frameTick = 0;
   }
 }

@@ -1,38 +1,25 @@
 /**
  * Controls the unified Help frame shown at game start and from the pause menu.
  */
-class StartHelpPopup {
+class StartHelpPopup extends BaseOverlayPopup {
   /**
    * Opens the unified Help overlay immediately upon game start.
    * @param {GameEngine} engine - Active GameEngine instance.
    */
   constructor(engine) {
-    this.engine = engine;
-    this.isOpen = true;
-    this.engine.isPaused = true;
-    this.overlayElement = document.getElementById("frame-help");
-    this.showOverlay();
+    super(engine, "frame-help");
+    this.pauseAndShow();
   }
 
   /**
-   * Shows the unified Help overlay and sets the in-game close label.
+   * Sets the in-game close label and displays the unified Help overlay.
    * @returns {void}
    */
   showOverlay() {
     if (this.overlayElement) {
       setHelpCloseLabel("OK / Continue (Enter)");
-      this.overlayElement.classList.remove("d-none");
     }
-  }
-
-  /**
-   * Hides the unified Help overlay element.
-   * @returns {void}
-   */
-  hideOverlay() {
-    if (this.overlayElement) {
-      this.overlayElement.classList.add("d-none");
-    }
+    super.showOverlay();
   }
 
   /**
@@ -47,16 +34,12 @@ class StartHelpPopup {
   }
 
   /**
-   * Resumes gameplay, resets dt timestamp, and hides the Help overlay.
+   * Resumes gameplay, clears held Enter state, and hides the Help overlay.
    * @returns {void}
    */
   closePopup() {
-    this.isOpen = false;
-    this.engine.isPaused = false;
-    this.engine.lastFrameTime = 0;
     this.engine.controller.enter = false;
-    this.engine.lastBossTick = performance.now();
-    this.hideOverlay();
+    this.resumeAndHide();
     blurActiveElement();
   }
 
@@ -65,9 +48,7 @@ class StartHelpPopup {
    * @returns {void}
    */
   openPopup() {
-    this.isOpen = true;
-    this.engine.isPaused = true;
-    this.showOverlay();
+    this.pauseAndShow();
   }
 }
 
@@ -75,10 +56,10 @@ class StartHelpPopup {
  * Closes the unified Help frame for active gameplay or returns to Frame 2 in menu mode.
  * @returns {void}
  */
-const closeHelpFrame = () => {
+function closeHelpFrame() {
   if (window.gameEngine && window.gameEngine.startHelp && window.gameEngine.startHelp.isOpen) {
     window.gameEngine.startHelp.closePopup();
   } else {
     showFrame2();
   }
-};
+}
