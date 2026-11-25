@@ -274,7 +274,7 @@ const playWinSound = () => {
  */
 const playArmourImpactTone = (ctx, now) => {
   const osc = ctx.createOscillator();
-  const gain = createGainEnvelope(ctx, 0.32, now, 0.26);
+  const gain = createGainEnvelope(ctx, 0.432, now, 0.26);
   osc.type = "triangle";
   osc.frequency.setValueAtTime(190, now);
   osc.frequency.exponentialRampToValueAtTime(48, now + 0.24);
@@ -290,7 +290,7 @@ const playArmourImpactTone = (ctx, now) => {
  */
 const playArmourShardRing = (ctx, now) => {
   const osc = ctx.createOscillator();
-  const gain = createGainEnvelope(ctx, 0.16, now, 0.19);
+  const gain = createGainEnvelope(ctx, 0.216, now, 0.19);
   osc.type = "sawtooth";
   osc.frequency.setValueAtTime(920, now);
   osc.frequency.exponentialRampToValueAtTime(310, now + 0.18);
@@ -324,7 +324,7 @@ const createArmourDebrisBuffer = (ctx) => {
 const playArmourDebrisNoise = (ctx, now) => {
   const source = ctx.createBufferSource();
   const filter = createBandpassFilter(ctx, 1450, now);
-  const gain = createGainEnvelope(ctx, 0.24, now, 0.28);
+  const gain = createGainEnvelope(ctx, 0.324, now, 0.28);
   filter.Q.value = 1.4;
   source.buffer = createArmourDebrisBuffer(ctx);
   source.connect(filter);
