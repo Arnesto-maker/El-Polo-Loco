@@ -189,8 +189,9 @@
 
 .frame-2 {
   width: clamp(280px, 48%, 640px);
-  max-width: 94dvw;
+  max-width: min(94dvw, 1920px);
   height: 88%;
+  max-height: 90dvh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
