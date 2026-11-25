@@ -47,7 +47,7 @@ const getSummaryOverlayTemplate = () => {
       <div class="summary-row"><img src="assets/img/6_salsa_bottle/salsa_bottle.png" alt="Bottle" class="summary-icon"><span id="summary-bottles"></span></div>
       <div class="summary-row"><span>Score =</span><span id="summary-score"></span></div>
       <div class="summary-row summary-total"><span>Total =</span><span id="summary-total"></span></div>
-      <div class="summary-actions"><span onclick="returnToMainMenu()">Tab = exit</span><span onclick="openSaveScoreFrame()">Enter = Save and exit</span></div>
+      <div class="summary-actions"><button type="button" class="summary-action-btn" onclick="returnToMainMenu()">Tab = exit</button><button type="button" class="summary-action-btn" onclick="openSaveScoreFrame()">Enter = Save and exit</button></div>
     </div>
   `;
 };
@@ -59,11 +59,14 @@ const getSummaryOverlayTemplate = () => {
 const getSaveScoreOverlayTemplate = () => {
   return `
     <div class="win-card">
-      <label for="player-name-input" class="save-label">Your name:</label>
-      <input id="player-name-input" class="save-input" type="text" maxlength="12" autocomplete="off">
-      <p id="save-validation-msg" class="save-hint">• min 4 letter maximum 12</p>
+      <div class="contact-input-parent">
+        <label for="player-name-input" class="save-label">Your name:</label>
+        <input id="player-name-input" class="save-input" type="text" maxlength="12" autocomplete="off" aria-invalid="false" aria-describedby="save-validation-hint player-name-inputContainerError" oninput="clearSaveScoreError()">
+        <p id="save-validation-hint" class="save-hint">• min 4 letter maximum 12</p>
+        <p id="player-name-inputContainerError" class="error-message" role="alert" aria-live="polite"></p>
+      </div>
       <div class="summary-row"><span>Score :</span><span id="save-score-value"></span></div>
-      <p class="save-submit-hint" onclick="handleSaveScoreSubmit()">Enter = Save to Leaderboard</p>
+      <button type="button" class="save-submit-hint" onclick="handleSaveScoreSubmit()">Enter = Save to Leaderboard</button>
     </div>
   `;
 };
@@ -87,7 +90,7 @@ const getSpinnerOverlayTemplate = () => {
 const getSaveStatusOverlayTemplate = () => {
   return `
     <div class="status-box">
-      <p id="save-status-title" class="status-title"></p>
+      <p id="save-status-title" class="status-title" role="status" aria-live="polite"></p>
       <p class="win-continue-text">Press Enter, click or Touch to continue</p>
     </div>
   `;
@@ -102,8 +105,8 @@ const getLocalSavePromptTemplate = () => {
     <div class="status-box">
       <p class="status-title">Do you want to locally save the game and automatically try again later?</p>
       <div class="prompt-actions">
-        <p class="prompt-option" onclick="handleLocalSaveConfirm()">Enter = yes and exit</p>
-        <p class="prompt-option" onclick="returnToMainMenu()">Tab = no and exit</p>
+        <button type="button" class="prompt-option" onclick="handleLocalSaveConfirm()">Enter = yes and exit</button>
+        <button type="button" class="prompt-option" onclick="returnToMainMenu()">Tab = no and exit</button>
       </div>
     </div>
   `;
@@ -118,7 +121,7 @@ const getHighscoreFrameTemplate = () => {
     <div class="win-card highscore-card">
       <h2 class="win-title">Leaderboard</h2>
       <div id="highscore-list" class="highscore-list"></div>
-      <p class="highscore-back" onclick="showFrame2()">Tab = back</p>
+      <button type="button" class="highscore-back" onclick="showFrame2()">Tab = back</button>
     </div>
   `;
 };
@@ -144,6 +147,6 @@ const getHighscoreRowTemplate = (index) => {
  */
 const getHighscoreStatusTemplate = () => {
   return `
-    <p id="highscore-status-msg" class="highscore-status-msg"></p>
+    <p id="highscore-status-msg" class="highscore-status-msg" role="status" aria-live="polite"></p>
   `;
 };

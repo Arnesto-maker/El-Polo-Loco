@@ -18,16 +18,17 @@ class GameEngine {
     this.statusBar = new StatusBar(this.designCanvas);
     this.combatManager = new CombatManager(this);
     this.collisionManager = new CollisionManager(this);
+    this.boundRenderLoop = this.renderLoop.bind(this);
     this.initLoopState();
     this.initPopups();
-    this.animationFrameId = requestAnimationFrame((ts) => this.renderLoop(ts));
+    this.animationFrameId = requestAnimationFrame(this.boundRenderLoop);
   }
 
   /**
    * Initializes loop flags and seconds-based delta timing state.
    * @returns {void}
    */
-  initLoopState = () => {
+  initLoopState() {
     this.lastBossTick = 0;
     this.isPaused = false;
     this.isRunning = true;
@@ -35,55 +36,55 @@ class GameEngine {
     this.lastFrameTime = 0;
     this.dtSec = 1 / 60;
     this.frameScale = 1;
-  };
+  }
 
   /**
    * Instantiates all in-game popup controllers.
    * @returns {void}
    */
-  initPopups = () => {
+  initPopups() {
     this.startHelp = new StartHelpPopup(this);
     this.bossDossier = new BossDossierPopup(this);
     this.coinConverter = new CoinConverter(this.statusBar, this);
     this.pausePopup = new PausePopup(this);
-  };
+  }
 
   /**
    * Rebuilds the cached render list from the World instance.
    * @returns {void}
    */
-  refreshFrameObjects = () => {
+  refreshFrameObjects() {
     this.frameObjects = this.world.getFramePackages();
-  };
+  }
 
   /**
    * Pauses simulation and clears held input flags when portrait Sperrframe activates.
    * @returns {void}
    */
-  pauseForLandscapeLock = () => {
+  pauseForLandscapeLock() {
     this.isPaused = true;
     this.lastFrameTime = 0;
     this.controller.resetStates();
-  };
+  }
 
   /**
    * Keeps simulation paused and triggers the Pause Popup when returning to landscape.
    * @returns {void}
    */
-  resumeAfterLandscapeLock = () => {
+  resumeAfterLandscapeLock() {
     this.isPaused = true;
     this.lastFrameTime = 0;
     if (this.pausePopup) {
       this.pausePopup.openPauseFromLandscapeLock();
     }
-  };
+  }
 
   /**
    * Dispatches a discrete key to whichever popup currently owns input focus.
    * @param {string} key - Logical key name (Tab, Enter, b, ArrowLeft, ArrowRight).
    * @returns {void}
    */
-  dispatchPopupKey = (key) => {
+  dispatchPopupKey(key) {
     if (this.startHelp.isOpen) {
       this.startHelp.handleKeyDown(key);
     } else if (this.bossDossier.isOpen) {
@@ -93,26 +94,26 @@ class GameEngine {
     } else {
       this.coinConverter.handleKeyDown(key);
     }
-  };
+  }
 
   /**
    * Routes discrete control keys from Controller to the highest-priority open popup.
    * @param {string} key - Logical key name (Tab, Enter, b, ArrowLeft, ArrowRight).
    * @returns {void}
    */
-  routePopupKeyDown = (key) => {
+  routePopupKeyDown(key) {
     if (!this.isRunning) {
       return;
     }
     this.dispatchPopupKey(key);
-  };
+  }
 
   /**
    * Executes one display frame with clamped seconds-based dt scaling.
    * @param {number} timestamp - High-resolution timestamp from requestAnimationFrame.
    * @returns {void}
    */
-  renderLoop = (timestamp) => {
+  renderLoop(timestamp) {
     if (!this.isRunning || !this.world) {
       return;
     }
@@ -121,26 +122,26 @@ class GameEngine {
       this.stepSimulation(this.world.character);
     }
     this.finishRenderFrame();
-  };
+  }
 
   /**
    * Draws the active frame and schedules the next animation frame when running.
    * @returns {void}
    */
-  finishRenderFrame = () => {
+  finishRenderFrame() {
     if (!this.isRunning) {
       return;
     }
     this.drawScene(this.world.character);
-    this.animationFrameId = requestAnimationFrame((ts) => this.renderLoop(ts));
-  };
+    this.animationFrameId = requestAnimationFrame(this.boundRenderLoop);
+  }
 
   /**
    * Calculates frame delta in seconds (clamped to 0.05s) and normalizes to a 60-FPS scale.
    * @param {number} now - Current timestamp in milliseconds.
    * @returns {void}
    */
-  updateDeltaSeconds = (now) => {
+  updateDeltaSeconds(now) {
     if (this.lastFrameTime === 0) {
       this.lastFrameTime = now;
     }
@@ -148,73 +149,73 @@ class GameEngine {
     this.lastFrameTime = now;
     this.dtSec = Math.max(0, Math.min(rawSec, 0.05));
     this.frameScale = this.dtSec * 60;
-  };
+  }
 
   /**
    * Advances one normalized simulation frame for logic, entities, and collisions.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  stepSimulation = (char) => {
+  stepSimulation(char) {
     this.updateLogic(char);
     if (this.isRunning) {
       this.collisionManager.checkAllCollisions(char);
     }
-  };
+  }
 
   /**
    * Syncs HUD bridge and viewport aspect ratio, clears buffer, and renders world, HUD, and popups.
    * @param {Character} char - Player character for camera translation.
    * @returns {void}
    */
-  drawScene = (char) => {
+  drawScene(char) {
     this.notifyExoticHud();
     this.syncViewportCanvas();
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.drawWorldWithCamera(char);
     this.statusBar.draw(this.ctx);
     this.coinConverter.draw(this.ctx);
-  };
+  }
 
   /**
    * Delegates exotic ultra-compact viewport HUD sync to the UI layer without DOM access.
    * @returns {void}
    */
-  notifyExoticHud = () => {
+  notifyExoticHud() {
     if (typeof syncExoticGameHud === "function") {
       syncExoticGameHud(this.statusBar);
     }
-  };
+  }
 
   /**
    * Delegates dynamic canvas aspect-ratio width sync to the UI layer without DOM access.
    * @returns {void}
    */
-  syncViewportCanvas = () => {
+  syncViewportCanvas() {
     if (typeof syncGameCanvasResolution === "function") {
       syncGameCanvasResolution();
     }
-  };
+  }
 
   /**
    * Syncs dynamic camera width, translates context by rounded offset, draws entities, and restores offset.
    * @param {Character} char - Player character holding cameraX.
    * @returns {void}
    */
-  drawWorldWithCamera = (char) => {
+  drawWorldWithCamera(char) {
     char.updateCameraControl(this.ctx.canvas.width);
     const camX = Math.round(char.cameraX);
     this.ctx.translate(camX, 0);
     this.drawFrame();
     this.ctx.translate(-camX, 0);
-  };
+  }
 
   /**
    * Advances combat, entity updates, object cleanup, and checks game-over condition.
    * @param {Character} char - Player character instance.
    * @returns {void}
    */
-  updateLogic = (char) => {
+  updateLogic(char) {
     if (!char.isDead() && !char.isHurtAnimationActive()) {
       this.combatManager.updateThrowWorkflow(char);
     }
@@ -226,37 +227,37 @@ class GameEngine {
     if (char.isReadyForGameOver) {
       this.triggerGameOverFlow();
     }
-  };
+  }
 
   /**
    * Invokes the dt-scaled update method on every active frame object.
    * @returns {void}
    */
-  updateAllFrameObjects = () => {
+  updateAllFrameObjects() {
     for (let i = 0; i < this.frameObjects.length; i++) {
       if (this.frameObjects[i].update) {
         this.frameObjects[i].update(this.controller, this.frameScale);
       }
     }
-  };
+  }
 
   /**
    * Draws every entity in the current Z-ordered frame array.
    * @returns {void}
    */
-  drawFrame = () => {
+  drawFrame() {
     for (let i = 0; i < this.frameObjects.length; i++) {
       if (this.frameObjects[i].draw) {
         this.frameObjects[i].draw(this.ctx);
       }
     }
-  };
+  }
 
   /**
    * Transitions the application into the Game Over screen.
    * @returns {void}
    */
-  triggerGameOverFlow = () => {
+  triggerGameOverFlow() {
     showGameOverFrame();
-  };
+  }
 }

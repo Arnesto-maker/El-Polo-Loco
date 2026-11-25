@@ -20,84 +20,102 @@ class Controller {
    * Resets all held movement and action flags along with touch HUD pointers and glow visuals.
    * @returns {void}
    */
-  resetStates = () => {
+  resetStates() {
     this.right = false;
     this.left = false;
     this.space = false;
     this.enter = false;
     this.touchInput.resetVisualsAndPointers();
-  };
+  }
 
   /**
    * Registers pointer-type tracking, touch-only contextmenu suppression, and focus-loss resets.
    * @returns {void}
    */
-  bindGlobalGuards = () => {
-    window.addEventListener("pointerdown", (e) => {
-      this.lastPointerType = e.pointerType || "mouse";
-    }, true);
-    window.addEventListener("contextmenu", (e) => this.blockNativeContextMenu(e));
-    window.addEventListener("blur", () => this.resetStates());
+  bindGlobalGuards() {
+    window.addEventListener("pointerdown", this.handleGlobalPointerDown.bind(this), true);
+    window.addEventListener("contextmenu", this.blockNativeContextMenu.bind(this));
+    window.addEventListener("blur", this.resetStates.bind(this));
     this.bindVisibilityReset();
-  };
+  }
+
+  /**
+   * Records the latest pointer device type for touch-only contextmenu checks.
+   * @param {PointerEvent} event - Global pointerdown event.
+   * @returns {void}
+   */
+  handleGlobalPointerDown(event) {
+    this.lastPointerType = event.pointerType || "mouse";
+  }
 
   /**
    * Resets held input flags whenever the browser tab becomes hidden.
    * @returns {void}
    */
-  bindVisibilityReset = () => {
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) {
-        this.resetStates();
-      }
-    });
-  };
+  bindVisibilityReset() {
+    document.addEventListener("visibilitychange", this.handleVisibilityChange.bind(this));
+  }
+
+  /**
+   * Clears held input flags when the active document transitions to hidden state.
+   * @returns {void}
+   */
+  handleVisibilityChange() {
+    if (document.hidden) {
+      this.resetStates();
+    }
+  }
 
   /**
    * Determines whether a contextmenu event originated from touch or pen input instead of a mouse right-click.
    * @param {MouseEvent|PointerEvent} event - The native contextmenu event.
    * @returns {boolean} True when triggered by touch or pen input.
    */
-  isTouchContextMenu = (event) => {
+  isTouchContextMenu(event) {
     if (event.pointerType) {
       return event.pointerType !== "mouse";
     }
     return this.lastPointerType !== "mouse";
-  };
+  }
 
   /**
    * Suppresses touch long-press context menus outside text inputs while keeping desktop right-click inspect intact.
    * @param {MouseEvent|PointerEvent} event - The native contextmenu event.
    * @returns {void}
    */
-  blockNativeContextMenu = (event) => {
+  blockNativeContextMenu(event) {
     if (event.target && event.target.tagName === "INPUT") {
       return;
     }
     if (this.isTouchContextMenu(event)) {
       event.preventDefault();
     }
-  };
+  }
 
   /**
    * Registers global keyboard keydown and keyup listeners.
    * @returns {void}
    */
-  bindKeyboardEvents = () => {
-    window.addEventListener("keydown", (event) => {
-      this.handleKeyDown(event);
-    });
-    window.addEventListener("keyup", (event) => {
-      this.setContinuousState(event.code, false);
-    });
-  };
+  bindKeyboardEvents() {
+    window.addEventListener("keydown", this.handleKeyDown.bind(this));
+    window.addEventListener("keyup", this.handleKeyUp.bind(this));
+  }
+
+  /**
+   * Clears the held movement or action flag for a released keyboard key.
+   * @param {KeyboardEvent} event - The keyboard release event.
+   * @returns {void}
+   */
+  handleKeyUp(event) {
+    this.setContinuousState(event.code, false);
+  }
 
   /**
    * Processes a keyboard press, blocks default Tab focus shift, and routes discrete actions.
    * @param {KeyboardEvent} event - The keyboard event.
    * @returns {void}
    */
-  handleKeyDown = (event) => {
+  handleKeyDown(event) {
     if (event.code === "Tab" || event.key === "Tab") {
       event.preventDefault();
     }
@@ -105,7 +123,7 @@ class Controller {
     if (!event.repeat) {
       this.routeDiscreteKey(event.key);
     }
-  };
+  }
 
   /**
    * Updates held movement and action flags from keyboard codes.
@@ -113,7 +131,7 @@ class Controller {
    * @param {boolean} state - Active state of the key.
    * @returns {void}
    */
-  setContinuousState = (code, state) => {
+  setContinuousState(code, state) {
     if (code === "ArrowRight" || code === "KeyD") {
       this.right = state;
     } else if (code === "ArrowLeft" || code === "KeyA") {
@@ -123,14 +141,14 @@ class Controller {
     } else if (code === "Enter" || code === "NumpadEnter") {
       this.enter = state;
     }
-  };
+  }
 
   /**
    * Routes discrete control keys to settings, active game popups, or menu screens unless portrait-locked.
    * @param {string} key - Logical key name.
    * @returns {void}
    */
-  routeDiscreteKey = (key) => {
+  routeDiscreteKey(key) {
     if (isLandscapeLocked()) {
       return;
     }
@@ -139,18 +157,18 @@ class Controller {
       return;
     }
     this.dispatchActiveScreenKey(key);
-  };
+  }
 
   /**
    * Sends a discrete key to either the running game engine or menu navigation handler.
    * @param {string} key - Logical key name.
    * @returns {void}
    */
-  dispatchActiveScreenKey = (key) => {
+  dispatchActiveScreenKey(key) {
     if (window.gameEngine && window.gameEngine.isRunning) {
       window.gameEngine.routePopupKeyDown(key);
     } else {
       handleMenuControlKey(key);
     }
-  };
+  }
 }

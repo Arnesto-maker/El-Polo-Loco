@@ -171,13 +171,19 @@
   font-weight: bold;
 }
 
-.summary-actions span {
+.summary-actions .summary-action-btn {
   display: flex;
   justify-content: center;
   align-items: center;
   min-width: 44px;
   min-height: 44px;
   padding: 6px 10px;
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: clamp(16px, 2.4dvh, 24px);
+  font-weight: bold;
+  color: #111111;
   cursor: pointer;
 }
 

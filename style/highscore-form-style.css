@@ -58,6 +58,9 @@
   min-height: 44px;
   padding: 6px 12px;
   margin: clamp(6px, 1dvh, 12px) 0 0 0;
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
   font-size: clamp(16px, 2.5dvh, 25px);
   color: #7f0000;
   font-weight: bold;
@@ -116,8 +119,12 @@
   min-height: 44px;
   padding: 6px 14px;
   margin: 0;
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
   font-size: clamp(16px, 3dvw, 34px);
   font-weight: bold;
+  color: #111111;
   cursor: pointer;
 }
 
@@ -186,8 +193,12 @@
   min-height: 44px;
   padding: 6px 14px;
   margin: clamp(8px, 1.5dvh, 16px) 0 0 0;
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
   font-size: clamp(16px, 2.4dvh, 24px);
   font-weight: bold;
+  color: #111111;
   cursor: pointer;
 }
 

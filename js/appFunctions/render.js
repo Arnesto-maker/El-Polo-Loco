@@ -85,12 +85,12 @@ const renderSaveScoreOverlay = (totalScore) => {
 };
 
 /**
- * Updates the validation hint message in the save-score overlay.
+ * Updates the accessible validation error message in the save-score overlay.
  * @param {string} message - Validation feedback text.
  * @returns {void}
  */
 const renderValidationMessage = (message) => {
-  renderTextValues({ "save-validation-msg": message });
+  renderTextValues({ "player-name-inputContainerError": message });
 };
 
 /**

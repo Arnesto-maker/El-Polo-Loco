@@ -221,7 +221,10 @@
   min-width: 44px;
   min-height: 44px;
   padding: 6px 14px;
+  background-color: transparent;
+  border: none;
   font-family: Arial, sans-serif;
+  font-size: clamp(16px, 2.5dvh, 22px);
   font-weight: bold;
   color: #000000;
   cursor: pointer;

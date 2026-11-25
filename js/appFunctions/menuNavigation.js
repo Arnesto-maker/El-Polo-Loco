@@ -149,6 +149,19 @@ const handleSaveFlowControlKey = (key) => {
 };
 
 /**
+ * Triggers a role-button overlay action when Space is pressed on the focused overlay.
+ * @param {KeyboardEvent} event - Keydown event on the overlay section.
+ * @param {Function} actionCallback - Handler function to invoke.
+ * @returns {void}
+ */
+const handleOverlaySpaceKey = (event, actionCallback) => {
+  if (event.key === " " || event.code === "Space") {
+    event.preventDefault();
+    actionCallback(event);
+  }
+};
+
+/**
  * Continues from Game Over back to Frame 2 on click or touch.
  * @param {Event} event - Click or touch event.
  * @returns {void}

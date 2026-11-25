@@ -41,17 +41,17 @@ class StatusBar extends DrawableObject {
    * Preloads player health, boss health, bottle, and coin icons.
    * @returns {void}
    */
-  initLoadImages = () => {
+  initLoadImages() {
     this.loadImages(this.IMAGES_HEALTH);
     this.loadImages(this.IMAGES_BOSS_HEALTH);
     this.loadImages([this.ICON_BOTTLE, this.ICON_COIN]);
-  };
+  }
 
   /**
    * Resets all gameplay HUD counters to starting values.
    * @returns {void}
    */
-  loadInitialValue = () => {
+  loadInitialValue() {
     this.health = 100;
     this.bossHealth = 100;
     this.bossArmour = 100;
@@ -61,73 +61,73 @@ class StatusBar extends DrawableObject {
     this.bossBonus = 0;
     this.bossTimeMs = 0;
     this.showBossHud = false;
-  };
+  }
 
   /**
    * Sets position and size of the top-left health bar.
    * @returns {void}
    */
-  setMainParameter = () => {
+  setMainParameter() {
     this.x = this.canvasWidth * 0.01;
     this.y = this.canvasHeight * 0.11;
     this.width = this.canvasWidth * 0.2;
     this.height = this.canvasHeight * 0.1;
-  };
+  }
 
   /**
    * Updates the displayed player health sprite for the current health value.
    * @returns {void}
    */
-  updateHealthImage = () => {
+  updateHealthImage() {
     const index = this.setHealthIndex(this.health);
     this.img = this.imageCache[this.IMAGES_HEALTH[index]];
-  };
+  }
 
   /**
    * Updates the displayed boss health sprite for the current boss health value.
    * @returns {void}
    */
-  updateBossHealthImage = () => {
+  updateBossHealthImage() {
     const index = this.setHealthIndex(this.bossHealth);
     this.bossImg = this.imageCache[this.IMAGES_BOSS_HEALTH[index]];
-  };
+  }
 
   /**
    * Maps a 0-100 health percentage to a 0-5 sprite index.
    * @param {number} health - Health value from 0 to 100.
    * @returns {number} Sprite index between 0 and 5.
    */
-  setHealthIndex = (health) => {
+  setHealthIndex(health) {
     if (health >= 100) return 5;
     if (health >= 80) return 4;
     if (health >= 60) return 3;
     if (health >= 40) return 2;
     if (health >= 20) return 1;
     return 0;
-  };
+  }
 
   /**
    * Formats single-digit integers with a leading zero.
    * @param {number} value - Numeric counter value.
    * @returns {string} Zero-padded string.
    */
-  formatCount = (value) => {
+  formatCount(value) {
     if (value < 10) {
       return "0" + value;
     }
     return String(value);
-  };
+  }
 
   /**
    * Returns the HUD font scale multiplier (1.35 on normal touch viewports, 1 otherwise).
    * @returns {number} Active HUD font scaling factor.
    */
-  getHudFontScale = () => {
+  getHudFontScale() {
     if (typeof isNormalTouchViewport === "function" && isNormalTouchViewport()) {
       return 1.35;
     }
     return 1;
-  };
+  }
 
   /**
    * Computes a logical HUD font size scaled by canvas height and active touch readability factor.
@@ -135,29 +135,29 @@ class StatusBar extends DrawableObject {
    * @param {number} [pulse=1] - Optional animation pulse multiplier.
    * @returns {number} Scaled logical pixel font size.
    */
-  getScaledFontSize = (ratio, pulse = 1) => {
+  getScaledFontSize(ratio, pulse = 1) {
     return Math.floor(this.canvasHeight * ratio * this.getHudFontScale() * pulse);
-  };
+  }
 
   /**
    * Applies shared font styling for HUD text readouts.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @returns {void}
    */
-  setFontStyling = (ctx) => {
+  setFontStyling(ctx) {
     const fontSize = this.getScaledFontSize(0.031);
     ctx.font = `${fontSize}px PolloFont`;
     ctx.fillStyle = "#000000";
     ctx.strokeStyle = "#000000";
     ctx.textBaseline = "middle";
-  };
+  }
 
   /**
    * Draws the salsa bottle icon and inventory count.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @returns {void}
    */
-  drawBottleGroup = (ctx) => {
+  drawBottleGroup(ctx) {
     const row2Y = this.y + this.height + this.canvasHeight * 0.01;
     const iconSize = this.height * 0.85;
     const textCenterY = row2Y + iconSize / 2;
@@ -165,14 +165,14 @@ class StatusBar extends DrawableObject {
     const bottleText = this.formatCount(this.bottleCount);
     ctx.strokeText(bottleText, this.x + iconSize + 6, textCenterY);
     ctx.fillText(bottleText, this.x + iconSize + 6, textCenterY);
-  };
+  }
 
   /**
    * Draws the coin icon and collected coin count.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @returns {void}
    */
-  drawCoinGroup = (ctx) => {
+  drawCoinGroup(ctx) {
     const row2Y = this.y + this.height + this.canvasHeight * 0.01;
     const iconSize = this.height * 0.85;
     const textCenterY = row2Y + iconSize / 2;
@@ -181,14 +181,14 @@ class StatusBar extends DrawableObject {
     const coinText = this.formatCount(this.coinCount);
     ctx.strokeText(coinText, coinGroupX + iconSize + 6, textCenterY);
     ctx.fillText(coinText, coinGroupX + iconSize + 6, textCenterY);
-  };
+  }
 
   /**
    * Draws current score, boss bonus, pause hint, and coin-buy prompt.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @returns {void}
    */
-  drawScoringGroup = (ctx) => {
+  drawScoringGroup(ctx) {
     const row2Y = this.y + this.height + this.canvasHeight * 0.01;
     const row3Y = row2Y + this.height * 0.85 + this.canvasHeight * 0.028;
     const scoreText = "Score: " + this.score;
@@ -197,7 +197,7 @@ class StatusBar extends DrawableObject {
     this.bossHud.drawBossBonusText(ctx, row3Y);
     this.drawPauseHintText(ctx, row3Y);
     this.drawBuyHintGroup(ctx, row3Y);
-  };
+  }
 
   /**
    * Draws the pause instruction referencing the Tab key.
@@ -205,7 +205,7 @@ class StatusBar extends DrawableObject {
    * @param {number} row3Y - Baseline Y coordinate of the score row.
    * @returns {void}
    */
-  drawPauseHintText = (ctx, row3Y) => {
+  drawPauseHintText(ctx, row3Y) {
     const row4Y = row3Y + this.canvasHeight * 0.042;
     const fontSize = this.getScaledFontSize(0.024);
     ctx.save();
@@ -213,7 +213,7 @@ class StatusBar extends DrawableObject {
     ctx.strokeText("Press Tab to pause", this.x + 50, row4Y);
     ctx.fillText("Press Tab to pause", this.x + 50, row4Y);
     ctx.restore();
-  };
+  }
 
   /**
    * Draws a pulsing buy-bottle prompt whenever the player has at least two coins.
@@ -221,7 +221,7 @@ class StatusBar extends DrawableObject {
    * @param {number} row3Y - Baseline Y coordinate of the score row.
    * @returns {void}
    */
-  drawBuyHintGroup = (ctx, row3Y) => {
+  drawBuyHintGroup(ctx, row3Y) {
     if (this.coinCount < 2) {
       return;
     }
@@ -231,7 +231,7 @@ class StatusBar extends DrawableObject {
     ctx.font = `${this.getScaledFontSize(0.024, pulse)}px PolloFont`;
     this.renderBuyHintElements(ctx, row5Y, pulse);
     ctx.restore();
-  };
+  }
 
   /**
    * Renders the text and bottle icon for the pulsing buy hint.
@@ -240,7 +240,7 @@ class StatusBar extends DrawableObject {
    * @param {number} pulse - Current animation scale factor.
    * @returns {void}
    */
-  renderBuyHintElements = (ctx, row5Y, pulse) => {
+  renderBuyHintElements(ctx, row5Y, pulse) {
     const hintText = "Press B to buy";
     const textX = this.x + 50;
     ctx.strokeText(hintText, textX, row5Y);
@@ -248,24 +248,24 @@ class StatusBar extends DrawableObject {
     const iconSize = this.height * 0.5 * pulse;
     const iconX = textX + ctx.measureText(hintText).width + 4;
     ctx.drawImage(this.imageCache[this.ICON_BOTTLE], iconX, row5Y - iconSize / 2, iconSize, iconSize);
-  };
+  }
 
   /**
    * Renders the canvas HUD overlay unless the exotic ultra-compact CSS HUD is active.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @returns {void}
    */
-  draw = (ctx) => {
+  draw(ctx) {
     if (typeof isExoticViewport === "function" && isExoticViewport()) {
       return;
     }
     ctx.save();
-    ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+    super.draw(ctx);
     this.setFontStyling(ctx);
     this.drawBottleGroup(ctx);
     this.drawCoinGroup(ctx);
     this.drawScoringGroup(ctx);
     this.bossHud.draw(ctx);
     ctx.restore();
-  };
+  }
 }

@@ -114,6 +114,10 @@
   justify-content: center;
   align-items: flex-end;
   padding: 0 clamp(12px, 3dvw, 32px) 3.5%;
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: clamp(16px, 3dvw, 42px);
   cursor: pointer;
 }
 

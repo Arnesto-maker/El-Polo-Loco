@@ -56,6 +56,54 @@ const openSaveScoreFrame = () => {
 };
 
 /**
+ * Marks the player name input invalid and shows the accessible error message.
+ * @param {HTMLInputElement} input - Player name input element.
+ * @param {string} message - Validation error message.
+ * @returns {void}
+ */
+const markSaveScoreInvalid = (input, message) => {
+  const parent = input.closest(".contact-input-parent");
+  const errorEl = document.getElementById("player-name-inputContainerError");
+  input.setAttribute("aria-invalid", "true");
+  if (parent) {
+    parent.classList.add("error-message-activated");
+  }
+  if (errorEl) {
+    errorEl.setAttribute("style", "opacity:1");
+  }
+  renderValidationMessage(message);
+};
+
+/**
+ * Resets aria-invalid and removes the error highlight class on the name input.
+ * @param {HTMLInputElement|null} input - Player name input element.
+ * @returns {void}
+ */
+const resetSaveInputInvalidState = (input) => {
+  if (!input) {
+    return;
+  }
+  input.setAttribute("aria-invalid", "false");
+  const parent = input.closest(".contact-input-parent");
+  if (parent) {
+    parent.classList.remove("error-message-activated");
+  }
+};
+
+/**
+ * Clears validation error styling, text, and ARIA invalid state on user input.
+ * @returns {void}
+ */
+const clearSaveScoreError = () => {
+  resetSaveInputInvalidState(document.getElementById("player-name-input"));
+  const errorEl = document.getElementById("player-name-inputContainerError");
+  if (errorEl) {
+    errorEl.setAttribute("style", "");
+  }
+  renderValidationMessage("");
+};
+
+/**
  * Validates player name input and initiates server score submission.
  * @returns {void}
  */
@@ -63,9 +111,10 @@ const handleSaveScoreSubmit = () => {
   const input = document.getElementById("player-name-input");
   const playerName = input.value.trim();
   if (!isValidPlayerName(playerName)) {
-    renderValidationMessage("• min 4 letter maximum 12 (A-Z only)");
+    markSaveScoreInvalid(input, "• min 4 letter maximum 12 (A-Z only)");
     return;
   }
+  clearSaveScoreError();
   const payload = getHighscoreDataTemplate(playerName, winState.summary.totalScore);
   winState.pendingPayload = payload;
   submitScoreToServer(payload);
