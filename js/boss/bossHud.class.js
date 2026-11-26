@@ -47,16 +47,50 @@ class BossHud {
   }
 
   /**
+   * Returns the Jump-Throw hint text adapted to compact mobile landscape or desktop.
+   * @returns {string} Jump-Throw tactical hint string.
+   */
+  getJumpThrowHintText() {
+    if (this.bar.isCompactMobileLandscape()) {
+      return "Jump Throw = Crit!";
+    }
+    return "Use Jump Throw to deal more damage";
+  }
+
+  /**
+   * Returns the boss armor hint text adapted to compact mobile landscape or desktop.
+   * @returns {string} Armor warning hint string.
+   */
+  getArmourHintText() {
+    if (this.bar.isCompactMobileLandscape()) {
+      return "Break Armour first!";
+    }
+    return "Armour activated! Break armour to reduce health";
+  }
+
+  /**
+   * Boosts boss hint font ratio on compact mobile landscape viewports for readability.
+   * @param {number} baseRatio - Base canvas-height font ratio.
+   * @returns {number} Effective font ratio.
+   */
+  getBossHintFontRatio(baseRatio) {
+    if (this.bar.isCompactMobileLandscape()) {
+      return baseRatio + 0.006;
+    }
+    return baseRatio;
+  }
+
+  /**
    * Draws pulsing Hint A advising Jump-Throw attacks beneath the boss armor bar.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @returns {void}
    */
   drawBossJumpThrowHint(ctx) {
     const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.07;
-    const fontSize = this.bar.getScaledFontSize(0.019, pulse);
+    const fontSize = this.bar.getScaledFontSize(this.getBossHintFontRatio(0.019), pulse);
     const hintX = ctx.canvas.width - this.bar.x * 2;
     const hintY = this.bar.y + this.bar.height * 2 + this.bar.canvasHeight * 0.032;
-    const text = "Use Jump Throw to deal more damage";
+    const text = this.getJumpThrowHintText();
     ctx.save();
     ctx.font = `${fontSize}px PolloFont`;
     ctx.textAlign = "right";
@@ -87,10 +121,10 @@ class BossHud {
     if (this.bar.bossArmour <= 0) {
       return;
     }
-    const fontSize = this.bar.getScaledFontSize(0.018);
+    const fontSize = this.bar.getScaledFontSize(this.getBossHintFontRatio(0.018));
     const hintX = ctx.canvas.width - this.bar.x * 2;
-    const hintY = this.bar.y + this.bar.height * 2 + this.bar.canvasHeight * 0.065;
-    const text = "Armour activated! Break armour to reduce health";
+    const hintY = this.bar.y + this.bar.height * 2 + this.bar.canvasHeight * 0.068;
+    const text = this.getArmourHintText();
     ctx.save();
     this.applyWarningHintStyle(ctx, fontSize);
     ctx.strokeText(text, hintX, hintY);

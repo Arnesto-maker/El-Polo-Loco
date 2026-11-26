@@ -95,7 +95,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 20;
+  z-index: 30;
   background-image: url("../assets/img/9_intro_outro_screens/start/startscreen_1.png");
   background-size: cover;
   background-position: center;

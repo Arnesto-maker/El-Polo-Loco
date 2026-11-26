@@ -119,6 +119,15 @@ class StatusBar extends DrawableObject {
   }
 
   /**
+   * Checks whether the active viewport is a compact mobile landscape screen (<= 924x412).
+   * @returns {boolean} True when landscape width <= 924 and height <= 412.
+   */
+  isCompactMobileLandscape() {
+    const isLandscape = window.innerWidth > window.innerHeight;
+    return isLandscape && window.innerWidth <= 924 && window.innerHeight <= 412;
+  }
+
+  /**
    * Returns the HUD font scale multiplier (1.35 on normal touch viewports, 1 otherwise).
    * @returns {number} Active HUD font scaling factor.
    */
@@ -200,6 +209,39 @@ class StatusBar extends DrawableObject {
   }
 
   /**
+   * Returns the pause hint text adapted to compact mobile landscape or desktop.
+   * @returns {string} Pause hint text.
+   */
+  getPauseHintLabel() {
+    if (this.isCompactMobileLandscape()) {
+      return "Tab: Pause";
+    }
+    return "Press Tab to pause";
+  }
+
+  /**
+   * Returns the buy hint text adapted to compact mobile landscape or desktop.
+   * @returns {string} Buy bottle hint text.
+   */
+  getBuyHintLabel() {
+    if (this.isCompactMobileLandscape()) {
+      return "B: Buy";
+    }
+    return "Press B to buy";
+  }
+
+  /**
+   * Returns the HUD hint font ratio boosted slightly on compact mobile landscape screens.
+   * @returns {number} Effective canvas-height font ratio.
+   */
+  getHintFontRatio() {
+    if (this.isCompactMobileLandscape()) {
+      return 0.027;
+    }
+    return 0.024;
+  }
+
+  /**
    * Draws the pause instruction referencing the Tab key.
    * @param {CanvasRenderingContext2D} ctx - Canvas 2D context.
    * @param {number} row3Y - Baseline Y coordinate of the score row.
@@ -207,11 +249,12 @@ class StatusBar extends DrawableObject {
    */
   drawPauseHintText(ctx, row3Y) {
     const row4Y = row3Y + this.canvasHeight * 0.042;
-    const fontSize = this.getScaledFontSize(0.024);
+    const fontSize = this.getScaledFontSize(this.getHintFontRatio());
+    const text = this.getPauseHintLabel();
     ctx.save();
     ctx.font = `${fontSize}px PolloFont`;
-    ctx.strokeText("Press Tab to pause", this.x + 50, row4Y);
-    ctx.fillText("Press Tab to pause", this.x + 50, row4Y);
+    ctx.strokeText(text, this.x + 50, row4Y);
+    ctx.fillText(text, this.x + 50, row4Y);
     ctx.restore();
   }
 
@@ -225,10 +268,10 @@ class StatusBar extends DrawableObject {
     if (this.coinCount < 2) {
       return;
     }
-    const row5Y = row3Y + this.canvasHeight * 0.085;
+    const row5Y = row3Y + this.canvasHeight * 0.082;
     const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.08;
     ctx.save();
-    ctx.font = `${this.getScaledFontSize(0.024, pulse)}px PolloFont`;
+    ctx.font = `${this.getScaledFontSize(this.getHintFontRatio(), pulse)}px PolloFont`;
     this.renderBuyHintElements(ctx, row5Y, pulse);
     ctx.restore();
   }
@@ -241,7 +284,7 @@ class StatusBar extends DrawableObject {
    * @returns {void}
    */
   renderBuyHintElements(ctx, row5Y, pulse) {
-    const hintText = "Press B to buy";
+    const hintText = this.getBuyHintLabel();
     const textX = this.x + 50;
     ctx.strokeText(hintText, textX, row5Y);
     ctx.fillText(hintText, textX, row5Y);

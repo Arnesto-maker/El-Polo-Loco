@@ -172,11 +172,12 @@
   border-color: #ffeb3b;
 }
 
-.dossier-continue-btn .dossier-touch-badge {
+.dossier-continue-btn .dossier-desktop-label {
+  display: flex;
+}
+
+.dossier-continue-btn .dossier-touch-label {
   display: none;
-  background-color: #2f241f;
-  color: #82b1ff;
-  border-color: #82b1ff;
 }
 
 @media (max-width: 1366px), (pointer: coarse) {
@@ -205,7 +206,11 @@
     display: none;
   }
 
-  .dossier-continue-btn .dossier-touch-badge {
+  .dossier-continue-btn .dossier-desktop-label {
+    display: none;
+  }
+
+  .dossier-continue-btn .dossier-touch-label {
     display: flex;
   }
 

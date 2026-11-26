@@ -1,8 +1,8 @@
 .settings-box {
-  width: 75%;
-  min-width: min(100%, 280px);
-  height: 100%;
-  max-height: 100%;
+  width: clamp(296px, 56dvw, 720px);
+  max-width: min(94dvw, 1920px);
+  height: auto;
+  max-height: 90dvh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -64,7 +64,7 @@
 }
 
 .settings-back-btn {
-  height: 20%;
+  height: clamp(46px, 8dvh, 68px);
   min-height: 44px;
 }
 
@@ -94,8 +94,9 @@
   left: 50%;
   transform: translate(-50%, -50%);
   max-width: 1920px;
-  max-height: 92dvh;
-  z-index: 55;
+  max-height: 96dvh;
+  z-index: 65;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.68);
 }
 
 .about-title {
@@ -165,11 +166,12 @@
 
 .help-overlay {
   position: absolute;
-  width: clamp(296px, 64dvw, 960px);
-  max-width: min(94dvw, 1920px);
-  height: clamp(260px, 64dvh, 720px);
-  max-height: 92dvh;
-  z-index: 30;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: clamp(8px, 2dvh, 24px) clamp(8px, 2dvw, 24px);
+  background-color: rgba(0, 0, 0, 0.65);
+  z-index: 60;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -178,9 +180,10 @@
 }
 
 .help-box {
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
+  width: clamp(296px, 64dvw, 960px);
+  max-width: min(94dvw, 1920px);
+  height: auto;
+  max-height: 90dvh;
   background-color: rgba(238, 138, 69, 0.96);
   border: 4px solid #000000;
   border-radius: 10px;
@@ -231,17 +234,17 @@
 }
 
 .pause-box {
-  width: 75%;
-  min-width: min(100%, 280px);
-  height: 100%;
-  max-height: 100%;
+  width: clamp(296px, 48dvw, 620px);
+  max-width: min(94dvw, 1920px);
+  height: auto;
+  max-height: 90dvh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
   gap: clamp(8px, 1.2dvh, 14px);
   padding: clamp(12px, 2.5dvh, 24px) clamp(14px, 3dvw, 32px);
-  background-color: rgba(238, 138, 69, 0.9);
+  background-color: rgba(238, 138, 69, 0.94);
   border: 3px solid #000000;
   border-radius: 10px;
   overflow-y: auto;
@@ -256,14 +259,18 @@
   color: #000000;
 }
 
+.pause-box .menu-btn {
+  height: clamp(46px, 8dvh, 68px);
+  min-height: 44px;
+}
+
 .dossier-overlay {
-  width: clamp(304px, 74dvw, 960px);
-  max-width: min(94dvw, 1920px);
-  height: auto;
-  max-height: 90dvh;
+  padding: clamp(6px, 1.5dvh, 18px) clamp(8px, 2dvw, 20px);
 }
 
 .dossier-box {
+  width: clamp(304px, 74dvw, 960px);
+  max-width: min(94dvw, 1920px);
   height: auto;
   max-height: 90dvh;
   gap: clamp(10px, 1.8dvh, 18px);
