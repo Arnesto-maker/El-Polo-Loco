@@ -16,10 +16,10 @@ class Cloud extends MovableObject {
     this.width = this.canvasWidth;
     this.height = 0.6 * this.canvasHeight;
     this.x = startX;
-    this.y = canvas.width * 0.1;
+    this.y = this.canvasWidth * 0.1;
     this.minX = minX;
     this.maxX = maxX;
-    this.v = v;
+    this.speed = v;
   }
 
   /**
@@ -29,9 +29,9 @@ class Cloud extends MovableObject {
    * @returns {void}
    */
   update(controller, scale = 1) {
-    this.x += this.v * scale;
+    this.x += this.speed * scale;
     if (this.x >= this.maxX || this.x <= this.minX) {
-      this.v = -this.v;
+      this.speed = -this.speed;
     }
   }
 }

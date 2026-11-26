@@ -2,8 +2,6 @@
  * Boss radial salvo bottle projectile with immediate ballistic arc.
  */
 class BossBottle extends Projectile {
-  vX = 0;
-
   /**
    * Creates a boss salvo bottle launched with initial velocity components.
    * @param {HTMLCanvasElement|Object} canvas - The game canvas or design dimension object.
@@ -27,7 +25,7 @@ class BossBottle extends Projectile {
    */
   setMainParameter(startX, startY, vX, vY) {
     this.initBaseBounds(startX, startY);
-    this.vX = vX;
+    this.speed = vX;
     this.vg = vY;
     this.gravity = 0.5;
     this.yMax = this.getGroundLine();
@@ -39,16 +37,7 @@ class BossBottle extends Projectile {
    * @returns {void}
    */
   updateFlight(scale = 1) {
-    this.x += this.vX * scale;
-    this.applyMidpointGravity(scale);
-  }
-
-  /**
-   * Stops horizontal and vertical salvo velocities upon impact.
-   * @returns {void}
-   */
-  stopMotion() {
-    super.stopMotion();
-    this.vX = 0;
+    this.x += this.speed * scale;
+    this.integrateMidpointGravity(scale);
   }
 }

@@ -70,13 +70,18 @@ class CharacterHealth extends MovableObject {
   }
 
   /**
-   * Interrupts throw and idle state and plays the hurt sprite sequence.
+   * Hook overridden by subclasses to cancel active action states on hurt or death.
+   * @returns {void}
+   */
+  interruptActiveActions() {}
+
+  /**
+   * Interrupts active actions and plays the hurt sprite sequence.
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
   applyHurtPriorityAnimation(scale = 1) {
-    this.isThrowing = false;
-    this.idleTimer = 0;
+    this.interruptActiveActions();
     this.playAnimation(this.IMAGES_HURT, scale, 6);
   }
 
@@ -106,8 +111,7 @@ class CharacterHealth extends MovableObject {
       this.currentAnimation = null;
       this.resetAnimationFrame();
     }
-    this.isThrowing = false;
-    this.idleTimer = 0;
+    this.interruptActiveActions();
   }
 
   /**

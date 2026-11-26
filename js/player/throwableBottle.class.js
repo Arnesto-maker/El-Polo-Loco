@@ -71,7 +71,7 @@ class ThrowableBottle extends Projectile {
   updateFlight(scale = 1) {
     this.x += this.speed * this.dir * scale;
     if (this.hasPassedXWMax()) {
-      this.applyMidpointGravity(scale);
+      this.integrateMidpointGravity(scale);
     }
   }
 

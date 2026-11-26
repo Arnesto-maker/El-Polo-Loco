@@ -11,7 +11,6 @@ class Chicken extends MovableObject {
   IMAGE_DEAD = ["assets/img/3_enemies_chicken/chicken_normal/2_dead/dead.png"];
   isDead = false;
   deadTime = 0;
-  v = 0;
   direction = 1;
 
   /**
@@ -39,8 +38,8 @@ class Chicken extends MovableObject {
     this.width = this.canvasWidth * 0.06;
     this.height = this.canvasHeight * 0.11;
     this.x = minX + Math.random() * (maxX - minX);
-    this.y = this.canvasHeight - this.height - this.floor - 10;
-    this.v = 1.5 + Math.random() * 1.5;
+    this.y = this.getGroundLine() - 10;
+    this.speed = 1.5 + Math.random() * 1.5;
     if (Math.random() < 0.5) {
       this.direction = -1;
     } else {
@@ -89,7 +88,7 @@ class Chicken extends MovableObject {
    * @returns {void}
    */
   updateMovement(scale = 1) {
-    this.x += this.v * this.direction * scale;
+    this.x += this.speed * this.direction * scale;
     if (this.x >= this.maxPatrolX) {
       this.x = this.maxPatrolX;
       this.direction = -1;
@@ -130,7 +129,7 @@ class Chicken extends MovableObject {
    */
   die() {
     this.isDead = true;
-    this.v = 0;
+    this.speed = 0;
     this.img = this.imageCache[this.IMAGE_DEAD[0]];
     this.deadTime = performance.now();
   }

@@ -17,14 +17,6 @@ class MovableObject extends DrawableObject {
   }
 
   /**
-   * Returns the Y coordinate where this entity rests on the desert floor.
-   * @returns {number} Ground line Y coordinate.
-   */
-  getGroundLine() {
-    return this.canvasHeight - this.height - this.floor;
-  }
-
-  /**
    * Checks whether the entity is currently airborne above the ground line.
    * @returns {boolean} True if above ground.
    */
@@ -52,11 +44,20 @@ class MovableObject extends DrawableObject {
    * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
    * @returns {void}
    */
-  applyVerticalMovement(scale = 1) {
+  integrateMidpointGravity(scale = 1) {
     const halfGravity = this.gravity * scale * 0.5;
     this.vg += halfGravity;
     this.y += this.vg * scale;
     this.vg += halfGravity;
+  }
+
+  /**
+   * Applies midpoint gravity and clamps upward jump velocity at yMax.
+   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
+   * @returns {void}
+   */
+  applyVerticalMovement(scale = 1) {
+    this.integrateMidpointGravity(scale);
     if (this.y <= this.yMax) {
       this.y = this.yMax;
       this.vg = this.gravity;

@@ -2,7 +2,6 @@
  * Playable hero Pepe handling dt-scaled movement, edge-triggered jumping, throwing, dynamic camera follow, and idle sprites.
  */
 class Character extends CharacterHealth {
-  vXChar = 7;
   isJumping = false;
   isMoving = false;
   isThrowing = false;
@@ -27,21 +26,12 @@ class Character extends CharacterHealth {
   }
 
   /**
-   * Builds and preloads a sequential sprite path array for Pepe.
-   * @param {string} dir - Subfolder inside assets/img/2_character_pepe.
-   * @param {string} prefix - Filename prefix before the frame number.
-   * @param {number} start - First frame index.
-   * @param {number} end - Last frame index.
-   * @returns {Array<string>} Preloaded sprite path list.
+   * Cancels throwing and idle timers when interrupted by hurt or death.
+   * @returns {void}
    */
-  loadSpriteRange(dir, prefix, start, end) {
-    const paths = [];
-    const base = `assets/img/2_character_pepe/${dir}/${prefix}`;
-    for (let i = start; i <= end; i++) {
-      paths.push(`${base}${i}.png`);
-    }
-    this.loadImages(paths);
-    return paths;
+  interruptActiveActions() {
+    this.isThrowing = false;
+    this.idleTimer = 0;
   }
 
   /**
@@ -49,15 +39,16 @@ class Character extends CharacterHealth {
    * @returns {void}
    */
   loadAllImages() {
-    const w21 = "assets/img/2_character_pepe/2_walk/W-21.png";
-    this.IMAGE_0 = "assets/img/2_character_pepe/1_idle/idle/I-1.png";
-    this.IMAGES_IDLE = this.loadSpriteRange("1_idle/idle", "I-", 1, 10);
-    this.IMAGES_LONG_IDLE = this.loadSpriteRange("1_idle/long_idle", "I-", 11, 20);
-    this.IMAGES_JUMP = this.loadSpriteRange("3_jump", "J-", 31, 39);
-    this.IMAGES_MOVING = this.loadSpriteRange("2_walk", "W-", 22, 26);
+    const base = "assets/img/2_character_pepe/";
+    const w21 = `${base}2_walk/W-21.png`;
+    this.IMAGE_0 = `${base}1_idle/idle/I-1.png`;
+    this.IMAGES_IDLE = this.loadSpriteRange(`${base}1_idle/idle/I-`, 1, 10);
+    this.IMAGES_LONG_IDLE = this.loadSpriteRange(`${base}1_idle/long_idle/I-`, 11, 20);
+    this.IMAGES_JUMP = this.loadSpriteRange(`${base}3_jump/J-`, 31, 39);
+    this.IMAGES_MOVING = this.loadSpriteRange(`${base}2_walk/W-`, 22, 26);
     this.IMAGES_MOVING.push(w21);
     this.loadImages([this.IMAGE_0, w21]);
-    this.IMAGES_THROWING = this.loadSpriteRange("6_throw", "T-", 1, 4);
+    this.IMAGES_THROWING = this.loadSpriteRange(`${base}6_throw/T-`, 1, 4);
     this.loadHealthImages();
   }
 
@@ -75,7 +66,7 @@ class Character extends CharacterHealth {
   }
 
   /**
-   * Sets initial size, spawn coordinates, jump limit, and hitbox offsets.
+   * Sets initial size, spawn coordinates, speed, jump limit, and hitbox offsets.
    * @returns {void}
    */
   setMainParameter() {
@@ -84,8 +75,9 @@ class Character extends CharacterHealth {
     this.width = this.canvasWidth * 0.14;
     this.height = this.canvasHeight * 0.36;
     this.x = this.canvasWidth * 0.05;
-    this.y = this.canvasHeight - this.height - this.floor;
+    this.y = this.getGroundLine();
     this.yMax = this.y - this.canvasHeight * 0.5;
+    this.speed = 7;
     this.offset = this.createHitboxOffset();
   }
 
@@ -208,10 +200,10 @@ class Character extends CharacterHealth {
   moveHorizontal(controller, scale = 1) {
     const maxWorldX = this.canvasWidth * 2 - this.width;
     if (controller.right && this.x < maxWorldX) {
-      this.x += this.vXChar * scale;
+      this.x += this.speed * scale;
       this.otherDirection = false;
     } else if (controller.left && this.x > 0) {
-      this.x -= this.vXChar * scale;
+      this.x -= this.speed * scale;
       this.otherDirection = true;
     }
   }
@@ -244,7 +236,7 @@ class Character extends CharacterHealth {
     this.isJumping = true;
     this.vg = velocity;
     this.currentAnimation = null;
-    this.imageCounter = 0;
+    this.resetAnimationFrame();
   }
 
   /**

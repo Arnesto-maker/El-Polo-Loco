@@ -230,17 +230,18 @@
           <button class="menu-btn settings-back-btn" type="button" onclick="closeSettingsOverlay()">Back (Tab)</button>
         </div>
       </section>
-      <section id="boss-dossier-overlay" class="help-overlay d-none">
-        <div class="help-box">
-          <div class="help-inner">
-            <p class="help-line">BOSS DOSSIER : EL POLLO LOCO</p>
-            <p class="help-line">Armor : 100 Points (Break shield first!)</p>
-            <p class="help-line">Hit-Zones : Jump-Throw for critical damage</p>
-            <p class="help-line">Counter AI : 3 back-hits trigger instant turn!</p>
-            <p class="help-line">Rage Mode : 0 Armor starts 8s bullet-hell salvos!</p>
-            <p class="help-line">Economy : Press B to buy bottles with coins.</p>
+      <section id="boss-dossier-overlay" class="help-overlay dossier-overlay d-none" aria-label="Boss Dossier">
+        <div class="help-box dossier-box">
+          <h2 class="dossier-title">BOSS DOSSIER : EL POLLO LOCO</h2>
+          <div class="dossier-stage-frame">
+            <canvas id="boss-dossier-canvas" class="dossier-canvas" width="800" height="360" aria-hidden="true"></canvas>
+            <p id="dossier-scene-hint" class="dossier-scene-hint" aria-live="polite">Use jump throw to deal critical damage.</p>
           </div>
-          <button type="button" class="help-footer" onclick="closeBossDossierFromDom()">Enter = ok and exit</button>
+          <button type="button" class="dossier-continue-btn" onclick="closeBossDossierFromDom()">
+            <span class="key-badge dossier-key-badge">Enter</span>
+            <span class="touch-badge touch-badge-enter dossier-touch-badge">Enter</span>
+            <span class="dossier-continue-label">to continue</span>
+          </button>
         </div>
       </section>
       <section id="pause-overlay" class="help-overlay d-none">
@@ -326,6 +327,8 @@
     <script src="js/boss/bossBottle.class.js"></script>
     <script src="js/boss/bossArmourBar.class.js"></script>
     <script src="js/boss/bossHud.class.js"></script>
+    <script src="js/boss/bossDossierScenes.class.js"></script>
+    <script src="js/boss/bossDossierAnimator.class.js"></script>
     <script src="js/boss/bossDossierPopUp.class.js"></script>
     <script src="js/hud/statusbar.class.js"></script>
     <script src="js/hud/starthelpPopUp.class.js"></script>

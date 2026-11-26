@@ -30,6 +30,14 @@ class DrawableObject {
   }
 
   /**
+   * Returns the Y coordinate where this sprite rests on the desert floor.
+   * @returns {number} Ground line Y coordinate.
+   */
+  getGroundLine() {
+    return this.canvasHeight - this.height - this.floor;
+  }
+
+  /**
    * Loads a single image directly onto this sprite.
    * @param {string} path - Image asset path.
    * @returns {void}
@@ -50,6 +58,22 @@ class DrawableObject {
       img.src = path;
       this.imageCache[path] = img;
     }
+  }
+
+  /**
+   * Builds and preloads a sequential numbered sprite array into the image cache.
+   * @param {string} basePath - Full path prefix before the frame index.
+   * @param {number} start - First frame index inclusive.
+   * @param {number} end - Last frame index inclusive.
+   * @returns {Array<string>} Preloaded sprite path list.
+   */
+  loadSpriteRange(basePath, start, end) {
+    const paths = [];
+    for (let i = start; i <= end; i++) {
+      paths.push(`${basePath}${i}.png`);
+    }
+    this.loadImages(paths);
+    return paths;
   }
 
   /**

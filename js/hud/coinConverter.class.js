@@ -1,16 +1,15 @@
 /**
  * In-game canvas popup enabling live coin-to-bottle conversion at a 2:1 exchange rate.
  */
-class CoinConverter {
+class CoinConverter extends BaseOverlayPopup {
   /**
    * Initializes converter state, sprite icons, and centered layout bounds.
    * @param {StatusBar} statusBar - HUD status bar holding coin and bottle counts.
    * @param {GameEngine} engine - Active GameEngine instance.
    */
   constructor(statusBar, engine) {
+    super(engine, null);
     this.statusBar = statusBar;
-    this.engine = engine;
-    this.isOpen = false;
     this.initialCoins = 0;
     this.rate = 2;
     this.borderRadius = [20, 20, 20, 20];
@@ -49,23 +48,20 @@ class CoinConverter {
     }
     if (!this.isOpen) {
       this.initPopupLayout();
-      this.isOpen = true;
-      this.engine.isPaused = true;
+      this.pauseAndShow();
       this.initialCoins = this.statusBar.coinCount;
       this.rate = 2;
     }
   }
 
   /**
-   * Closes the converter popup and resumes gameplay.
+   * Closes the converter popup and resumes gameplay with reset delta timing.
    * @returns {void}
    */
   closePopup() {
     if (this.isOpen) {
-      this.isOpen = false;
-      this.engine.isPaused = false;
       this.engine.controller.enter = false;
-      this.engine.lastBossTick = performance.now();
+      this.resumeAndHide();
     }
   }
 

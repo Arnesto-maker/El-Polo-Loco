@@ -73,19 +73,7 @@ class Projectile extends MovableObject {
    * @returns {void}
    */
   updateFlight(scale = 1) {
-    this.applyMidpointGravity(scale);
-  }
-
-  /**
-   * Integrates vertical velocity and position using midpoint gravity.
-   * @param {number} [scale=1] - Normalized 60-FPS delta scale factor.
-   * @returns {void}
-   */
-  applyMidpointGravity(scale = 1) {
-    const halfGravity = this.gravity * scale * 0.5;
-    this.vg += halfGravity;
-    this.y += this.vg * scale;
-    this.vg += halfGravity;
+    this.integrateMidpointGravity(scale);
   }
 
   /**

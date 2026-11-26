@@ -3,14 +3,17 @@
  */
 class BaseOverlayPopup {
   /**
-   * Binds the engine reference and caches the target DOM overlay element.
+   * Binds the engine reference and caches an optional target DOM overlay element.
    * @param {GameEngine} engine - Active GameEngine instance.
-   * @param {string} overlayId - DOM element ID of the popup container.
+   * @param {string|null} [overlayId=null] - DOM element ID of the popup container or null for canvas popups.
    */
-  constructor(engine, overlayId) {
+  constructor(engine, overlayId = null) {
     this.engine = engine;
     this.isOpen = false;
-    this.overlayElement = document.getElementById(overlayId);
+    this.overlayElement = null;
+    if (overlayId) {
+      this.overlayElement = document.getElementById(overlayId);
+    }
   }
 
   /**

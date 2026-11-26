@@ -86,6 +86,12 @@ class BossCombat extends MovableObject {
   }
 
   /**
+   * Hook overridden by Boss to launch a special salvo counterattack.
+   * @returns {void}
+   */
+  triggerSpecialAttack() {}
+
+  /**
    * Turns the boss around immediately and launches a counter salvo.
    * @returns {void}
    */

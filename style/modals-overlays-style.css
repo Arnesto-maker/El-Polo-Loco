@@ -255,3 +255,107 @@
   font-weight: bold;
   color: #000000;
 }
+
+.dossier-overlay {
+  width: clamp(304px, 74dvw, 960px);
+  max-width: min(94dvw, 1920px);
+  height: auto;
+  max-height: 90dvh;
+}
+
+.dossier-box {
+  height: auto;
+  max-height: 90dvh;
+  gap: clamp(10px, 1.8dvh, 18px);
+  padding: clamp(12px, 2.2dvh, 24px) clamp(14px, 2.5dvw, 28px);
+}
+
+.dossier-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(18px, 3.4dvh, 34px);
+  color: #000000;
+  text-align: center;
+}
+
+.dossier-stage-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  background-color: #1c1410;
+  border: 3px solid #7f0000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.dossier-canvas {
+  display: flex;
+  width: 100%;
+  height: auto;
+  max-height: 52dvh;
+  aspect-ratio: 800 / 360;
+  object-fit: contain;
+}
+
+.dossier-scene-hint {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: clamp(8px, 1.3dvh, 14px) clamp(10px, 2dvw, 20px);
+  background-color: #1c1410;
+  border-top: 2px solid #7f0000;
+  font-family: Arial, sans-serif;
+  font-size: clamp(16px, 2.4dvh, 22px);
+  font-weight: bold;
+  color: #fff8e1;
+  text-align: center;
+}
+
+.dossier-continue-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(8px, 1.4dvw, 14px);
+  min-width: 44px;
+  min-height: 48px;
+  padding: clamp(8px, 1.1dvh, 12px) clamp(18px, 2.6dvw, 30px);
+  background-color: #1c1410;
+  border: 3px solid #ffeb3b;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+  font-size: clamp(16px, 2.4dvh, 22px);
+  font-weight: bold;
+  color: #fff8e1;
+  cursor: pointer;
+  touch-action: manipulation;
+  animation: dossierContinuePulse 1.3s ease-in-out infinite;
+}
+
+.dossier-continue-btn:hover,
+.dossier-continue-btn:focus-visible {
+  background-color: #2c2019;
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.dossier-continue-label {
+  display: flex;
+  align-items: center;
+  font-size: clamp(16px, 2.4dvh, 22px);
+  color: #fff8e1;
+}
+
+@keyframes dossierContinuePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 235, 59, 0.75);
+  }
+  50% {
+    transform: scale(1.045);
+    box-shadow: 0 0 16px 4px rgba(255, 235, 59, 0.92);
+  }
+}

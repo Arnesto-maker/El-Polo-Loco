@@ -43,7 +43,7 @@ class Bottle extends DrawableObject {
   setBottleParameter(sectorMaxX, sectorMinX) {
     this.width = this.canvasWidth * 0.05;
     this.height = this.canvasHeight * 0.11;
-    this.y = this.canvasHeight - this.height - this.floor;
+    this.y = this.getGroundLine();
     const availableWidth = sectorMaxX - sectorMinX - this.width;
     this.x = sectorMinX + Math.random() * availableWidth;
   }

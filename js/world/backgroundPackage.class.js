@@ -91,7 +91,7 @@ class BackgroundPackage {
 
   /**
    * Combines background layers and clouds into a single Z-ordered render array.
-   * @returns {Array<MovableObject>} Combined background render package.
+   * @returns {Array<DrawableObject>} Combined background render package.
    */
   getBgPackage() {
     const bgComponentsFrames = [];

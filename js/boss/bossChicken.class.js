@@ -23,34 +23,18 @@ class Boss extends BossCombat {
   }
 
   /**
-   * Builds and preloads a sequential sprite array for the Endboss.
-   * @param {string} dir - Subfolder inside assets/img/4_enemie_boss_chicken.
-   * @param {number} start - First G-sprite index.
-   * @param {number} end - Last G-sprite index.
-   * @returns {Array<string>} Preloaded sprite path list.
-   */
-  loadBossRange(dir, start, end) {
-    const paths = [];
-    const base = `assets/img/4_enemie_boss_chicken/${dir}/G`;
-    for (let i = start; i <= end; i++) {
-      paths.push(`${base}${i}.png`);
-    }
-    this.loadImages(paths);
-    return paths;
-  }
-
-  /**
    * Preloads all boss sprite animations.
    * @returns {void}
    */
   loadAllImages() {
-    this.IMAGES_WALK = this.loadBossRange("1_walk", 1, 4);
-    this.IMAGES_ALERT = this.loadBossRange("2_alert", 5, 12);
-    this.IMAGES_ATTACK = this.loadBossRange("3_attack", 13, 20);
+    const base = "assets/img/4_enemie_boss_chicken/";
+    this.IMAGES_WALK = this.loadSpriteRange(`${base}1_walk/G`, 1, 4);
+    this.IMAGES_ALERT = this.loadSpriteRange(`${base}2_alert/G`, 5, 12);
+    this.IMAGES_ATTACK = this.loadSpriteRange(`${base}3_attack/G`, 13, 20);
     const atk = this.IMAGES_ATTACK;
     this.IMAGES_SPECIAL_ATTACK = [atk[5], atk[6], atk[5], atk[6], atk[7]];
-    this.IMAGES_HURT = this.loadBossRange("4_hurt", 21, 23);
-    this.IMAGES_DEAD = this.loadBossRange("5_dead", 24, 26);
+    this.IMAGES_HURT = this.loadSpriteRange(`${base}4_hurt/G`, 21, 23);
+    this.IMAGES_DEAD = this.loadSpriteRange(`${base}5_dead/G`, 24, 26);
   }
 
   /**
@@ -143,8 +127,7 @@ class Boss extends BossCombat {
     this.lastSalvoTime = now;
     this.lastSpecialTime = now;
     this.specialStartTime = now;
-    this.imageCounter = 0;
-    this.frameTick = 0;
+    this.resetAnimationFrame();
   }
 
   /**

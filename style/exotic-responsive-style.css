@@ -8,6 +8,32 @@
     max-height: calc(100dvh - 60px);
   }
 
+  .dossier-overlay {
+    width: clamp(304px, 86dvw, 680px);
+    height: auto;
+    max-height: 90dvh;
+  }
+
+  .dossier-box {
+    gap: 6px;
+    padding: 8px 12px;
+  }
+
+  .dossier-canvas {
+    max-height: 44dvh;
+  }
+
+  .dossier-scene-hint {
+    padding: 4px 8px;
+    font-size: 16px;
+  }
+
+  .dossier-continue-btn {
+    min-height: 44px;
+    padding: 6px 14px;
+    font-size: 16px;
+  }
+
   #game-container.exotic-gameplay:not(.exotic-boss-mode) .help-overlay {
     top: calc((100dvh - 52px) / 2);
   }
@@ -261,7 +287,8 @@
   .lock-spinner-ring,
   .loading-spinner-bottle,
   .exotic-buy-pill,
-  .exotic-hint-jump {
+  .exotic-hint-jump,
+  .dossier-continue-btn {
     animation: none;
   }
 }

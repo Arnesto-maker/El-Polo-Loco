@@ -165,6 +165,20 @@
   display: none;
 }
 
+.dossier-continue-btn .dossier-key-badge {
+  display: flex;
+  background-color: #2f241f;
+  color: #ffffff;
+  border-color: #ffeb3b;
+}
+
+.dossier-continue-btn .dossier-touch-badge {
+  display: none;
+  background-color: #2f241f;
+  color: #82b1ff;
+  border-color: #82b1ff;
+}
+
 @media (max-width: 1366px), (pointer: coarse) {
   .help-content-wrap {
     max-width: 100%;
@@ -184,6 +198,14 @@
   }
 
   .help-col-touch {
+    display: flex;
+  }
+
+  .dossier-continue-btn .dossier-key-badge {
+    display: none;
+  }
+
+  .dossier-continue-btn .dossier-touch-badge {
     display: flex;
   }
 
